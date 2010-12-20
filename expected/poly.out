@@ -1,3 +1,9 @@
+\set ECHO none
+ set_sphere_output_precision 
+-----------------------------
+ SET 8
+(1 row)
+
 -- checking polygon operators
 \set poly 'spoly \'{(0.1,0),(0.2,0),(0.2,0.1),(0.3,0.1),(0.3,-0.1),(0.4,-0.1),(0.5,0.1),(0.4,0.2),(0.1,0.2)}\''
 SELECT spoint   '(0.15,0.10)' @ :poly;                  -- point inside polygon
@@ -1698,9 +1704,9 @@ SELECT sellipse '<{5d,2d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-18d)
 
 -- create polygon as aggregate
 SELECT spoly(data.p) FROM ( SELECT spoint '(0,1)' as p UNION ALL SELECT spoint '(1,1)' UNION ALL SELECT '(1,0)' ) AS data ;
-                                            spoly                                            
----------------------------------------------------------------------------------------------
- {(0d , 57.2957795130823d),(57.2957795130823d , 57.2957795130823d),(57.2957795130823d , 0d)}
+                            spoly                            
+-------------------------------------------------------------
+ {(0d , 57.29578d),(57.29578d , 57.29578d),(57.29578d , 0d)}
 (1 row)
 
 -- test stored data
