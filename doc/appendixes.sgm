@@ -2,7 +2,7 @@
       <title>
         Appendixes
       </title>
-      <sect2 id="appendixes.changelog">
+      <sect2 id="appendixes.changelog-1-1">
         <title>
           Changes from version 1.0 to 1.1
         </title>
@@ -24,7 +24,7 @@
           </listitem>
         </itemizedlist>
       </sect2>
-      <sect2 id="appendixes.changelog">
+      <sect2 id="appendixes.changelog-1-2">
         <title>
           Changes from version 1.1 to 1.2
         </title>
