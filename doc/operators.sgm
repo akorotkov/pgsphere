@@ -394,7 +394,7 @@
                 is undefined. 
             </para>
             <example>
-              <title>Return length and Check if north pole on <type>sline</type>s</title>
+              <title>Return length and check if north pole on <type>sline</type>s</title>
               <programlisting>
 <![CDATA[sql> SELECT set_sphere_output('DEG');]]>
 <![CDATA[ set_sphere_output ]]>

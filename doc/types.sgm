@@ -350,30 +350,33 @@ i             syntax is a somewhat complex.
               is :
             </para>
             <synopsis>( euler ), length</synopsis>
-            <itemizedlist>
-            <title>Note:</title>
-              <listitem>
-                  <para>
-                    For a simpler line input, use casting
-                    operators (<xref linkend="op.casting"/>) or constructor
-                    functions (<xref linkend="construct"/>).
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>
-                      If the length is larger than 360&deg;, the line length
-                      is truncated to 360&deg;.
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>
-                      The transformation <parameter>euler</parameter>
-                      will always be converted to a Euler
-                      transformation using axes <literal>Z</literal>,
-                      <literal>X</literal>, and <literal>Z</literal>.
-                  </para>
-              </listitem>
-            </itemizedlist>
+            <note>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                      <para>
+                        For a simpler line input, use casting
+                        operators (<xref linkend="op.casting"/>) or constructor
+                        functions (<xref linkend="construct"/>).
+                      </para>
+                  </listitem>
+                  <listitem>
+                      <para>
+                          If the length is larger than 360&deg;, the line length
+                          is truncated to 360&deg;.
+                      </para>
+                  </listitem>
+                  <listitem>
+                      <para>
+                          The transformation <parameter>euler</parameter>
+                          will always be converted to a Euler
+                          transformation using axes <literal>Z</literal>,
+                          <literal>X</literal>, and <literal>Z</literal>.
+                      </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </note>
             <example>
               <title>A line input</title>
               <simpara>
@@ -454,32 +457,35 @@ i             syntax is a somewhat complex.
                 Hence, the input syntax is:
             </para>
             <synopsis>&lt; &lcub; rad_1, rad_2 &rcub;, center, pos &gt;</synopsis>
-            <itemizedlist>
-              <title>Note:</title>
-              <listitem>
-                  <para>
-                      The radii <parameter>rad_1</parameter> and
-                      <parameter>rad_2</parameter> have to be less than
-                      90&deg;.
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>
-                      If <parameter>rad_1</parameter> is less than
-                      <parameter>rad_2</parameter> , the values will be
-                      swapped.
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>
-                      The position angle <parameter>pos</parameter>
-                      is defined within
-                      <application>pgSphere</application> as a counterclockwise
-                      rotation around the ellipse center and is zero, if the
-                      ellipse is &ldquo;parallel to the equator&rdquo;
-                  </para>
-              </listitem>
-            </itemizedlist>
+            <note>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                      <para>
+                          The radii <parameter>rad_1</parameter> and
+                          <parameter>rad_2</parameter> have to be less than
+                          90&deg;.
+                      </para>
+                  </listitem>
+                  <listitem>
+                      <para>
+                          If <parameter>rad_1</parameter> is less than
+                          <parameter>rad_2</parameter> , the values will be
+                          swapped.
+                      </para>
+                  </listitem>
+                  <listitem>
+                      <para>
+                          The position angle <parameter>pos</parameter>
+                          is defined within
+                          <application>pgSphere</application> as a counterclockwise
+                          rotation around the ellipse center and is zero, if the
+                          ellipse is &ldquo;parallel to the equator&rdquo;
+                      </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </note>
             <example>
                <title>Input of a spherical ellipse</title>
                <simpara>
@@ -492,7 +498,6 @@ i             syntax is a somewhat complex.
                </programlisting>
             </example>
         </sect2>
-
 
         <sect2 id="dt.spath">
             <title>
@@ -524,20 +529,23 @@ i             syntax is a somewhat complex.
                 lists of positions. The input syntax is :
             </para>
             <synopsis>&lcub;pos1,pos2&lsqb;,pos3&lsqb;,pos4&lsqb;,...&rsqb;&rsqb;&rsqb;&rcub;</synopsis>
-            <itemizedlist>
-              <title>Note:</title>
-              <listitem>
-                  <para>
-                      The distance between 2 sequent positions has to be
-                      less than 180&deg; and greater than zero.
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>
-                      At least 2 positions are required. 
-                  </para>
-              </listitem>
-            </itemizedlist>
+            <note>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                      <para>
+                          The distance between 2 sequent positions has to be
+                          less than 180&deg; and greater than zero.
+                      </para>
+                  </listitem>
+                  <listitem>
+                      <para>
+                          At least 2 positions are required. 
+                      </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </note>
             <example>
               <title>Path input example</title>
               <simpara>
@@ -561,6 +569,8 @@ i             syntax is a somewhat complex.
                   <imagedata fileref="&graph1007;" width="142px" format="JPEG"/>
                 </imageobject>
               </mediaobject>
+            </para>
+            <para>
               A spherical polygon is a
               closed spherical path where line segments cannot be crossed.
               One main usage case are areas on the earth and sky sphere.
@@ -568,27 +578,30 @@ i             syntax is a somewhat complex.
               have the same input syntax as paths:
             </para>
             <synopsis>&lcub;pos1,pos2,pos3&lsqb;,pos4&lsqb;,... &rsqb;&rsqb;&rcub;</synopsis>
-            <itemizedlist>
-              <title>Note:</title>
-              <listitem>
-                  <para>
-                      A spherical polygon has the same restrictions as a
-                      spherical path (see <xref linkend="dt.spath" />).
-                      Except that a polygon needs at least 3 positions.
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>
-                      The line segments can not be crossed. 
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>
-                      The maximum dimension of a polygon must be less than
-                      180&deg;.
-                  </para>
-              </listitem>
-            </itemizedlist>
+            <note>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                      <para>
+                          A spherical polygon has the same restrictions as a
+                          spherical path (see <xref linkend="dt.spath" />).
+                          Except that a polygon needs at least 3 positions.
+                      </para>
+                  </listitem>
+                  <listitem>
+                      <para>
+                          The line segments can not be crossed. 
+                      </para>
+                  </listitem>
+                  <listitem>
+                      <para>
+                          The maximum dimension of a polygon must be less than
+                          180&deg;.
+                      </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </note>
             <example>
               <title>Input of polygon</title>
               <simpara>
@@ -612,6 +625,8 @@ i             syntax is a somewhat complex.
                   <imagedata fileref="&graph1008;" width="142px" format="JPEG"/>
                 </imageobject>
               </mediaobject>
+            </para>
+            <para>
               A spherical box is a
               coordinates range. Hence, you can select objects within a
               longitude range and latitude range. The box is represented
@@ -623,24 +638,27 @@ i             syntax is a somewhat complex.
             <synopsis>( pos_sw, pos_ne )</synopsis>
             <para>or</para>
             <synopsis>pos_sw, pos_ne</synopsis>
-            <itemizedlist>
-              <title>Note:</title>
-              <listitem>
-                <para>
-                  If the latitude of the southwest edge is larger than
-                  the latitude of the northeast edge,
-                  <application>pgSphere</application> swaps the edges.
-                </para>
-              </listitem>
-              <listitem>
-                <para>
-                  If the longitude of the southwest edge is equal to
-                  the longitude of the northeast edge,
-                  <application>pgSphere</application> assumes a full latitude
-                  range, except that the latitudes are equal, too.
-                </para>
-              </listitem>
-            </itemizedlist>
+            <note>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      If the latitude of the southwest edge is larger than
+                      the latitude of the northeast edge,
+                      <application>pgSphere</application> swaps the edges.
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      If the longitude of the southwest edge is equal to
+                      the longitude of the northeast edge,
+                      <application>pgSphere</application> assumes a full latitude
+                      range, except that the latitudes are equal, too.
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </note>
             <example>
               <title>
                 Input of a full latitude range
