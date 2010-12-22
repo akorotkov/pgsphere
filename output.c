@@ -570,7 +570,6 @@ Datum
 pg_sphere_version(PG_FUNCTION_ARGS)
 {
 	char	   *buffer = (char *) palloc(20);
-
-	sprintf(buffer, "1.1.1pre2");
+	sprintf(buffer, "1.2.0");
 	PG_RETURN_CSTRING(buffer);
 }

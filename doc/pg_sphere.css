@@ -109,10 +109,6 @@ p, ol, ul, li {
   line-height: 1.5em;
 }
 
-.function {
-  font-size: 100%;
-}
-
 table.CALSTABLE {
   width: 50%;
 }
@@ -165,7 +161,9 @@ blockquote.tip
 
 
 .literal,
-.parameter
+.parameter,
+.funcsynopsis,
+.function
 {
   font-size: 130%;
 }
