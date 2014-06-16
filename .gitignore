@@ -1,0 +1,6 @@
+*.o
+*.so
+*.sql
+results
+regression.out
+regression.diffs

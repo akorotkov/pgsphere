@@ -1,0 +1,19 @@
+-- indexed operations.....
+-- spoint_data and scircle_data tables have to be created and indexed using
+\! testsuite/gen_point.pl 1 > results/gen_point_1.sql
+\i results/gen_point_1.sql
+CREATE TABLE spoint_data (sp spoint);
+COPY spoint_data (sp) FROM stdin;
+CREATE INDEX sp_idx ON spoint_data USING gist (sp);
+-- and
+\! testsuite/gen_circle.pl 1 0.1 > results/gen_circle_1_0.1.sql
+\i results/gen_circle_1_0.1.sql
+CREATE TABLE scircle_data (sc scircle);
+COPY scircle_data (sc) FROM stdin;
+CREATE INDEX sc_idx ON scircle_data USING gist (sc);
+--
+\! testsuite/gen_poly.pl 1 0.1 4 > results/gen_poly_1_0.1_4.sql
+\i results/gen_poly_1_0.1_4.sql
+CREATE TABLE spoly_data (sp spoly);
+COPY spoly_data (sp) FROM stdin;
+CREATE INDEX spl_idx ON spoly_data USING gist (sp);

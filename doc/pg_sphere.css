@@ -1,0 +1,133 @@
+/* PostgreSQL.org Documentation Style */
+
+
+body {
+margin: 1em;
+padding: 1em;
+font-size: 85%;
+font-family: verdana, sans-serif;
+color: #000;
+background-color: #fff;
+}
+
+h1 {
+font-size: 1.4em;
+font-weight: bold;
+margin-top: 0em;
+margin-bottom: 0em;
+}
+
+h2 {
+font-size: 1.2em;
+margin: 1.2em 0em 1.2em 0em;
+font-weight: bold;
+}
+
+h3 {
+font-size: 1.0em;
+margin: 1.2em 0em 1.2em 0em;
+font-weight: bold;
+}
+
+h4 {
+font-size: 0.95em;
+margin: 1.2em 0em 1.2em 0em;
+font-weight: normal;
+}
+
+h5 {
+font-size: 0.9em;
+margin: 1.2em 0em 1.2em 0em;
+font-weight: normal;
+}
+
+h6 {
+font-size: 0.85em;
+margin: 1.2em 0em 1.2em 0em;
+font-weight: normal;
+}
+
+img {
+border: 0;
+}
+
+ol, ul, li {
+font-size: 1.0em;
+line-height: 1.2em;
+margin-top: 0.2em;
+margin-bottom: 0.1em; 
+}
+
+p {
+font-size: 1.2em;
+line-height: 1.2em;
+margin: 1.2em 0em 1.2em 0em;
+}
+
+li > p {
+margin-top: 0.2em;
+}
+
+pre {
+font-family: monospace;
+font-size: 1.2em;
+margin:0em;
+}
+
+strong, b {
+font-weight: bold;
+}
+
+h1 {
+  font-weight: bold; 
+  color: #EC5800; 
+  font-size: 1.4em;
+}
+
+h2 {
+  font-weight: bold; 
+  color: #666; 
+  font-size: 1.2em;
+}
+
+h3 { 
+  font-weight: bold; 
+  color: #666; 
+  font-size: 1.1em;
+}
+
+h4 { 
+color: #666; 
+}
+
+
+/* Text Styles */
+
+.txtCurrentLocation {
+  font-weight: bold;
+}
+
+p, ol, ul, li {
+  line-height: 1.5em;
+}
+
+
+
+.function {
+  font-size: 100%;
+}
+
+table.CALSTABLE {
+  width: 50%;
+}
+
+table.CALSTABLE td {
+  vertical-align : top;
+}
+
+/* Link Styles */
+
+a:link                          { color:#0066A2; text-decoration: underline; }
+a:visited                       { color:#004E66; text-decoration: underline; }
+a:active                        { color:#0066A2; text-decoration: underline; }
+a:hover                         { color:#000000; text-decoration: underline; }

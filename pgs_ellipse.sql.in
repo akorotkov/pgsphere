@@ -1,0 +1,1067 @@
+-- ****************************
+--
+-- spherical ellipse functions
+--
+-- ****************************
+
+
+CREATE FUNCTION sellipse(spoint,float8,float8,float8)
+   RETURNS sellipse
+   AS 'MODULE_PATHNAME' , 'sphereellipse_infunc'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION sellipse(spoint,float8,float8,float8) IS
+  'returns spherical ellipse from center, radius1, radius2 and inclination'; 
+
+CREATE FUNCTION inc(sellipse)
+   RETURNS float8
+   AS 'MODULE_PATHNAME' , 'sphereellipse_incl'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION inc(sellipse) IS
+  'inclination of spherical ellipse'; 
+
+CREATE FUNCTION lrad(sellipse)
+   RETURNS float8
+   AS 'MODULE_PATHNAME' , 'sphereellipse_rad1'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION lrad(sellipse) IS
+  'large radius of spherical ellipse'; 
+
+CREATE FUNCTION srad(sellipse)
+   RETURNS float8
+   AS 'MODULE_PATHNAME' , 'sphereellipse_rad2'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION srad(sellipse) IS
+  'small radius of spherical ellipse'; 
+
+
+
+--
+-- Casting point as ellipse
+--
+
+CREATE FUNCTION sellipse(spoint)
+   RETURNS sellipse
+   AS 'MODULE_PATHNAME' , 'spherepoint_ellipse'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION sellipse(spoint) IS
+  'returns spherical point as spherical ellipse'; 
+
+CREATE CAST (spoint AS sellipse)
+    WITH FUNCTION sellipse(spoint)
+    AS IMPLICIT;
+
+
+--
+-- Casting ellipse as circle
+--
+
+CREATE FUNCTION scircle(sellipse)
+   RETURNS scircle
+   AS 'MODULE_PATHNAME' , 'sphereellipse_circle'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION scircle(sellipse) IS
+  'spherical bounding circle of spherical ellipse'; 
+
+CREATE CAST (sellipse AS scircle)
+    WITH FUNCTION scircle(sellipse)
+    AS IMPLICIT;
+
+--
+-- Casting circle as ellipse
+--
+
+CREATE FUNCTION sellipse(scircle)
+   RETURNS sellipse
+   AS 'MODULE_PATHNAME' , 'spherecircle_ellipse'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION sellipse(scircle) IS
+  'returns spherical circle as spherical ellipse'; 
+
+CREATE CAST (scircle AS sellipse)
+    WITH FUNCTION sellipse(scircle)
+    AS IMPLICIT;
+
+--
+-- Casting ellipse as Euler transformation
+--
+
+CREATE FUNCTION strans(sellipse)
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'sphereellipse_trans'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans(sellipse) IS
+  'returns Euler transformation of spherical ellipse'; 
+
+CREATE CAST (sellipse AS strans)
+    WITH FUNCTION strans(sellipse)
+    AS IMPLICIT;
+
+
+
+
+
+-- ****************************
+--
+-- spherical ellipse operators
+--
+-- ****************************
+
+
+CREATE FUNCTION center(sellipse)
+   RETURNS spoint
+   AS 'MODULE_PATHNAME' , 'sphereellipse_center'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION center(sellipse) IS
+  'center of spherical ellipse'; 
+
+
+CREATE OPERATOR @@ (
+   RIGHTARG   = sellipse,
+   PROCEDURE  = center
+);
+
+COMMENT ON OPERATOR @@ ( NONE , sellipse ) IS
+  'center of spherical ellipse';
+
+--
+-- equal
+--
+
+CREATE FUNCTION sellipse_equal(sellipse,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_equal'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT ;
+
+COMMENT ON FUNCTION sellipse_equal(sellipse,sellipse) IS
+  'returns true, if spherical ellipses are equal';
+
+CREATE OPERATOR  = (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   COMMUTATOR = = ,
+   NEGATOR    = <>,
+   PROCEDURE  = sellipse_equal,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR = ( sellipse, sellipse ) IS
+  'true, if spherical ellipses are equal';
+
+
+
+--
+-- not equal
+--
+  
+CREATE FUNCTION sellipse_equal_neg(sellipse,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_equal_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT ;
+
+COMMENT ON FUNCTION sellipse_equal_neg(sellipse,sellipse) IS
+  'returns true, if spherical ellipses are not equal';    
+
+CREATE OPERATOR  <> (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   COMMUTATOR = <>,
+   NEGATOR    = = ,
+   PROCEDURE  = sellipse_equal_neg,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR <> ( sellipse, sellipse ) IS
+  'true, if spherical ellipses are not equal'; 
+
+
+--
+-- ellipse contains ellipse
+--
+
+CREATE FUNCTION sellipse_contains_ellipse(sellipse,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_ellipse'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_ellipse(sellipse,sellipse) IS
+  'true if spherical ellipse contains spherical ellipse '; 
+
+
+CREATE OPERATOR ~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_ellipse,
+   COMMUTATOR = '@',
+   NEGATOR    = '!~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR ~ ( sellipse, sellipse ) IS
+  'true if spherical ellipse contains spherical ellipse'; 
+
+
+--
+-- ellipse is contained by ellipse
+--
+
+CREATE FUNCTION sellipse_contains_ellipse_com(sellipse, sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_ellipse_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_ellipse_com(sellipse, sellipse) IS
+  'true if spherical ellipse is contained by spherical ellipse '; 
+
+
+CREATE OPERATOR @ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_ellipse_com,
+   COMMUTATOR = '~',
+   NEGATOR    = '!@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR @ ( sellipse, sellipse ) IS
+  'true if spherical ellipse is contained by spherical ellipse'; 
+
+--
+-- ellipse does not contain ellipse
+--
+
+CREATE FUNCTION sellipse_contains_ellipse_neg(sellipse,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_ellipse_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_ellipse_neg(sellipse,sellipse) IS
+  'true if spherical ellipse does not contain spherical ellipse '; 
+
+
+CREATE OPERATOR !~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_ellipse_neg,
+   COMMUTATOR = '!@',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !~ ( sellipse, sellipse ) IS
+  'true if spherical ellipse does not contain spherical ellipse'; 
+
+
+--
+-- ellipse is not contained by ellipse
+--
+
+CREATE FUNCTION sellipse_contains_ellipse_com_neg(sellipse, sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_ellipse_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_ellipse_com_neg(sellipse, sellipse) IS
+  'true if spherical ellipse is not contained by spherical ellipse '; 
+
+
+CREATE OPERATOR !@ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_ellipse_com_neg,
+   COMMUTATOR = '!~',
+   NEGATOR    = '@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !@ ( sellipse, sellipse ) IS
+  'true if spherical ellipse is not contained by spherical ellipse'; 
+
+
+--
+-- ellipses overlap
+--
+
+CREATE FUNCTION sellipse_overlap_ellipse(sellipse,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_ellipse'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION  sellipse_overlap_ellipse(sellipse,sellipse) IS
+  'true if spherical ellipse overlaps spherical ellipse '; 
+
+
+CREATE OPERATOR && (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_overlap_ellipse,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR && ( sellipse, sellipse ) IS
+  'true if spherical ellipses overlap '; 
+
+--
+-- ellipses do not overlap
+--
+
+CREATE FUNCTION sellipse_overlap_ellipse_neg(sellipse,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_ellipse_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION  sellipse_overlap_ellipse_neg(sellipse,sellipse) IS
+  'true if spherical ellipse does not overlap spherical ellipse'; 
+
+
+CREATE OPERATOR !&& (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_overlap_ellipse_neg,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !&& ( sellipse, sellipse ) IS
+  'true if spherical ellipse does not overlap spherical ellipse'; 
+
+
+--
+-- ellipse contains point
+--
+
+CREATE FUNCTION sellipse_contains_point(sellipse,spoint)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_point'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_point(sellipse, spoint) IS
+  'true if spherical ellipse contains spherical point '; 
+
+CREATE OPERATOR ~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = spoint,
+   PROCEDURE  = sellipse_contains_point,
+   COMMUTATOR = '@',
+   NEGATOR    = '!~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR ~ ( sellipse, spoint ) IS
+  'true if spherical ellipse contains spherical point '; 
+
+--
+--  point is contained by ellipse
+--
+
+CREATE FUNCTION sellipse_contains_point_com(spoint,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_point_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_point_com(spoint, sellipse) IS
+  'true if spherical ellipse contains spherical point '; 
+
+
+CREATE OPERATOR @ (
+   LEFTARG    = spoint,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_point_com,
+   COMMUTATOR = '~',
+   NEGATOR    = '!@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR @ ( spoint, sellipse ) IS
+  'true if spherical ellipse contains spherical point '; 
+
+--
+-- ellipse does not contain point
+--
+
+CREATE FUNCTION sellipse_contains_point_neg(sellipse,spoint)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_point_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_point_neg(sellipse, spoint) IS
+  'true if spherical ellipse contains spherical point '; 
+
+CREATE OPERATOR !~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = spoint,
+   PROCEDURE  = sellipse_contains_point_neg,
+   COMMUTATOR = '!@',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !~ ( sellipse, spoint ) IS
+  'true if spherical ellipse does not contain spherical point'; 
+
+--
+--  point is not contained by ellipse
+--
+
+CREATE FUNCTION sellipse_contains_point_com_neg(spoint,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_point_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_point_com_neg(spoint, sellipse) IS
+  'true if spherical ellipse contains spherical point '; 
+
+
+CREATE OPERATOR !@ (
+   LEFTARG    = spoint,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_point_com_neg,
+   COMMUTATOR = '!~',
+   NEGATOR    = '@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !@ ( spoint, sellipse ) IS
+  'true if spherical ellipse does not contain spherical point'; 
+
+
+--
+-- Transformation of ellipse
+--
+
+
+CREATE FUNCTION strans_ellipse( sellipse, strans )
+   RETURNS sellipse
+   AS 'MODULE_PATHNAME' , 'spheretrans_ellipse'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_ellipse ( sellipse, strans ) IS
+  'returns a transformated spherical ellipse'; 
+
+CREATE OPERATOR + (
+   LEFTARG    = sellipse,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_ellipse
+);
+
+COMMENT ON OPERATOR + ( sellipse, strans ) IS
+  'transforms a spherical ellipse '; 
+
+CREATE FUNCTION strans_ellipse_inverse ( sellipse, strans )
+   RETURNS sellipse
+   AS 'MODULE_PATHNAME' , 'spheretrans_ellipse_inv'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_ellipse_inverse ( sellipse, strans ) IS
+  'returns a inverse transformated spherical ellipse'; 
+
+CREATE OPERATOR - (
+   LEFTARG    = sellipse,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_ellipse_inverse
+);
+
+COMMENT ON OPERATOR - ( sellipse, strans ) IS
+  'transforms inverse a spherical ellipse '; 
+
+
+--
+-- ellipse contains circle
+--
+
+CREATE FUNCTION sellipse_contains_circle(sellipse,scircle)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_circle'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_circle(sellipse,scircle) IS
+  'true if spherical ellipse contains spherical circle ';
+
+
+CREATE OPERATOR ~ (    
+   LEFTARG    = sellipse,  
+   RIGHTARG   = scircle,
+   PROCEDURE  = sellipse_contains_circle,
+   COMMUTATOR = '@',       
+   NEGATOR    = '!~',     
+   RESTRICT   = contsel,   
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR ~ ( sellipse, scircle ) IS
+  'true if spherical ellipse contains spherical circle';
+
+--
+-- circle is contained by ellipse
+--
+
+CREATE FUNCTION sellipse_contains_circle_com(scircle, sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_circle_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_circle_com(scircle, sellipse) IS
+  'true if spherical ellipse contains spherical circle '; 
+
+
+CREATE OPERATOR @ (
+   LEFTARG    = scircle,
+   RIGHTARG   = sellipse,  
+   PROCEDURE  = sellipse_contains_circle_com,
+   COMMUTATOR = '~',
+   NEGATOR    = '!@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR @ ( scircle, sellipse ) IS
+  'true if spherical ellipse contains spherical circle';
+
+  
+--
+-- ellipse does not contain circle
+--
+  
+CREATE FUNCTION sellipse_contains_circle_neg(sellipse,scircle)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_circle_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_circle_neg(sellipse,scircle) IS
+  'true if spherical ellipse does not contain spherical circle ';
+
+
+CREATE OPERATOR !~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = scircle,
+   PROCEDURE  = sellipse_contains_circle_neg,
+   COMMUTATOR = '!@',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR !~ ( sellipse, scircle ) IS
+  'true if spherical ellipse does not contain spherical circle';
+
+--
+-- circle is not contained by ellipse
+--
+  
+CREATE FUNCTION sellipse_contains_circle_com_neg(scircle, sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_circle_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_circle_com_neg(scircle, sellipse) IS
+  'true if spherical ellipse does not contain spherical circle ';   
+
+
+CREATE OPERATOR !@ (
+   LEFTARG    = scircle,
+   RIGHTARG   = sellipse,  
+   PROCEDURE  = sellipse_contains_circle_com_neg,
+   COMMUTATOR = '!~',
+   NEGATOR    = '@',  
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR !@ ( scircle, sellipse ) IS
+  'true if spherical ellipse does not contain spherical circle';
+
+--
+-- circle contains ellipse
+--
+  
+CREATE FUNCTION scircle_contains_ellipse(scircle,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_ellipse'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_ellipse(scircle,sellipse) IS
+  'true if spherical circle contains spherical ellipse '; 
+
+
+CREATE OPERATOR ~ (
+   LEFTARG    = scircle,
+   RIGHTARG   = sellipse,  
+   PROCEDURE  = scircle_contains_ellipse,
+   COMMUTATOR = '@',
+   NEGATOR    = '!~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR ~ ( scircle, sellipse ) IS
+  'true if spherical circle contains spherical ellipse';
+
+
+--
+-- ellipse is contained by circle
+--
+  
+CREATE FUNCTION scircle_contains_ellipse_com(sellipse, scircle)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_ellipse_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_ellipse_com(sellipse, scircle) IS
+  'true if spherical circle contains spherical ellipse '; 
+
+
+CREATE OPERATOR @ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = scircle,
+   PROCEDURE  = scircle_contains_ellipse_com,
+   COMMUTATOR = '~',
+   NEGATOR    = '!@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR @ ( sellipse, scircle ) IS
+  'true if spherical circle contains spherical ellipse';
+
+--
+-- circle does not contain ellipse
+--
+  
+CREATE FUNCTION scircle_contains_ellipse_neg(scircle,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_ellipse_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_ellipse_neg(scircle,sellipse) IS
+  'true if spherical circle does not contain spherical ellipse '; 
+
+
+CREATE OPERATOR !~ (
+   LEFTARG    = scircle,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = scircle_contains_ellipse_neg,
+   COMMUTATOR = '!@',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR !~ ( scircle, sellipse ) IS
+  'true if spherical circle does not contain spherical ellipse';
+
+--
+-- ellipse is not contained by circle
+--
+  
+CREATE FUNCTION scircle_contains_ellipse_com_neg(sellipse, scircle)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_ellipse_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_ellipse_com_neg(sellipse, scircle) IS
+  'true if spherical circle does not contain spherical ellipse '; 
+
+
+CREATE OPERATOR !@ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = scircle,
+   PROCEDURE  = scircle_contains_ellipse_com_neg,
+   COMMUTATOR = '!~',
+   NEGATOR    = '@',  
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR !@ ( sellipse, scircle ) IS
+  'true if spherical circle does not contain spherical ellipse';
+
+--
+-- circle overlaps ellipse
+--
+  
+CREATE FUNCTION sellipse_overlap_circle(sellipse,scircle)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_circle'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_overlap_circle(sellipse,scircle) IS
+  'true if spherical circle overlap spherical ellipse ';  
+
+
+CREATE OPERATOR && (
+   LEFTARG    = sellipse,
+   RIGHTARG   = scircle,
+   PROCEDURE  = sellipse_overlap_circle,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR && ( sellipse, scircle ) IS
+  'true if spherical circle overlap spherical ellipse';
+
+
+--
+-- ellipse overlaps circle
+--
+  
+CREATE FUNCTION sellipse_overlap_circle_com(scircle,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_circle_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION  sellipse_overlap_circle_com(scircle,sellipse) IS
+  'true if spherical circle overlap spherical ellipse '; 
+
+
+CREATE OPERATOR && (
+   LEFTARG    = scircle,
+   RIGHTARG   = sellipse,  
+   PROCEDURE  = sellipse_overlap_circle_com,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR && ( scircle, sellipse ) IS
+  'true if spherical circle overlap spherical ellipse';
+
+--
+-- circle does not overlap ellipse
+--
+  
+CREATE FUNCTION sellipse_overlap_circle_neg(sellipse,scircle)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_circle_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION  sellipse_overlap_circle_neg(sellipse,scircle) IS
+  'true if spherical circle does not overlap spherical ellipse ';
+
+
+CREATE OPERATOR !&& (
+   LEFTARG    = sellipse,
+   RIGHTARG   = scircle,
+   PROCEDURE  = sellipse_overlap_circle_neg,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&', 
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+  
+COMMENT ON OPERATOR !&& ( sellipse, scircle ) IS
+  'true if spherical circle does not overlap spherical ellipse';
+
+
+--
+-- ellipse does not overlap circle
+--
+  
+CREATE FUNCTION sellipse_overlap_circle_com_neg(scircle,sellipse)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_circle_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION  sellipse_overlap_circle_com_neg(scircle,sellipse) IS
+  'true if spherical circle does not overlap spherical ellipse ';  
+
+
+CREATE OPERATOR !&& (
+   LEFTARG    = scircle,
+   RIGHTARG   = sellipse,  
+   PROCEDURE  = sellipse_overlap_circle_com_neg,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&', 
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR !&& ( scircle, sellipse ) IS
+  'true if spherical circle does not overlap spherical ellipse';
+
+
+
+
+--
+-- ellipse overlaps line
+--
+
+CREATE FUNCTION sellipse_overlap_line ( sellipse, sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_line'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_overlap_line ( sellipse, sline ) IS
+  'returns true if spherical line overlaps spherical ellipse'; 
+
+
+CREATE OPERATOR && (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sline,
+   PROCEDURE  = sellipse_overlap_line,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&' ,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR && ( sellipse, sline ) IS
+  'true if spherical line overlaps spherical ellipse'; 
+
+--
+-- line overlaps ellipse    
+--
+
+CREATE FUNCTION sellipse_overlap_line_com( sline , sellipse )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_line_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_overlap_line_com( sline , sellipse ) IS
+  'returns true if spherical line overlaps spherical ellipse'; 
+
+
+CREATE OPERATOR && (
+   LEFTARG    = sline,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_overlap_line_com,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&' ,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR && ( sline, sellipse ) IS
+  'true if spherical line overlaps spherical ellipse'; 
+
+
+--
+-- ellipse does not overlap line
+--
+
+CREATE FUNCTION sellipse_overlap_line_neg ( sellipse, sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_line_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_overlap_line_neg ( sellipse, sline ) IS
+  'returns true if spherical line overlaps spherical ellipse'; 
+
+
+CREATE OPERATOR !&& (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sline,
+   PROCEDURE  = sellipse_overlap_line_neg,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&' ,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR !&& ( sellipse, sline ) IS
+  'true if spherical line does not overlap spherical ellipse'; 
+
+--
+-- line does not overlap ellipse    
+--
+
+CREATE FUNCTION sellipse_overlap_line_com_neg( sline , sellipse )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_line_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_overlap_line_com_neg( sline , sellipse ) IS
+  'returns true if spherical line does not overlap spherical ellipse'; 
+
+
+CREATE OPERATOR !&& (
+   LEFTARG    = sline,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_overlap_line_com_neg,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&' ,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR !&& ( sline, sellipse ) IS
+  'true if spherical line does not overlap spherical ellipse'; 
+
+
+--
+-- ellipse contains line
+--
+
+
+CREATE FUNCTION sellipse_contains_line( sellipse , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_line'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_line( sellipse , sline ) IS
+  'returns true if spherical ellipse contains spherical line'; 
+
+
+CREATE OPERATOR ~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sline,
+   PROCEDURE  = sellipse_contains_line,
+   COMMUTATOR = '@',
+   NEGATOR    = '!~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR ~ ( sellipse, sline ) IS
+  'true if spherical ellipse contains spherical line'; 
+
+
+--
+-- line is contained by ellipse
+--
+
+
+CREATE FUNCTION sellipse_contains_line_com( sline , sellipse )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_line_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_line_com( sline , sellipse ) IS
+  'returns true if spherical ellipse contains spherical line'; 
+
+CREATE OPERATOR @ (
+   LEFTARG    = sline,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_line_com,
+   COMMUTATOR = '~',
+   NEGATOR    = '!@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR @ ( sline, sellipse ) IS
+  'true if spherical ellipse contains spherical line'; 
+
+
+--
+-- ellipse does not contain line
+--
+
+CREATE FUNCTION sellipse_contains_line_neg( sellipse , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_line_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_line_neg( sellipse , sline ) IS
+  'returns true if spherical ellipse does not contain spherical line'; 
+
+
+CREATE OPERATOR !~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = sline,
+   PROCEDURE  = sellipse_contains_line_neg,
+   COMMUTATOR = '!@',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !~ ( sellipse, sline ) IS
+  'true if spherical ellipse does not contain spherical line'; 
+
+
+--
+-- line is not contained by ellipse
+--
+
+
+CREATE FUNCTION sellipse_contains_line_com_neg( sline , sellipse )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_line_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sellipse_contains_line_com_neg( sline , sellipse ) IS
+  'returns true if spherical ellipse does not contain spherical line'; 
+
+
+CREATE OPERATOR !@ (
+   LEFTARG    = sline,
+   RIGHTARG   = sellipse,
+   PROCEDURE  = sellipse_contains_line_com_neg,
+   COMMUTATOR = '!~',
+   NEGATOR    = '@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !@ ( sline, sellipse ) IS
+  'true if spherical ellipse does not contain spherical line'; 
+

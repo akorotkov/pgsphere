@@ -1,0 +1,583 @@
+
+-- Spherical key definition'
+
+CREATE FUNCTION spherekey_in(CSTRING)
+   RETURNS spherekey
+   AS 'MODULE_PATHNAME'
+   LANGUAGE 'c'     
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION spherekey_out(spherekey)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME'
+   LANGUAGE 'c'   
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE spherekey (
+   internallength = 24,
+   input   = spherekey_in,
+   output  = spherekey_out
+);
+
+
+CREATE FUNCTION pointkey_in(CSTRING)
+   RETURNS pointkey
+   AS 'MODULE_PATHNAME', 'pointkey_in'
+   LANGUAGE 'c'     
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION pointkey_out(pointkey)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME', 'pointkey_out'
+   LANGUAGE 'c'   
+   WITH (isstrict,iscachable);
+
+CREATE FUNCTION pointkey_volume(pointkey)
+   RETURNS float8
+   AS 'MODULE_PATHNAME', 'pointkey_volume'
+   LANGUAGE 'c'   
+   WITH (isstrict,iscachable);
+
+CREATE FUNCTION pointkey_area(pointkey)
+   RETURNS float8
+   AS 'MODULE_PATHNAME', 'pointkey_area'
+   LANGUAGE 'c'   
+   WITH (isstrict,iscachable);
+
+CREATE FUNCTION pointkey_perimeter(pointkey)
+   RETURNS float8
+   AS 'MODULE_PATHNAME', 'pointkey_perimeter'
+   LANGUAGE 'c'   
+   WITH (isstrict,iscachable);
+
+CREATE TYPE pointkey (
+   input = pointkey_in,
+   output = pointkey_out,
+   internallength = -1,
+   ALIGNMENT = int4,
+   STORAGE = PLAIN
+);
+
+-- GIST common
+
+CREATE FUNCTION g_spherekey_decompress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spherekey_decompress'
+   LANGUAGE 'c';   
+
+CREATE FUNCTION g_spherekey_union(bytea, internal)
+   RETURNS spherekey
+   AS 'MODULE_PATHNAME' , 'g_spherekey_union'
+   LANGUAGE 'c';   
+
+CREATE FUNCTION g_spherekey_penalty (internal,internal,internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spherekey_penalty'
+   LANGUAGE 'c' with (isstrict);
+
+CREATE FUNCTION g_spherekey_picksplit(internal, internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spherekey_picksplit'
+   LANGUAGE 'c';
+
+CREATE FUNCTION g_spherekey_same (spherekey,spherekey,internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spherekey_same'
+   LANGUAGE 'c';
+
+
+
+-- create the operator class for spherical points
+
+CREATE FUNCTION g_spoint_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoint_compress'
+   LANGUAGE 'c';   
+
+
+--ifversion < v080400
+CREATE FUNCTION g_spoint_consistent(internal, internal, int4)
+--elseversion
+CREATE FUNCTION g_spoint_consistent(internal, internal, int4, oid, internal)
+--endifversion
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoint_consistent'
+   LANGUAGE 'c';   
+
+
+CREATE OPERATOR CLASS spoint
+   DEFAULT FOR TYPE spoint USING gist AS
+--ifversion < v080400
+   OPERATOR   1 = (spoint, spoint) RECHECK,
+   OPERATOR  11 @ (spoint, scircle) RECHECK,
+   OPERATOR  12 @ (spoint, sline) RECHECK,
+   OPERATOR  13 @ (spoint, spath) RECHECK,
+   OPERATOR  14 @ (spoint, spoly) RECHECK,
+   OPERATOR  15 @ (spoint, sellipse) RECHECK,
+   OPERATOR  16 @ (spoint, sbox) RECHECK,
+   FUNCTION  1 g_spoint_consistent (internal, internal, int4),
+--elseversion
+   OPERATOR   1 = (spoint, spoint),
+   OPERATOR  11 @ (spoint, scircle),
+   OPERATOR  12 @ (spoint, sline),
+   OPERATOR  13 @ (spoint, spath),
+   OPERATOR  14 @ (spoint, spoly),
+   OPERATOR  15 @ (spoint, sellipse),
+   OPERATOR  16 @ (spoint, sbox),
+   FUNCTION  1 g_spoint_consistent (internal, internal, int4, oid, internal),
+--endifversion
+   FUNCTION  2 g_spherekey_union (bytea, internal),
+   FUNCTION  3 g_spoint_compress (internal),
+   FUNCTION  4 g_spherekey_decompress (internal),
+   FUNCTION  5 g_spherekey_penalty (internal, internal, internal),
+   FUNCTION  6 g_spherekey_picksplit (internal, internal),
+   FUNCTION  7 g_spherekey_same (spherekey, spherekey, internal),
+   STORAGE   spherekey;
+
+-- create the next generation operator class for spherical points
+
+CREATE FUNCTION g_spoint2_union(bytea, internal)
+   RETURNS spherekey
+   AS 'MODULE_PATHNAME' , 'g_spoint2_union'
+   LANGUAGE 'c';   
+
+CREATE FUNCTION g_spoint2_penalty (internal, internal, internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoint2_penalty'
+   LANGUAGE 'c' with (isstrict);
+
+CREATE FUNCTION g_spoint2_picksplit(internal, internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoint2_picksplit'
+   LANGUAGE 'c';
+
+CREATE FUNCTION g_spoint2_same (bytea, bytea, internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoint2_same'
+   LANGUAGE 'c';
+
+CREATE FUNCTION g_spoint2_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoint2_compress'
+   LANGUAGE 'c';   
+
+CREATE FUNCTION g_spoint2_consistent(internal, internal, int4, oid, internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoint2_consistent'
+   LANGUAGE 'c';   
+
+CREATE FUNCTION g_spoint2_distance(internal, internal, int4, oid)
+   RETURNS float8
+   AS 'MODULE_PATHNAME' , 'g_spoint2_distance'
+   LANGUAGE 'c';   
+
+CREATE OPERATOR CLASS spoint2
+   FOR TYPE spoint USING gist AS
+   OPERATOR   1 = (spoint, spoint),
+   OPERATOR  11 @ (spoint, scircle),
+   OPERATOR  12 @ (spoint, sline),
+   OPERATOR  13 @ (spoint, spath),
+   OPERATOR  14 @ (spoint, spoly),
+   OPERATOR  15 @ (spoint, sellipse),
+   OPERATOR  16 @ (spoint, sbox),
+   OPERATOR  100 <-> (spoint, spoint) FOR ORDER BY float_ops,
+   FUNCTION  1 g_spoint2_consistent (internal, internal, int4, oid, internal),
+   FUNCTION  2 g_spoint2_union (bytea, internal),
+   FUNCTION  3 g_spoint2_compress (internal),
+   FUNCTION  4 g_spherekey_decompress (internal),
+   FUNCTION  5 g_spoint2_penalty (internal, internal, internal),
+   FUNCTION  6 g_spoint2_picksplit (internal, internal),
+   FUNCTION  7 g_spoint2_same (bytea, bytea, internal),
+   FUNCTION  8 g_spoint2_distance (internal, internal, int4, oid),
+   STORAGE   pointkey;
+
+-- create the operator class for spherical circle
+
+CREATE FUNCTION g_scircle_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_scircle_compress'
+   LANGUAGE 'c';   
+
+
+--ifversion < v080400
+CREATE FUNCTION g_scircle_consistent(internal, internal, int4)
+--elseversion
+CREATE FUNCTION g_scircle_consistent(internal, internal, int4, oid, internal)
+--endifversion
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_scircle_consistent'
+   LANGUAGE 'c';   
+
+CREATE OPERATOR CLASS scircle
+   DEFAULT FOR TYPE scircle USING gist AS
+--ifversion < v080400
+   OPERATOR   1 =  (scircle, scircle) RECHECK,
+   OPERATOR  11 @  (scircle, scircle) RECHECK,
+   OPERATOR  12 @  (scircle, spoly) RECHECK,
+   OPERATOR  13 @  (scircle, sellipse) RECHECK,
+   OPERATOR  14 @  (scircle, sbox) RECHECK,
+   OPERATOR  21 ~ (scircle, spoint) RECHECK,
+   OPERATOR  22 ~ (scircle, scircle) RECHECK,
+   OPERATOR  23 ~ (scircle, sline) RECHECK,
+   OPERATOR  24 ~ (scircle, spath) RECHECK,
+   OPERATOR  25 ~ (scircle, spoly) RECHECK,
+   OPERATOR  26 ~ (scircle, sellipse) RECHECK,
+   OPERATOR  27 ~ (scircle, sbox) RECHECK,
+   OPERATOR  31 && (scircle, scircle) RECHECK,
+   OPERATOR  32 && (scircle, sline) RECHECK,
+   OPERATOR  33 && (scircle, spath) RECHECK,
+   OPERATOR  34 && (scircle, spoly) RECHECK,
+   OPERATOR  35 && (scircle, sellipse) RECHECK,
+   OPERATOR  36 && (scircle, sbox) RECHECK,
+   FUNCTION  1 g_scircle_consistent (internal, internal, int4),
+--elseversion
+   OPERATOR   1 =  (scircle, scircle),
+   OPERATOR  11 @  (scircle, scircle),
+   OPERATOR  12 @  (scircle, spoly),
+   OPERATOR  13 @  (scircle, sellipse),
+   OPERATOR  14 @  (scircle, sbox),
+   OPERATOR  21 ~ (scircle, spoint),
+   OPERATOR  22 ~ (scircle, scircle),
+   OPERATOR  23 ~ (scircle, sline),
+   OPERATOR  24 ~ (scircle, spath),
+   OPERATOR  25 ~ (scircle, spoly),
+   OPERATOR  26 ~ (scircle, sellipse),
+   OPERATOR  27 ~ (scircle, sbox),
+   OPERATOR  31 && (scircle, scircle),
+   OPERATOR  32 && (scircle, sline),
+   OPERATOR  33 && (scircle, spath),
+   OPERATOR  34 && (scircle, spoly),
+   OPERATOR  35 && (scircle, sellipse),
+   OPERATOR  36 && (scircle, sbox),
+   FUNCTION  1 g_scircle_consistent (internal, internal, int4, oid, internal),
+--endifversion
+   FUNCTION  2 g_spherekey_union (bytea, internal),
+   FUNCTION  3 g_scircle_compress (internal),
+   FUNCTION  4 g_spherekey_decompress  (internal),
+   FUNCTION  5 g_spherekey_penalty   (internal, internal, internal),
+   FUNCTION  6 g_spherekey_picksplit (internal, internal),
+   FUNCTION  7 g_spherekey_same (spherekey, spherekey, internal),
+   STORAGE   spherekey;
+
+
+
+-- create the operator class for spherical line
+
+CREATE FUNCTION g_sline_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_sline_compress'
+   LANGUAGE 'c';   
+
+--ifversion < v080400
+CREATE FUNCTION g_sline_consistent(internal, internal, int4)
+--elseversion
+CREATE FUNCTION g_sline_consistent(internal, internal, int4, oid, internal)
+--endifversion
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_sline_consistent'
+   LANGUAGE 'c';
+
+
+CREATE OPERATOR CLASS sline
+   DEFAULT FOR TYPE sline USING gist AS
+--ifversion < v080400
+   OPERATOR   1 =  (sline, sline) RECHECK,
+   OPERATOR   2 #  (sline, sline) RECHECK,
+   OPERATOR  11 @  (sline, scircle) RECHECK,
+   OPERATOR  12 @  (sline, spoly) RECHECK,
+   OPERATOR  13 @  (sline, sellipse) RECHECK,
+   OPERATOR  14 @  (sline, sbox) RECHECK,
+   OPERATOR  21 ~ (sline, spoint) RECHECK,
+   OPERATOR  31 && (sline, scircle) RECHECK,
+   OPERATOR  32 && (sline, sline) RECHECK,
+   OPERATOR  33 && (sline, spath) RECHECK,
+   OPERATOR  34 && (sline, spoly) RECHECK,
+   OPERATOR  35 && (sline, sellipse) RECHECK,
+   OPERATOR  36 && (sline, sbox) RECHECK,
+   FUNCTION  1 g_sline_consistent (internal, internal, int4),
+--elseversion
+   OPERATOR   1 =  (sline, sline),
+   OPERATOR   2 #  (sline, sline),
+   OPERATOR  11 @  (sline, scircle),
+   OPERATOR  12 @  (sline, spoly),
+   OPERATOR  13 @  (sline, sellipse),
+   OPERATOR  14 @  (sline, sbox),
+   OPERATOR  21 ~ (sline, spoint),
+   OPERATOR  31 && (sline, scircle),
+   OPERATOR  32 && (sline, sline),
+   OPERATOR  33 && (sline, spath),
+   OPERATOR  34 && (sline, spoly),
+   OPERATOR  35 && (sline, sellipse),
+   OPERATOR  36 && (sline, sbox),
+   FUNCTION  1 g_sline_consistent (internal, internal, int4, oid, internal),
+--endifversion
+   FUNCTION  2 g_spherekey_union (bytea, internal),
+   FUNCTION  3 g_sline_compress (internal),
+   FUNCTION  4 g_spherekey_decompress  (internal),
+   FUNCTION  5 g_spherekey_penalty   (internal, internal, internal),
+   FUNCTION  6 g_spherekey_picksplit (internal, internal),
+   FUNCTION  7 g_spherekey_same (spherekey, spherekey, internal),
+   STORAGE   spherekey;
+
+ -- create the operator class for spherical ellipse
+ 
+CREATE FUNCTION g_sellipse_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_sellipse_compress'
+   LANGUAGE 'c';   
+ 
+--ifversion < v080400
+ CREATE FUNCTION g_sellipse_consistent(internal, internal, int4)
+--elseversion
+ CREATE FUNCTION g_sellipse_consistent(internal, internal, int4, oid, internal)
+--endifversion
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_sellipse_consistent'
+   LANGUAGE 'c';
+ 
+CREATE OPERATOR CLASS sellipse
+   DEFAULT FOR TYPE sellipse USING gist AS
+--ifversion < v080400
+   OPERATOR   1 =  (sellipse, sellipse) RECHECK,
+   OPERATOR  11 @  (sellipse, scircle) RECHECK,
+   OPERATOR  12 @  (sellipse, spoly) RECHECK,
+   OPERATOR  13 @  (sellipse, sellipse) RECHECK,
+   OPERATOR  14 @  (sellipse, sbox) RECHECK,
+   OPERATOR  21 ~ (sellipse, spoint) RECHECK,
+   OPERATOR  22 ~ (sellipse, scircle) RECHECK,
+   OPERATOR  23 ~ (sellipse, sline) RECHECK,
+   OPERATOR  24 ~ (sellipse, spath) RECHECK,
+   OPERATOR  25 ~ (sellipse, spoly) RECHECK,
+   OPERATOR  26 ~ (sellipse, sellipse) RECHECK,
+   OPERATOR  27 ~ (sellipse, sbox) RECHECK,
+   OPERATOR  31 && (sellipse, scircle) RECHECK,
+   OPERATOR  32 && (sellipse, sline) RECHECK,
+   OPERATOR  33 && (sellipse, spath) RECHECK,
+   OPERATOR  34 && (sellipse, spoly) RECHECK,
+   OPERATOR  35 && (sellipse, sellipse) RECHECK,
+   OPERATOR  36 && (sellipse, sbox) RECHECK,
+   FUNCTION  1 g_sellipse_consistent (internal, internal, int4),
+--elseversion
+   OPERATOR   1 =  (sellipse, sellipse),
+   OPERATOR  11 @  (sellipse, scircle),
+   OPERATOR  12 @  (sellipse, spoly),
+   OPERATOR  13 @  (sellipse, sellipse),
+   OPERATOR  14 @  (sellipse, sbox),
+   OPERATOR  21 ~ (sellipse, spoint),
+   OPERATOR  22 ~ (sellipse, scircle),
+   OPERATOR  23 ~ (sellipse, sline),
+   OPERATOR  24 ~ (sellipse, spath),
+   OPERATOR  25 ~ (sellipse, spoly),
+   OPERATOR  26 ~ (sellipse, sellipse),
+   OPERATOR  27 ~ (sellipse, sbox),
+   OPERATOR  31 && (sellipse, scircle),
+   OPERATOR  32 && (sellipse, sline),
+   OPERATOR  33 && (sellipse, spath),
+   OPERATOR  34 && (sellipse, spoly),
+   OPERATOR  35 && (sellipse, sellipse),
+   OPERATOR  36 && (sellipse, sbox),
+   FUNCTION  1 g_sellipse_consistent (internal, internal, int4, oid, internal),
+--endifversion
+   FUNCTION  2 g_spherekey_union (bytea, internal),
+   FUNCTION  3 g_sellipse_compress (internal),
+   FUNCTION  4 g_spherekey_decompress  (internal),
+   FUNCTION  5 g_spherekey_penalty   (internal, internal, internal),
+   FUNCTION  6 g_spherekey_picksplit (internal, internal),
+   FUNCTION  7 g_spherekey_same (spherekey, spherekey, internal),
+   STORAGE   spherekey;
+
+ -- create the operator class for spherical polygon
+ 
+CREATE FUNCTION g_spoly_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoly_compress'
+   LANGUAGE 'c';   
+ 
+--ifversion < v080400
+CREATE FUNCTION g_spoly_consistent(internal, internal, int4)
+--elseversion
+CREATE FUNCTION g_spoly_consistent(internal, internal, int4, oid, internal)
+--endifversion
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spoly_consistent'
+   LANGUAGE 'c';
+ 
+ 
+CREATE OPERATOR CLASS spoly
+   DEFAULT FOR TYPE spoly USING gist AS
+--ifversion < v080400
+   OPERATOR   1 =  (spoly, spoly) RECHECK,
+   OPERATOR  11 @  (spoly, scircle) RECHECK,
+   OPERATOR  12 @  (spoly, spoly) RECHECK,
+   OPERATOR  13 @  (spoly, sellipse) RECHECK,
+   OPERATOR  14 @  (spoly, sbox) RECHECK,
+   OPERATOR  21 ~ (spoly, spoint) RECHECK,
+   OPERATOR  22 ~ (spoly, scircle) RECHECK,
+   OPERATOR  23 ~ (spoly, sline) RECHECK,
+   OPERATOR  24 ~ (spoly, spath) RECHECK,
+   OPERATOR  25 ~ (spoly, spoly) RECHECK,
+   OPERATOR  26 ~ (spoly, sellipse) RECHECK,
+   OPERATOR  27 ~ (spoly, sbox) RECHECK,
+   OPERATOR  31 && (spoly, scircle) RECHECK,
+   OPERATOR  32 && (spoly, sline) RECHECK,
+   OPERATOR  33 && (spoly, spath) RECHECK,
+   OPERATOR  34 && (spoly, spoly) RECHECK,
+   OPERATOR  35 && (spoly, sellipse) RECHECK,
+   OPERATOR  36 && (spoly, sbox) RECHECK,
+   FUNCTION  1 g_spoly_consistent (internal, internal, int4),
+--elseversion
+   OPERATOR   1 =  (spoly, spoly),
+   OPERATOR  11 @  (spoly, scircle),
+   OPERATOR  12 @  (spoly, spoly),
+   OPERATOR  13 @  (spoly, sellipse),
+   OPERATOR  14 @  (spoly, sbox),
+   OPERATOR  21 ~ (spoly, spoint),
+   OPERATOR  22 ~ (spoly, scircle),
+   OPERATOR  23 ~ (spoly, sline),
+   OPERATOR  24 ~ (spoly, spath),
+   OPERATOR  25 ~ (spoly, spoly),
+   OPERATOR  26 ~ (spoly, sellipse),
+   OPERATOR  27 ~ (spoly, sbox),
+   OPERATOR  31 && (spoly, scircle),
+   OPERATOR  32 && (spoly, sline),
+   OPERATOR  33 && (spoly, spath),
+   OPERATOR  34 && (spoly, spoly),
+   OPERATOR  35 && (spoly, sellipse),
+   OPERATOR  36 && (spoly, sbox),
+   FUNCTION  1 g_spoly_consistent (internal, internal, int4, oid, internal),
+--endifversion
+   FUNCTION  2 g_spherekey_union (bytea, internal),
+   FUNCTION  3 g_spoly_compress (internal),
+   FUNCTION  4 g_spherekey_decompress  (internal),
+   FUNCTION  5 g_spherekey_penalty   (internal, internal, internal),
+   FUNCTION  6 g_spherekey_picksplit (internal, internal),
+   FUNCTION  7 g_spherekey_same (spherekey, spherekey, internal),
+   STORAGE   spherekey;
+
+
+ -- create the operator class for spherical path
+ 
+CREATE FUNCTION g_spath_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spath_compress'
+   LANGUAGE 'c';   
+ 
+--ifversion < v080400
+CREATE FUNCTION g_spath_consistent(internal, internal, int4)
+--elseversion
+CREATE FUNCTION g_spath_consistent(internal, internal, int4, oid, internal)
+--endifversion
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_spath_consistent'
+   LANGUAGE 'c';
+ 
+ 
+CREATE OPERATOR CLASS spath
+   DEFAULT FOR TYPE spath USING gist AS
+--ifversion < v080400
+   OPERATOR   1 =  (spath, spath) RECHECK,
+   OPERATOR  11 @  (spath, scircle) RECHECK,
+   OPERATOR  12 @  (spath, spoly) RECHECK,
+   OPERATOR  13 @  (spath, sellipse) RECHECK,
+   OPERATOR  14 @  (spath, sbox) RECHECK,
+   OPERATOR  21 ~ (spath, spoint) RECHECK,
+   OPERATOR  31 && (spath, scircle) RECHECK,
+   OPERATOR  32 && (spath, sline) RECHECK,
+   OPERATOR  33 && (spath, spath) RECHECK,
+   OPERATOR  34 && (spath, spoly) RECHECK,
+   OPERATOR  35 && (spath, sellipse) RECHECK,
+   OPERATOR  36 && (spath, sbox) RECHECK,
+   FUNCTION  1 g_spath_consistent (internal, internal, int4),
+--elseversion
+   OPERATOR   1 =  (spath, spath),
+   OPERATOR  11 @  (spath, scircle),
+   OPERATOR  12 @  (spath, spoly),
+   OPERATOR  13 @  (spath, sellipse),
+   OPERATOR  14 @  (spath, sbox),
+   OPERATOR  21 ~ (spath, spoint),
+   OPERATOR  31 && (spath, scircle),
+   OPERATOR  32 && (spath, sline),
+   OPERATOR  33 && (spath, spath),
+   OPERATOR  34 && (spath, spoly),
+   OPERATOR  35 && (spath, sellipse),
+   OPERATOR  36 && (spath, sbox),
+   FUNCTION  1 g_spath_consistent (internal, internal, int4, oid, internal),
+--endifversion
+   FUNCTION  2 g_spherekey_union (bytea, internal),
+   FUNCTION  3 g_spath_compress (internal),
+   FUNCTION  4 g_spherekey_decompress  (internal),
+   FUNCTION  5 g_spherekey_penalty   (internal, internal, internal),
+   FUNCTION  6 g_spherekey_picksplit (internal, internal),
+   FUNCTION  7 g_spherekey_same (spherekey, spherekey, internal),
+   STORAGE   spherekey;
+
+
+ -- create the operator class for spherical box
+ 
+CREATE FUNCTION g_sbox_compress(internal)
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_sbox_compress'
+   LANGUAGE 'c';
+ 
+--ifversion < v080400
+CREATE FUNCTION g_sbox_consistent(internal, internal, int4)
+--elseversion
+CREATE FUNCTION g_sbox_consistent(internal, internal, int4, oid, internal)
+--endifversion
+   RETURNS internal
+   AS 'MODULE_PATHNAME' , 'g_sbox_consistent'
+   LANGUAGE 'c';
+ 
+CREATE OPERATOR CLASS sbox
+   DEFAULT FOR TYPE sbox USING gist AS
+--ifversion < v080400
+   OPERATOR   1 =  (sbox, sbox) RECHECK,
+   OPERATOR  11 @  (sbox, scircle) RECHECK,
+   OPERATOR  12 @  (sbox, spoly) RECHECK,
+   OPERATOR  13 @  (sbox, sellipse) RECHECK,
+   OPERATOR  14 @  (sbox, sbox) RECHECK,
+   OPERATOR  21 ~ (sbox, spoint) RECHECK,
+   OPERATOR  22 ~ (sbox, scircle) RECHECK,
+   OPERATOR  23 ~ (sbox, sline) RECHECK,
+   OPERATOR  24 ~ (sbox, spath) RECHECK,
+   OPERATOR  25 ~ (sbox, spoly) RECHECK,
+   OPERATOR  26 ~ (sbox, sellipse) RECHECK,
+   OPERATOR  27 ~ (sbox, sbox) RECHECK,
+   OPERATOR  31 && (sbox, scircle) RECHECK,
+   OPERATOR  32 && (sbox, sline) RECHECK,
+   OPERATOR  33 && (sbox, spath) RECHECK,
+   OPERATOR  34 && (sbox, spoly) RECHECK,
+   OPERATOR  35 && (sbox, sellipse) RECHECK,
+   OPERATOR  36 && (sbox, sbox) RECHECK,
+   FUNCTION  1 g_sbox_consistent (internal, internal, int4),
+--elseversion
+   OPERATOR   1 =  (sbox, sbox),
+   OPERATOR  11 @  (sbox, scircle),
+   OPERATOR  12 @  (sbox, spoly),
+   OPERATOR  13 @  (sbox, sellipse),
+   OPERATOR  14 @  (sbox, sbox),
+   OPERATOR  21 ~ (sbox, spoint),
+   OPERATOR  22 ~ (sbox, scircle),
+   OPERATOR  23 ~ (sbox, sline),
+   OPERATOR  24 ~ (sbox, spath),
+   OPERATOR  25 ~ (sbox, spoly),
+   OPERATOR  26 ~ (sbox, sellipse),
+   OPERATOR  27 ~ (sbox, sbox),
+   OPERATOR  31 && (sbox, scircle),
+   OPERATOR  32 && (sbox, sline),
+   OPERATOR  33 && (sbox, spath),
+   OPERATOR  34 && (sbox, spoly),
+   OPERATOR  35 && (sbox, sellipse),
+   OPERATOR  36 && (sbox, sbox),
+   FUNCTION  1 g_sbox_consistent (internal, internal, int4, oid, internal),
+--endifversion
+   FUNCTION  2 g_spherekey_union (bytea, internal),
+   FUNCTION  3 g_sbox_compress (internal),
+   FUNCTION  4 g_spherekey_decompress  (internal),
+   FUNCTION  5 g_spherekey_penalty   (internal, internal, internal),
+   FUNCTION  6 g_spherekey_picksplit (internal, internal),
+   FUNCTION  7 g_spherekey_same (spherekey, spherekey, internal),
+   STORAGE   spherekey;

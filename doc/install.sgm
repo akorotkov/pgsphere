@@ -1,0 +1,125 @@
+    <sect1>
+        <title>
+            Installation
+        </title>
+        <sect2>
+            <title>
+                Download
+            </title>
+            <para>  
+                <application>pgSphere</application> is not part of the <application>PostgreSQL</application> software. 
+                You can download it from the <application>pgSphere</application> homepage
+                <ulink url="http://pgfoundry.org/projects/pgsphere/"><citetitle>http://pgfoundry.org/projects/pgsphere/</citetitle></ulink>
+            </para>
+        </sect2>
+
+        <sect2>
+            <title>
+                Installation
+            </title>
+            <para>
+                You will need <application>PostgreSQL
+                7.3</application> or above. We assume that you have
+                <application>PostgreSQL</application> already compiled and
+                installed. Please note: Depending on your system configuration mostly you have to be logged in as the system
+                superuser.
+            </para>
+            <para>
+                There are two ways to compile <application>pgSphere</application>.
+                The first is to copy the sources into the contribution directory of
+                <application>PostgreSQL</application>'s source tree 
+                (<filename>POSTGRESQL_SRC/src/contrib</filename>).
+                Then, change into <filename>POSTGRESQL_SRC/src/contrib</filename>. 
+                If the sources are not yet installed and the directory
+                <filename>pg_sphere</filename> does not exist, take the
+                gzipped <application>pgSphere</application> sources ( e.g.,
+                <filename>pg_sphere_xxx.tgz</filename> ) and run:
+            </para>
+            <programlisting>
+<![CDATA[shell> tar -xzf path/to/pg_sphere_xxx.tgz]]>
+            </programlisting>
+            <para>
+                Now, change into the <filename>pg_sphere</filename>
+                directory and run :
+            </para>
+            <programlisting>
+<![CDATA[shell> make]]>
+            </programlisting>
+            <para>
+                and to install <application>pgSphere</application> :
+            </para>
+            <programlisting>
+<![CDATA[shell> make install]]>
+            </programlisting>
+            <para>
+              The second way does not require the <application>PostgreSQL</application> sources but
+              the configuration tool <application>pg_config</application>.
+            </para>
+            <para>
+              First unpack the <application>pgSphere</application> sources:
+            </para>
+            <programlisting>
+<![CDATA[shell> tar -xzf path_to_pg_sphere_xxx.tgz]]>
+            </programlisting>
+            <para>
+              Now, change into the <filename>pg_sphere</filename>
+              directory and run:
+            </para>
+            <programlisting>
+<![CDATA[shell> make USE_PGXS=1 PG_CONFIG=/path/to/pg_config]]>
+            </programlisting>
+            <para>
+              To install <application>pgSphere</application> you have to run :
+            </para>
+            <programlisting>
+<![CDATA[shell> make USE_PGXS=1 PG_CONFIG=/path/to/pg_config install]]>
+            </programlisting>
+            <para>
+                To check the installation change into the <filename>pg_sphere</filename> source
+                directory again and run:
+            </para>
+            <programlisting>
+<![CDATA[shell> make installcheck]]>
+            </programlisting>
+            <para>
+                The check status will be displayed. Please note, the check gives different results with 
+		different <application>PostgreSQL</application>-versions. Currently, the check should
+		run without errors with <application>PostgreSQL</application>-version 8.4. Otherwise check
+		the file <filename>regression.diff</filename>.
+            </para>
+            
+        </sect2>
+        
+        <sect2>
+            <title>
+                Creating a database with <application>pgSphere</application>
+            </title>
+            <para>
+                We assume you have already created a database
+                <database>datab</database>, where <database>datab</database>
+                is the name of any database. Now change into the directory
+                <filename>POSTGRESQL_INSTALL_PATH/share/contrib</filename>. 
+                Presupposing the name of your
+                <application>PostgreSQL</application>'s superuser is
+                <parameter>postgres</parameter> type:
+            </para>
+            <programlisting>
+<![CDATA[shell> psql -U postgres datab < pg_sphere.sql]]>
+            </programlisting>
+            <para>
+                Depending on your system, it may be necessary to give more
+                <command>psql</command> options like port or host name. 
+                Please have a look at the
+                <application>PostgreSQL</application> documentation for more
+                details.
+            </para>
+            <para>
+                To get the version of installed pgSphere software, simply 
+                call:
+            </para>
+            <programlisting>
+<![CDATA[pgsql> SELECT pg_sphere_version()]]>
+            </programlisting>
+        </sect2>
+        
+    </sect1>

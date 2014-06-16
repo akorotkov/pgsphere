@@ -1,0 +1,408 @@
+    <sect1 id="construct">
+        <title>
+            Constructors
+        </title>
+        <para>
+          Constructors within <application>pgSphere</application> are
+          functions needed to create spherical data types from other data
+          types. In usage, there isn't a difference from
+          <emphasis>usual</emphasis> <application>PostgreSQL</application>
+          functions.  <application>pgSphere</application> constructor
+          functions are named by returned data type. Constructor functions
+          expecting one parameter only are implemented as <link
+          linkend="op.casting">casting operators</link>, too. These are not
+          mentioned here.
+        </para>
+
+        <sect2 id="contr.spoint">
+          <title>
+            Point
+          </title>
+          <para>
+            There is only one constructor function for spherical points.
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>spoint</function></funcdef>
+                <paramdef>float8 <parameter>lng</parameter></paramdef>
+                <paramdef>float8 <parameter>lat</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            where <parameter>lng</parameter> is the longitude of the spherical
+            point in radians, <parameter>lng</parameter> is the latitude of
+            the spherical point in radians.
+          </para>
+          <example>
+            <title>A spherical point from longitude and latitude</title>
+            <simpara>
+              Get a spherical position with 270&deg; of longitude and
+              -30&deg; of latitude.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT spoint ( 270.0*pi()/180.0,-30.0*pi()/180.0 ) AS spoint;]]>
+            </programlisting>
+          </example>
+
+        </sect2>
+
+        <sect2 id="contr.strans">
+          <title>
+            Euler transformation
+          </title>
+          <para>
+            There are two constructor functions for a Euler transformation:
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>strans</function></funcdef>
+                <paramdef>float8 <parameter>phi</parameter></paramdef>
+                <paramdef>float8 <parameter>theta</parameter></paramdef>
+                <paramdef>float8 <parameter>psi</parameter></paramdef>
+            </funcprototype>
+            <funcprototype>
+              <funcdef><function>strans</function></funcdef>
+                <paramdef>float8 <parameter>phi</parameter></paramdef>
+                <paramdef>float8 <parameter>theta</parameter></paramdef>
+                <paramdef>float8 <parameter>psi</parameter></paramdef>
+                <paramdef>character <parameter>axis</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            where <parameter>phi</parameter>, <parameter>theta</parameter> and
+            <parameter>psi</parameter> are the three angles of <link linkend="dt.strans">
+            Euler transformation</link>. The fourth parameter is the three letter code
+            of Euler the transformation axis. If that parameter is omitted,
+            <application>pgSphere</application> will assume <literal>ZXZ</literal>.
+            For more information about that parameter, see <xref linkend="dt.strans"/>.
+          </para>
+          <example>
+            <title>Create a Euler transformation object</title>
+            <simpara>
+              Create a transformation object to rotate a spherical object
+              counterclockwise, first 20&deg; around
+              the <literal>x</literal>-axis, second -270&deg; around
+              the <literal>z</literal>-axis, and last 70.5&deg; around
+              the <literal>y</literal>-axis.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT strans ( 20.0*pi()/180.0, -270.0*pi()/180.0, 70.5*pi()/180.0, 'XZY');]]>
+            </programlisting>
+          </example>
+
+        </sect2>
+
+        <sect2 id="contr.scircle">
+          <title>
+            Circle
+          </title>
+          <para>
+            The function
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>scircle</function></funcdef>
+                <paramdef>spoint <parameter>center</parameter></paramdef>
+                <paramdef>float8 <parameter>radius</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            returns a spherical circle with center at
+            <parameter>center</parameter> and a radius
+            <parameter>radius</parameter> in radians.  The circle radius has
+            to be larger than or equal to zero but less or equal to 90&deg;. 
+            Otherwise, this function returns an error.
+          </para>
+          <example>
+            <title>A circle around the Noth Pole</title>
+            <simpara>
+             Get a spherical circle around the North Pole with a radius
+             of 30&deg;.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output ]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT scircle ( spoint '(0d,90d)', 30.0*pi()/180.0 );]]>
+<![CDATA[      scircle       ]]>
+<![CDATA[--------------------]]>
+<![CDATA[ <(0d , 90d) , 30d>]]>
+<![CDATA[(1 row)]]>
+           </programlisting>
+         </example>
+
+        </sect2>
+
+        <sect2 id="contr.sline">
+          <title>
+            Line
+          </title>
+          <para>
+            The input of spherical lines using Euler transformation and
+            length is quite circumstantial (see <xref linkend="dt.sline"/>). 
+            For short lines it is easier to input a line specifying the
+            begining and the end of the line.
+          </para>              
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>sline</function></funcdef>
+                <paramdef>spoint <parameter>begin</parameter></paramdef>
+                <paramdef>spoint <parameter>end</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            If the distance between <parameter>begin</parameter> and
+            <parameter>end</parameter> is 180&deg; (&pgr;), this function
+            returns an error because the location of the line is undefined. 
+            However, if longitudes of <parameter>begin</parameter> and
+            <parameter>end</parameter> are equal,
+            <application>pgSphere</application> assumes a meridian and
+            returns the corresponding spherical line.
+          </para>               
+          <example id="const.line.1">
+            <title>A line created using begin and end of line</title>
+            <simpara>
+              A line starting at <literal>spoint '(270d,10d)'</literal> and
+              ending at <literal>spoint '(270d,30d)'</literal>:
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG')]]>
+<![CDATA[ set_sphere_output]]>
+<![CDATA[-------------------]]>
+<![CDATA[  SET DEG]]>
+<![CDATA[ (1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT sline( spoint '(270d,10d)', spoint '(270d,30d)');]]>
+<![CDATA[          sline]]>
+<![CDATA[ ----------------------------]]>
+<![CDATA[  ( 10d, 90d, 270d, ZXZ ), 20d]]>
+<![CDATA[ (1 row)]]>
+            </programlisting>
+          </example>
+          <para>
+            Furthermore, there is a function for inputing a line
+            using Euler transformation <parameter>trans</parameter>
+            and line length <parameter>length</parameter>
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>sline</function></funcdef>
+                <paramdef>strans <parameter>trans</parameter></paramdef>
+                <paramdef>float8 <parameter>length</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            where the line length <parameter>length</parameter> must be
+            given in radians.
+          </para>
+          <example>
+            <title>A line created with its transformation and length</title>
+            <simpara>
+              The same line as in <xref linkend="const.line.1"/>, but using
+              transformation and line length.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT sline ( strans '10d, 90d, 270d, ZXZ', 20.0*pi()/180.0 );]]>
+<![CDATA[          sline]]>
+<![CDATA[------------------------------]]>
+<![CDATA[ ( 10d, 90d, 270d, ZXZ ), 20d]]>
+<![CDATA[(1 row)]]>
+            </programlisting>
+          </example>
+        </sect2>
+
+        <sect2 id="contr.sellipse">
+          <title>
+            Ellipse
+          </title>
+          <para>
+            You can use the function
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>sellipse</function></funcdef>
+                <paramdef>spoint <parameter>center</parameter></paramdef>
+                <paramdef>float8 <parameter>major_rad</parameter></paramdef>
+                <paramdef>float8 <parameter>minor_rad</parameter></paramdef>
+                <paramdef>float8 <parameter>incl</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            to create a spherical ellipse. The first parameter
+            <parameter>center</parameter> is the center of ellipse.  The
+            parameter <parameter>major_rad</parameter> and
+            <parameter>minor_rad</parameter> are the major and the minor
+            radii of the ellipse in radians. If the major radius is smaller
+            than minor radius, <application>pgSphere</application> swaps the
+            values automatically.  The last parameter
+            <parameter>incl</parameter> is the inclination angle in radians. 
+            For more informations about ellipses, see <xref
+            linkend="dt.sellipse"/>.
+          </para>
+          <example>
+            <title>Create an ellipse</title>
+            <simpara>
+              An ellipse with a center at 20&deg; of longitude and 0&deg;
+              of latitude. The minor radius is part of the equator. The major
+              radius has a size of 10&deg;. The minor radius has 5&deg;.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[sql> SELECT sellipse ( spoint '( 20d, 0d )', 10.0*pi()/180.0, 5.0*pi()/180.0,]]>
+<![CDATA[       pi()/2.0 );]]>
+<![CDATA[            sellipse]]>
+<![CDATA[-----------------------------------]]>
+<![CDATA[ <{ 10d , 5d }, (20d , -0d) , 90d>]]>
+<![CDATA[(1 row)]]>
+            </programlisting>
+          </example>
+        </sect2>
+
+        <sect2 id="contr.spoly">
+          <title>
+            Polygon
+          </title>
+          <para>
+            The aggregate function
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>spoly</function></funcdef>
+                <paramdef>spoint <parameter>edge</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            can be used to create a polygon from a set of spherical points.
+            There are the same restrictions as for using the input function of
+            spherical polygon (see <xref linkend="dt.spoly"/>). The function
+            returns
+            <literal>NULL</literal>, if the polygon couldn't be created.
+          </para>
+          <example>
+            <title>
+              Create a spherical polygon using a set of spherical points
+            </title>
+            <simpara>
+              Create a table and put in some spherical points with a
+              unique ID.  Then, create two polygons with different edge
+              sequences.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output ]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> CREATE TABLE points ( i int PRIMARY KEY, p spoint );]]>
+<![CDATA[sql> INSERT INTO points VALUES (1, '( 0d, 0d)');]]>
+<![CDATA[sql> INSERT INTO points VALUES (2, '(10d, 0d)');]]>
+<![CDATA[sql> INSERT INTO points VALUES (3, '( 0d,10d)');]]>
+<![CDATA[sql> SELECT spoly(data.p) FROM ( SELECT p FROM points ORDER BY i ASC ) AS data ;]]>
+<![CDATA[               spoly               ]]>
+<![CDATA[-----------------------------------]]>
+<![CDATA[ {(0d , 0d),(10d , 0d),(0d , 10d)}]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT spoly(data.p) FROM ( SELECT p FROM points ORDER BY i DESC ) AS data ;]]>
+<![CDATA[               spoly               ]]>
+<![CDATA[-----------------------------------]]>
+<![CDATA[ {(0d , 10d),(10d , 0d),(0d , 0d)}]]>
+<![CDATA[(1 row)]]>
+            </programlisting>
+          </example>
+        </sect2>
+
+        <sect2 id="contr.spath">
+          <title>
+            Path
+          </title>
+          <para>
+            Similar to spherical polygons, you can use the aggregate function
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>spath</function></funcdef>
+                <paramdef>spoint <parameter>edge</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            to create a spherical path using a set of spherical points.
+            There are the same restrictions as with the input function of
+            spherical path (see <xref linkend="dt.spath"/>). The function returns
+            <literal>NULL</literal> if the path couldn't be created.
+          </para>
+          <example>
+            <title>
+              Create a spherical path using a set of spherical points
+            </title>
+            <simpara>
+              Create a table and put in some spherical points with a
+              unique ID.  Then, create a spherical path from it.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output ]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> CREATE TABLE points ( i int PRIMARY KEY, p spoint );]]>
+<![CDATA[sql> INSERT INTO points VALUES (1, '( 0d, 10d)');]]>
+<![CDATA[sql> INSERT INTO points VALUES (2, '( 0d,  0d)');]]>
+<![CDATA[sql> INSERT INTO points VALUES (3, '( 0d,-10d)');]]>
+<![CDATA[sql> SELECT spath(data.p) FROM ( SELECT p FROM points ORDER BY i ASC ) AS data ;]]>
+<![CDATA[                       spath]]>
+<![CDATA[---------------------------------------------------]]>
+<![CDATA[ {(0d , 10d),(0d , 0d),(0d , -10d)}]]>
+<![CDATA[(1 row)]]>
+<![CDATA[sql> SELECT spath(data.p) FROM ( SELECT p FROM points ORDER BY i DESC ) AS data ;]]>
+<![CDATA[                       spath]]>
+<![CDATA[---------------------------------------------------]]>
+<![CDATA[ {(0d , -10d),(0d , 0d),(0d , 10d)}]]>
+<![CDATA[(1 row)]]>
+            </programlisting>
+          </example>
+
+        </sect2>
+
+        <sect2 id="contr.sbox">
+          <title>
+            Coordinates range
+          </title>
+          <para>
+            The function
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>sellipse</function></funcdef>
+                <paramdef>spoint <parameter>south_west</parameter></paramdef>
+                <paramdef>spoint <parameter>north_east</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            creates an <type>sbox</type> object with its first parameter
+            <parameter>south_west</parameter> as the southwest edge and its
+            second parameter <parameter>northeast</parameter> as the
+            north-east edge of the coordinates range.
+          </para>
+          <example>
+            <title>Create a spherical box using edges</title>
+            <simpara>
+              A coordinate range between 0&deg; and +10&deg; in latitude and
+              longitude.
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT sbox ( spoint '(0d,0d),(10d,10d)' );]]>
+            </programlisting>
+          </example>
+        </sect2>
+
+    </sect1>

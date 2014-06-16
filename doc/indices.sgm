@@ -1,0 +1,71 @@
+    <sect1 id="indices">
+      <title>
+        Create an index
+      </title>
+      <sect2 id="ind.sphere">
+        <title>
+          Spherical index
+        </title>
+        <para>
+          <application>pgSphere</application> uses <literal>GiST</literal>
+          to create spherical indices. An index speeds up the executation
+          time of operators <link
+          linkend="op.over"><literal>@</literal></link>, <link
+          linkend="op.over"><literal>&amp;&amp;</literal></link>, <link
+          linkend="op.cross"><literal>&num;</literal></link>, <link
+          linkend="op.equal"><literal>=</literal></link>, and <link
+          linkend="op.equal"><literal>!=</literal></link>.  You can create
+          an index with following spherical data types:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+               point (<type>spoint</type>)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              circle (<type>scircle</type>)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              line (<type>sline</type>)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              ellipse (<type>sellipse</type>)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              polygon (<type>spoly</type>)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              path (<type>spath</type>)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              coordinates range (<type>sbox</type>)
+            </para>
+          </listitem>
+        </itemizedlist>
+        <example>
+          <title>Simple index of spherical points</title>
+          <programlisting>
+<![CDATA[CREATE TABLE test (]]>
+<![CDATA[  pos spoint NOT NULL]]>
+<![CDATA[);]]>
+<![CDATA[-- Put in data now]]>
+<![CDATA[CREATE INDEX test_pos_idx USING GIST ON test (pos);]]>
+<![CDATA[VACUUM ANALYZE test;]]>
+          </programlisting>
+        </example>
+
+      </sect2>
+        
+    </sect1>

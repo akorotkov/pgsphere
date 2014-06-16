@@ -1,0 +1,240 @@
+-- radian input
+SELECT spoint (-3*pi(),       0);
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint ( 3*pi(),       0);
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint (      0,    pi());
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint (      0,   -pi());
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint ( 2*pi(),  2*pi());
+ spoint  
+---------
+ (0 , 0)
+(1 row)
+
+SELECT spoint (   pi(),  2*pi());
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint (      0,  pi()/2);
+        spoint         
+-----------------------
+ (0 , 1.5707963267949)
+(1 row)
+
+SELECT spoint (      0, -pi()/2);
+         spoint         
+------------------------
+ (0 , -1.5707963267949)
+(1 row)
+
+-- degree input
+SELECT spoint '(-540d,    0d)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '( 540d,    0d)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '(   0d,  180d)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '(   0d, -180d)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '( 360d,  360d)';
+ spoint  
+---------
+ (0 , 0)
+(1 row)
+
+SELECT spoint '( 180d,  360d)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '(   0d,   90d)';
+        spoint         
+-----------------------
+ (0 , 1.5707963267949)
+(1 row)
+
+SELECT spoint '(   0d,  -90d)';
+         spoint         
+------------------------
+ (0 , -1.5707963267949)
+(1 row)
+
+-- dms input
+SELECT spoint '( 0.0d   0m  0s,    0d 0m 0s)';
+ERROR:  parsing: syntax error
+SELECT spoint '(   0d  60m  0s,    0d 0m 0s)';
+ERROR:  parsing: minutes or seconds invalid (min:60.000000 sec:0.000000)
+SELECT spoint '(   0d   0m 60s,    0d 0m 0s)';
+ERROR:  parsing: minutes or seconds invalid (min:0.000000 sec:60.000000)
+SELECT spoint '( 539d 59m 59.9999s,    0d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159265310498 , 0)
+(1 row)
+
+SELECT spoint '(   0d  0m  0s,       180d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '(   0d  0m  0s,      -180d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '( 360d  0m  0s,       360d 0m 0s)';
+ spoint  
+---------
+ (0 , 0)
+(1 row)
+
+SELECT spoint '( 180d  0m  0s,       360d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '(   0d  0m  0s,        90d 0m 0s)';
+        spoint         
+-----------------------
+ (0 , 1.5707963267949)
+(1 row)
+
+SELECT spoint '(   0d  0m  0s,       -90d 0m 0s)';
+         spoint         
+------------------------
+ (0 , -1.5707963267949)
+(1 row)
+
+-- hms input for latitude
+SELECT spoint '( 0.0h   0m  0s,    0)';
+ERROR:  parsing: syntax error
+SELECT spoint '(   0h  60m  0s,    0)';
+ERROR:  parsing: minutes or seconds invalid (min:60.000000 sec:0.000000)
+SELECT spoint '(   0h   0m 60s,    0)';
+ERROR:  parsing: minutes or seconds invalid (min:0.000000 sec:60.000000)
+SELECT spoint '( 35h 59m 59.9999s,    0d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159264631759 , 0)
+(1 row)
+
+SELECT spoint '(  0h  0m  0s,       180d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '(  0h  0m  0s,      -180d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '( 24h  0m  0s,       360d 0m 0s)';
+ spoint  
+---------
+ (0 , 0)
+(1 row)
+
+SELECT spoint '( 12h  0m  0s,       360d 0m 0s)';
+         spoint         
+------------------------
+ (3.14159265358979 , 0)
+(1 row)
+
+SELECT spoint '(  0h  0m  0s,        90d 0m 0s)';
+        spoint         
+-----------------------
+ (0 , 1.5707963267949)
+(1 row)
+
+SELECT spoint '(  0h  0m  0s,       -90d 0m 0s)';
+         spoint         
+------------------------
+ (0 , -1.5707963267949)
+(1 row)
+
+-- mixed input
+-- operators
+SELECT spoint '(0, 90d)'   = spoint '(0, 90d)';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(0, 90d)'   = spoint '(0,-90d)';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(0,-90d)'   = spoint '(0,-90d)';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(0, 90d)'  != spoint '(0, 90d)';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(0, 90d)'  != spoint '(0,-90d)';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(0,-90d)'  != spoint '(0,-90d)';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(0d,  0)'   = spoint '(360d,0)';
+ ?column? 
+----------
+ t
+(1 row)
+

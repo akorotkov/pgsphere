@@ -1,0 +1,706 @@
+-- ****************************
+--
+-- spherical line functions
+--
+-- ****************************
+
+CREATE FUNCTION sline( spoint, spoint )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'sphereline_from_points'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline( spoint, spoint ) IS
+  'returns a spherical line using begin ( arg1 ) and end ( arg2 )'; 
+
+CREATE FUNCTION sline( strans, float8 )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'sphereline_from_trans'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline( strans, float8 ) IS
+  'returns a spherical line using Euler transformation ( arg1 ) and length ( arg2 )'; 
+
+CREATE FUNCTION meridian( float8 )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'sphereline_meridian'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION meridian( float8 ) IS
+  'returns a spherical line as a meridian along longitude arg'; 
+
+
+CREATE FUNCTION sl_beg( sline )
+   RETURNS spoint
+   AS 'MODULE_PATHNAME' , 'sphereline_begin'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sl_beg( sline ) IS
+  'returns the begin of a spherical line'; 
+
+CREATE FUNCTION sl_end( sline )
+   RETURNS spoint
+   AS 'MODULE_PATHNAME' , 'sphereline_end'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sl_end( sline ) IS
+  'returns the end of a spherical line'; 
+
+
+--
+-- Cast line as Euler transformation
+--
+
+CREATE FUNCTION strans( sline )
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans_from_line'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans( sline ) IS
+  'converts line to a transformation (ZXZ)'; 
+
+CREATE CAST (sline AS strans)
+    WITH FUNCTION strans( sline )
+    AS IMPLICIT;
+
+
+--
+-- Cast point as line
+--
+
+CREATE FUNCTION sline( spoint )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'sphereline_from_point'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION sline( spoint ) IS
+  'casts a spherical point to a spherical line'; 
+
+CREATE CAST (spoint AS sline)
+    WITH FUNCTION sline( spoint )
+    AS IMPLICIT;
+
+
+
+
+
+-- ***************************
+--
+-- spherical line operators
+--
+-- ***************************
+
+
+--
+-- equal
+--
+
+CREATE FUNCTION sline_equal(sline,sline)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_equal'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_equal(sline,sline) IS
+  'returns true, if spherical lines are equal'; 
+
+CREATE OPERATOR  = (
+   LEFTARG    = sline,
+   RIGHTARG   = sline,
+   COMMUTATOR = = ,
+   NEGATOR    = <>,
+   PROCEDURE  = sline_equal,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR = ( sline, sline ) IS
+  'true, if spherical lines are equal'; 
+
+
+--
+-- not equal
+--
+
+CREATE FUNCTION sline_equal_neg(sline,sline)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_equal_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_equal_neg(sline,sline) IS
+  'returns true, if spherical lines are not equal'; 
+
+CREATE OPERATOR  <> (
+   LEFTARG    = sline,
+   RIGHTARG   = sline,
+   COMMUTATOR = <>,
+   NEGATOR    = = ,
+   PROCEDURE  = sline_equal_neg,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR <> ( sline, sline ) IS
+  'true, if spherical lines are not equal'; 
+
+
+--
+-- length
+--
+
+CREATE FUNCTION length( sline )
+   RETURNS FLOAT8
+   AS 'MODULE_PATHNAME' , 'sphereline_length'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION length( sline ) IS
+  'returns the length of a spherical line ( in radians )'; 
+
+
+CREATE OPERATOR @-@ (
+   RIGHTARG   = sline,
+   PROCEDURE  = length
+);
+
+COMMENT ON OPERATOR @-@ ( NONE , sline ) IS
+  'length of spherical line';
+
+--
+-- swap begin and end
+--
+
+CREATE FUNCTION swap( sline )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'sphereline_swap_beg_end'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION swap( sline ) IS
+  'returns a spherical line with swapped begin and end';
+
+CREATE OPERATOR - (
+   RIGHTARG   = sline,
+   PROCEDURE  = swap
+);
+
+COMMENT ON OPERATOR - ( NONE , sline ) IS
+  'swaps begin and and of a spherical line';
+
+--
+-- turns path of line
+--
+
+CREATE FUNCTION turn( sline )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'sphereline_turn'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION turn( sline ) IS
+  'returns a turned spherical line but keeps begin and end';
+
+CREATE OPERATOR ! (
+   RIGHTARG   = sline,
+   PROCEDURE  = turn
+);
+
+COMMENT ON OPERATOR ! ( NONE , sline ) IS
+  'turns a spherical line, but keep begin and end,';
+
+
+
+--
+-- line crossing
+--
+
+CREATE FUNCTION sline_crosses( sline , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_crosses'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_crosses( sline , sline ) IS
+  'returns true if spherical lines cross'; 
+
+
+CREATE OPERATOR  # (
+   LEFTARG    = sline,
+   RIGHTARG   = sline,
+   COMMUTATOR =  #,
+   NEGATOR    = !#,
+   PROCEDURE  = sline_crosses,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR # ( sline, sline ) IS
+  'true, if spherical lines cross'; 
+
+
+--
+-- lines do not cross
+--
+
+CREATE FUNCTION sline_crosses_neg( sline , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_crosses_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_crosses_neg( sline , sline ) IS
+  'returns true if spherical lines do not cross'; 
+
+
+CREATE OPERATOR  !# (
+   LEFTARG    = sline,
+   RIGHTARG   = sline,
+   COMMUTATOR =  !#,
+   NEGATOR    =  #,
+   PROCEDURE  = sline_crosses_neg,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !# ( sline, sline ) IS
+  'true, if spherical lines do not cross'; 
+
+
+--
+-- lines overlap
+--
+
+CREATE FUNCTION sline_overlap( sline , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_overlap'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_overlap( sline , sline ) IS
+  'returns true if spherical lines overlap or cross'; 
+
+
+CREATE OPERATOR && (
+   LEFTARG    = sline,
+   RIGHTARG   = sline,
+   PROCEDURE  = sline_overlap,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR && ( sline, sline ) IS
+  'true if spherical line overlap or cross'; 
+
+--
+-- lines do not overlap
+--
+
+CREATE FUNCTION sline_overlap_neg( sline , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_overlap_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_overlap_neg( sline , sline ) IS
+  'returns true if spherical lines do not overlap or cross'; 
+
+CREATE OPERATOR !&& (
+   LEFTARG    = sline,
+   RIGHTARG   = sline,
+   PROCEDURE  = sline_overlap,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR !&& ( sline, sline ) IS
+  'true if spherical lines do not overlap or cross'; 
+
+
+
+--
+-- line contains point
+--
+
+
+CREATE FUNCTION sline_contains_point ( sline , spoint )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_cont_point'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_contains_point ( sline , spoint ) IS
+  'returns true if spherical line contains spherical point'; 
+
+
+CREATE OPERATOR ~ (
+   LEFTARG    = sline,
+   RIGHTARG   = spoint,
+   PROCEDURE  = sline_contains_point,
+   COMMUTATOR = '@',
+   NEGATOR    = '!~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR ~ ( sline, spoint ) IS
+  'true if spherical line contains spherical point'; 
+
+
+--
+-- point is contained by line
+--
+
+
+CREATE FUNCTION sline_contains_point_com ( spoint , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_cont_point_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_contains_point_com ( spoint , sline ) IS
+  'returns true if spherical line contains spherical point'; 
+
+
+CREATE OPERATOR @ (
+   LEFTARG    = spoint,
+   RIGHTARG   = sline,
+   PROCEDURE  = sline_contains_point_com,
+   COMMUTATOR = '~',
+   NEGATOR    = '!@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR @ ( spoint, sline ) IS
+  'true if spherical line contains spherical point'; 
+
+
+--
+-- line does not contain point
+--
+
+CREATE FUNCTION sline_contains_point_neg ( sline , spoint )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_cont_point_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_contains_point_neg ( sline , spoint ) IS
+  'returns true if spherical line does not contain spherical point'; 
+
+CREATE OPERATOR !~ (
+   LEFTARG    = sline,
+   RIGHTARG   = spoint,
+   PROCEDURE  = sline_contains_point,
+   COMMUTATOR = '!@',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !~ ( sline, spoint ) IS
+  'true if spherical line does not contain spherical point'; 
+
+
+--
+-- point is not contained by line
+--
+
+
+CREATE FUNCTION sline_contains_point_com_neg ( spoint , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_cont_point_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_contains_point_com_neg ( spoint , sline ) IS
+  'returns true if spherical line does not contain spherical point'; 
+
+CREATE OPERATOR !@ (
+   LEFTARG    = spoint,
+   RIGHTARG   = sline,
+   PROCEDURE  = sline_contains_point_com_neg,
+   COMMUTATOR = '!~',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !@ ( spoint, sline ) IS
+  'true if spherical line does not contain spherical point'; 
+
+
+--
+--  Transformation of line
+--
+
+CREATE FUNCTION strans_line( sline, strans )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'spheretrans_line'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_line ( sline, strans ) IS
+  'returns a transformated spherical line'; 
+
+CREATE OPERATOR + (
+   LEFTARG    = sline,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_line
+);
+
+COMMENT ON OPERATOR + ( sline, strans ) IS
+  'transforms a spherical line '; 
+
+
+CREATE FUNCTION strans_line_inverse( sline, strans )
+   RETURNS sline
+   AS 'MODULE_PATHNAME' , 'spheretrans_line_inverse'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_line_inverse ( sline, strans ) IS
+  'returns a inverse transformated spherical line'; 
+
+
+CREATE OPERATOR - (
+   LEFTARG    = sline,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_line_inverse
+);
+
+COMMENT ON OPERATOR - ( sline, strans ) IS
+  'transforms inverse a spherical line'; 
+
+--
+-- line overlaps circle
+--
+
+CREATE FUNCTION sline_overlap_circle( sline , scircle )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_overlap_circle'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_overlap_circle( sline , scircle ) IS
+  'returns true if spherical line overlaps spherical circle'; 
+
+
+CREATE OPERATOR && (
+   LEFTARG    = sline,
+   RIGHTARG   = scircle,
+   PROCEDURE  = sline_overlap_circle,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&' ,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR && ( sline, scircle ) IS
+  'true if spherical line overlaps spherical circle'; 
+
+--
+-- circle overlaps line    
+--
+
+CREATE FUNCTION sline_overlap_circle_com( scircle , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_overlap_circle_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_overlap_circle_com( scircle , sline ) IS
+  'returns true if spherical line overlaps spherical circle'; 
+
+
+CREATE OPERATOR && (
+   LEFTARG    = scircle,
+   RIGHTARG   = sline,
+   PROCEDURE  = sline_overlap_circle_com,
+   COMMUTATOR = '&&',
+   NEGATOR    = '!&&' ,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR && ( scircle, sline ) IS
+  'true if spherical line overlaps spherical circle'; 
+
+--
+-- line does not overlap circle
+--
+
+CREATE FUNCTION sline_overlap_circle_neg( sline , scircle )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_overlap_circle_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_overlap_circle_neg( sline , scircle ) IS
+  'returns true if spherical line does not overlap spherical circle'; 
+
+
+CREATE OPERATOR !&& (
+   LEFTARG    = sline,
+   RIGHTARG   = scircle,
+   PROCEDURE  = sline_overlap_circle_neg,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&' ,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR !&& ( sline, scircle ) IS
+  'true if spherical line does not overlap spherical circle'; 
+
+--
+-- circle does not overlap line    
+--
+
+CREATE FUNCTION sline_overlap_circle_com_neg( scircle , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'sphereline_overlap_circle_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sline_overlap_circle_com_neg( scircle , sline ) IS
+  'returns true if spherical line overlaps spherical circle'; 
+
+
+CREATE OPERATOR !&& (
+   LEFTARG    = scircle,
+   RIGHTARG   = sline,
+   PROCEDURE  = sline_overlap_circle_com,
+   COMMUTATOR = '!&&',
+   NEGATOR    = '&&',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR !&& ( scircle, sline ) IS
+  'true if spherical line does not overlap spherical circle'; 
+
+
+--
+-- circle contains line
+--
+
+
+CREATE FUNCTION scircle_contains_line( scircle , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_line'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_line( scircle , sline ) IS
+  'returns true if spherical circle contains spherical line'; 
+
+
+CREATE OPERATOR ~ (
+   LEFTARG    = scircle,
+   RIGHTARG   = sline,
+   PROCEDURE  = scircle_contains_line,
+   COMMUTATOR = '@',
+   NEGATOR    = '!~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR ~ ( scircle, sline ) IS
+  'true if spherical circle contains spherical line'; 
+
+
+--
+-- line is contained by circle
+--
+
+
+CREATE FUNCTION scircle_contains_line_com( sline , scircle )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_line_com'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_line_com( sline , scircle ) IS
+  'returns true if spherical circle contains spherical line'; 
+
+CREATE OPERATOR @ (
+   LEFTARG    = sline,
+   RIGHTARG   = scircle,
+   PROCEDURE  = scircle_contains_line_com,
+   COMMUTATOR = '~',
+   NEGATOR    = '!@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR @ ( sline, scircle ) IS
+  'true if spherical circle contains spherical line'; 
+
+
+--
+-- circle does not contain line
+--
+
+CREATE FUNCTION scircle_contains_line_neg( scircle , sline )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_line_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_line_neg( scircle , sline ) IS
+  'returns true if spherical circle does not contain spherical line'; 
+
+
+CREATE OPERATOR !~ (
+   LEFTARG    = scircle,
+   RIGHTARG   = sline,
+   PROCEDURE  = scircle_contains_line_neg,
+   COMMUTATOR = '!@',
+   NEGATOR    = '~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !~ ( scircle, sline ) IS
+  'true if spherical circle does not contain spherical line'; 
+
+
+--
+-- line is not contained by circle
+--
+
+CREATE FUNCTION scircle_contains_line_com_neg( sline , scircle )
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spherecircle_cont_line_com_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION scircle_contains_line_com_neg( sline , scircle ) IS
+  'returns true if spherical circle does not contain spherical line'; 
+
+
+CREATE OPERATOR !@ (
+   LEFTARG    = sline,
+   RIGHTARG   = scircle,
+   PROCEDURE  = scircle_contains_line_com_neg,
+   COMMUTATOR = '!~',
+   NEGATOR    = '@',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR !@ ( sline, scircle ) IS
+  'true if spherical circle does not contain spherical line'; 
+

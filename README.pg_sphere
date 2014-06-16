@@ -1,0 +1,27 @@
+This is R-Tree implementation using GiST for spherical objects
+like spherical points and spherical circles with 
+useful functions and operators.
+
+
+NOTICE:
+     This version will works only with postgresql version 8.0 and above.
+
+INSTALLATION:
+
+  gmake
+  gmake install
+  -- load functions
+  psql <database> < pg_sphere.sql
+
+REGRESSION TEST:
+
+   gmake installcheck
+
+LONG REGRESSION TEST:
+
+   gmake crushtest
+
+For more informations have a look at http://pgsphere.projects.postgresql.org/
+
+Have a lot of fun! 
+

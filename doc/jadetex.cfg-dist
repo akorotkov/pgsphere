@@ -1,0 +1,14 @@
+\hypersetup{
+     pdftitle={pgSphere},
+     pdfsubject={user guide},
+     pdfauthor={pgSphere developer team},
+     pdfkeywords={spherical PostgreSQL SQL},
+     bookmarksopen=true,
+     bookmarksopenlevel=2,
+     colorlinks=true,
+     linkcolor=blue,
+     pdfpagemode=UseOutlines,
+     pdfstartview=FitH
+}
+\usepackage{url}
+\tolerance=2000

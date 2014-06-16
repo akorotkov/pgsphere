@@ -1,0 +1,507 @@
+    <sect1 id="operators">
+        <title>
+            Operators
+        </title>
+        <sect2 id="op.casting">
+            <title>
+                Casting
+            </title>
+            <para>
+                <application>pgSphere</application> provides some casting
+                operators. So, you can transform an object to another data
+                type. A cast is done using a <literal>CAST(x AS typename)</literal>,
+                <literal>x::typename</literal> or <literal>typename(x)</literal>
+                construct.
+            </para>
+            <table frame="all" rowsep="1" colsep="1">
+              <title>Castings</title>
+              <tgroup cols="3" >
+                <colspec colname="col0" align="left" />
+                <colspec colname="col1" align="left" />
+                <colspec colname="col2" align="left" colwidth="3*"/>
+                <thead valign="middle">
+                  <row>
+                    <entry align="center">casting argument</entry>
+                    <entry align="center">type target</entry>
+                    <entry align="center">returns</entry>
+                  </row>
+                </thead>
+                <tbody>
+                  <row>
+                    <entry>
+                    	<type>spoint</type>
+                    </entry>
+                    <entry>
+                     	<type>scircle</type>
+                    </entry>
+                    <entry>
+                      circle with center position <type>spoint</type> and
+                      radius 0.0
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                     	<type>spoint</type>
+                    </entry>
+                    <entry>
+                      <type>sellipse</type>
+                    </entry>
+                    <entry>
+                      an ellipse at position <type>spoint</type> and
+                      radius 0.0
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                     	<type>spoint</type>
+                    </entry>
+                    <entry>
+                    	<type>sline</type>
+                    </entry>
+                    <entry>
+                      a line with length 0.0 at position <type>spoint</type>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                     	<type>scircle</type>
+                    </entry>
+                    <entry>
+                     	<type>sellipse</type>
+                    </entry>
+                    <entry>
+                    	the <type>scircle</type> as <type>sellipse</type>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>sline</type>
+                    </entry>
+                    <entry>
+                      <type>strans</type>
+                    </entry>
+                    <entry>
+                      the Euler transformation of <type>sline</type>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                     	<type>sellipse</type>
+                    </entry>
+                    <entry>
+                     	<type>scircle</type>
+                    </entry>
+                    <entry>
+                     	the bounding circle of <type>sellipse</type>
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                     	<type>sellipse</type>
+                    </entry>
+                    <entry>
+                     	<type>strans</type>
+                    </entry>
+                    <entry>
+                     	the Euler transformation of <type>sellipse</type>
+                    </entry>
+                  </row>
+                </tbody>
+              </tgroup>
+            </table>
+            <example>
+              <title>Cast a spherical point as a circle</title>
+              <programlisting>
+<![CDATA[sql> SELECT CAST ( spoint '(10d,20d)' AS scircle );]]>
+<![CDATA[      scircle]]>
+<![CDATA[--------------------]]>
+<![CDATA[ <(10d , 20d) , 0d>]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+
+        </sect2>
+        
+        <sect2 id="op.equal">
+            <title>
+                Equality
+            </title>
+            <para>
+                All data types of <application>pgSphere</application> have
+                equality operators. The equality operator is as in
+                <literal>SQL</literal> <literal>=</literal>.  Furthermore,
+                there are two valid negators to indicate that two objects
+                are not equal: <literal>!=</literal> and
+                <literal>&lt;&gt;</literal>.
+            </para>
+            <example>
+              <title>Equality of two spherical points</title>
+              <programlisting>
+<![CDATA[sql> SELECT spoint '(10d,20d)' = spoint '(370d,20d)' ;]]>
+<![CDATA[ test]]>
+<![CDATA[------]]>
+<![CDATA[ t]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+        
+        <sect2 id="op.over">
+            <title>
+               Contain and overlap
+            </title>
+            <para>
+                On sphere, an equality relationship is rarely used. There
+                are frequently questions like <emphasis>Is object
+                <literal>a</literal> contained by object
+                <literal>b</literal>?</emphasis> or <emphasis>Does object
+                <literal>a</literal> overlap object
+                <literal>b</literal>?</emphasis> 
+                <application>pgSphere</application> supports such
+                queries using binary operators returning
+                <emphasis>true</emphasis> or <emphasis>false</emphasis>:
+            </para>
+            <table frame="all" rowsep="1" colsep="1">
+              <title>Contain and overlap operators</title>
+              <tgroup cols="2" colsep="1" rowsep="1">
+                <colspec colname="col0" align="left"/>
+                <colspec colname="col1" align="left" colwidth="4*"/>
+                <thead valign="middle">
+                  <row>
+                   <entry align="center">operator</entry>
+                   <entry align="center">operator returns true, if</entry>
+                  </row>
+                </thead>
+                <tbody>
+                  <row>
+                    <entry>
+                      @
+                    </entry>
+                    <entry>
+                      the left object is contained by right object
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      &tilde;
+                    </entry>
+                    <entry>
+                      the left object contains right object
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      !@
+                    </entry>
+                    <entry>
+                      the left object is not contained by right object
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      !&tilde;
+                    </entry>
+                    <entry>
+                      the left object does not contain right object
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      &amp;&amp;
+                    </entry>
+                    <entry>
+                      the objects overlap each other
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      !&amp;&amp;
+                    </entry>
+                    <entry>
+                      the objects do not overlap each other
+                    </entry>
+                  </row>
+                </tbody>
+              </tgroup>
+            </table>
+            <para>
+                An overlap or contain operator does not exist for all
+                combinations of data types.
+                For instance, scircle @ <type>spoint</type> is
+                useless because a spherical point can never contain a
+                spherical circle.
+            </para>
+            <example>
+              <title>Is the left circle contained by the right circle?</title>
+              <programlisting>
+<![CDATA[sql> SELECT scircle '<(0d,20d),2d>' @ scircle '<(355d,20d),10d>' AS test ;]]>
+<![CDATA[test]]>
+<![CDATA[------]]>
+<![CDATA[ t]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+            <example>
+              <title>Are the circles overlapping?</title>
+              <programlisting>
+<![CDATA[sql> SELECT scircle '<(0d,20d),2d>' && scircle '<(199d,-10d),10d>' AS test ;]]>
+<![CDATA[ test]]>
+<![CDATA[------]]>
+<![CDATA[ f]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="op.cross">
+            <title>
+                Crossing of lines
+            </title>
+            <para>
+                Another binary relationship is <emphasis>crossing</emphasis>.
+                <application>pgSphere</application> supports only crossing of
+                lines.
+                The correlative operator is named <literal>&num;</literal>.
+            </para>
+            <example>
+              <title>Are the lines crossed?</title>
+              <programlisting>
+<![CDATA[sql> SELECT sline '(0d,0d,0d),10d' # sline '(90d,5d,5d,XYZ),10d' AS test ;]]>
+<![CDATA[ test]]>
+<![CDATA[------]]>
+<![CDATA[ t]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+        
+        <sect2 id="op.dist">
+            <title>
+                Distance
+            </title>
+            <para>
+                The binary distance operator <literal>&lt;-&gt;</literal> is
+                a non-boolean operator returning the distance between two
+                objects in radians. Currently,
+                <application>pgSphere</application> supports only distances
+                between points, circles, and between point and circle. If the
+                objects are overlapping, the distance operator returns zero
+                (0.0).
+            </para>
+            <example>
+              <title>Distance between two circles</title>
+              <programlisting>
+<![CDATA[sql> SELECT 180 * ( scircle '<(0d,20d),2d>' <-> scircle '<(0d,40d),2d>' )]]>
+<![CDATA[        / pi() AS dist ;]]>
+<![CDATA[ dist]]>
+<![CDATA[------]]>
+<![CDATA[ 16]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+        
+        <sect2 id="op.circum">
+            <title>
+                Length and circumference
+            </title>
+            <para>
+                The length/circumference operator <literal>@-@</literal> is
+                a non-boolean unary operator returning the cirumference or
+                length of an object.  In the current implementation,
+                <application>pgSphere</application> supports only
+                circumferences of circles, polygons, and boxes.  It supports
+                lengths of lines and paths too. Instead of using the
+                operator, you can use the functions
+                <literal>circum(object)</literal> or
+                <literal>length(object)</literal>.
+            </para>
+            <example>
+              <title>Circumference of a circle</title>
+              <programlisting>
+<![CDATA[sql> SELECT 180 * ( @-@ scircle '<(0d,20d),30d>' )/ pi() AS circ ;]]>
+<![CDATA[ circ]]>
+<![CDATA[------]]>
+<![CDATA[ 180]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+            <example>
+              <title>Length of a line</title>
+              <programlisting>
+<![CDATA[sql> SELECT 180 * ( @-@ sline '(0d,0d,0d),30d' )/ pi() AS length ;]]>
+<![CDATA[ length]]>
+<![CDATA[--------]]>
+<![CDATA[ 30]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="op.center">
+            <title>
+                Center
+            </title>
+            <para>
+                The center operator <literal>@@</literal> is a non-boolean
+                unary operator returning the center of an object.  In the
+                current implementation of <application>pgSphere</application>,
+                only centers of circles and ellipses are supported. Instead
+                of using the operator, you can use the function
+                <literal>center(object)</literal>.
+            </para>
+            <example>
+              <title>Center of a circle</title>
+              <programlisting>
+<![CDATA[sql> SELECT @@ scircle '<(0d,20d),30d>';]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="op.direction">
+            <title>
+                Change the direction
+            </title>
+            <para>
+                The unary operator <literal>-</literal> changes the
+                direction of <type>sline</type> or <type>spath</type>
+                objects. You can use it with a Euler transformation object
+                in the figurative sense, too (<xref linkend="op.trans"/>).
+            </para>
+            <example>
+              <title>Swap begin and end of a <type>sline</type></title>
+              <programlisting>
+<![CDATA[sql> SELECT - sline (spoint '(0d,0d)', spoint '(10d,0d)');]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="op.turnline">
+            <title>
+                Turn the path of a line
+            </title>
+            <para>
+                The unary operator <literal>!</literal> turns the
+                path of <type>sline</type> objects, but preserves 
+                begin and end of the spherical line. The length of
+                returned line will be 360&deg; minus the line length
+                of operator's argument.
+            </para>
+            <para>
+                The operator <literal>!</literal> returns
+                <literal>NULL</literal>, if the length of <type>sline</type> argument
+                is 0, because the path of returned <type>sline</type>
+                is undefined. 
+            </para>
+            <example>
+              <title>Return length and Check if north pole on <type>sline</type>s</title>
+              <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output ]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT length ( sline ( spoint '(0d,0d)', spoint '(0d,10d)' ) ) *]]>
+<![CDATA[        180.0 / pi() AS length;]]>
+<![CDATA[ length ]]>
+<![CDATA[--------]]>
+<![CDATA[     10]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT spoint '(0d,90d)' @]]>
+<![CDATA[        sline ( spoint '(0d,0d)', spoint '(0d,10d)' ) AS test;]]>
+<![CDATA[ test ]]>
+<![CDATA[------]]>
+<![CDATA[ f]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT length ( ! sline ( spoint '(0d,0d)', spoint '(0d,10d)' ) ) *]]>
+<![CDATA[        180.0 / pi() AS length;]]>
+<![CDATA[ length ]]>
+<![CDATA[--------]]>
+<![CDATA[    350]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT spoint '(0d,90d)' @]]>
+<![CDATA[        ! sline ( spoint '(0d,0d)', spoint '(0d,10d)' ) AS test;]]>
+<![CDATA[ test ]]>
+<![CDATA[------]]>
+<![CDATA[ t]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="op.trans">
+            <title>
+                Transformation
+            </title>
+            <para>
+                As in a plane, translations and rotations are needed to do
+                object or coordinate transformations. With
+                <application>pgSphere</application>, it is done using Euler
+                transformations (<type>strans</type>). On a sphere, there
+                aren't real translations.  All movements on a sphere are
+                rotations around axes.
+            </para>
+            <para>
+                The general syntax for a transformation is always:
+            </para>
+            <synopsis>object operator euler</synopsis>
+            <para>
+                where operators are <literal>+</literal> for a usual
+                transformation, <literal>-</literal> for an inverse
+                transformation.  You can transform any object having a
+                <application>pgSphere</application> data type, except the
+                data type <type>sbox</type>.
+            </para>
+            <example>
+              <title>Transformation of a point</title>
+              <simpara>
+                Rotate a spherical point counterclockwise, first 90&deg; around
+                the <literal>x</literal>-axis, second 90&deg; around
+                the <literal>z</literal>-axis, and last 40.5&deg; around
+                the <literal>x</literal>-axis.
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT spoint '(30d,0d)' + strans '90d, 90d, 40.5d, XZX AS spoint';]]>
+<![CDATA[   spoint]]>
+<![CDATA[---------------]]>
+<![CDATA[ (90d , 70.5d)]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+            <para>
+                You can use the <literal>+</literal> and
+                <literal>-</literal> operator as unary operators for
+                transformations, too. <literal>+<type>strans</type></literal>
+                just returns the transformation itself,
+                <literal>-<type>strans</type></literal> returns the inverse
+                transformation.
+            </para>
+            <example>
+              <title>An inverse transformation</title>
+              <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT - strans '20d, 50d, 80d, XYZ' AS inverted;]]>
+<![CDATA[      inverted]]>
+<![CDATA[-----------------------]]>
+<![CDATA[ 280d, 310d, 340d, ZYX]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+        
+    </sect1>

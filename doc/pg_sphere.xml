@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+<!ENTITY capWhatis     SYSTEM "whatis.sgm">
+<!ENTITY capInstall    SYSTEM "install.sgm">
+<!ENTITY capTypes      SYSTEM "types.sgm">
+<!ENTITY capConstr     SYSTEM "constructors.sgm">
+<!ENTITY capOperators  SYSTEM "operators.sgm">
+<!ENTITY capFunctions  SYSTEM "functions.sgm">
+<!ENTITY capIndices    SYSTEM "indices.sgm">
+<!ENTITY capExamples   SYSTEM "examples.sgm">
+<!ENTITY capFaq        SYSTEM "faq.sgm">
+<!ENTITY capAppendixes SYSTEM "appendixes.sgm">
+
+<!ENTITY graph1001 "img/spoint.jpg">
+<!ENTITY graph1002 "img/scircle.jpg">
+<!ENTITY graph1003 "img/strans.jpg">
+<!ENTITY graph1004 "img/sellipse.jpg">
+<!ENTITY graph1005 "img/sline.jpg">
+<!ENTITY graph1006 "img/spath.jpg">
+<!ENTITY graph1007 "img/spoly.jpg">
+<!ENTITY graph1008 "img/sbox.jpg">
+<!ENTITY graph1009 "img/logo.jpg">
+
+]>
+
+
+<article lang="en">
+    <articleinfo>
+        <title>
+            pgSphere 1.1
+        </title>
+        <author>
+            <surname>pgSphere development team</surname>
+        </author>
+        <abstract>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1009;" width="225px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+            </para>
+            <para>
+                <application>pgSphere</application> provides spherical data
+                types, functions, and operators for
+                <application>PostgreSQL</application>.
+            </para>
+            <para>
+              The project is hosted at <ulink url="http://pgfoundry.org/projects/pgsphere/"><citetitle>pgfoundry.org</citetitle></ulink>
+            </para>
+            <para>    
+                This document
+                describes installation and usage of this module.
+            </para>
+        </abstract>
+    </articleinfo>
+    &capWhatis;
+    &capInstall;
+    &capTypes;
+    &capConstr;
+    &capOperators;
+    &capFunctions;
+    &capIndices;
+    &capExamples;
+    &capFaq;
+    &capAppendixes;
+
+</article>

@@ -1,0 +1,64 @@
+    <sect1>
+        <title>
+            What is pgSphere?
+        </title>
+        <para>
+            <application>pgSphere</application> is an extra module for
+            <application>PostgreSQL</application> which adds spherical data
+            types. It provides:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    input and output of data
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    containing, overlapping, and other operators 
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    various input and converting functions and operators
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    circumference and area of an object
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    spherical transformation 
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    indexing of spherical data types 
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    several input and output formats 
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para>
+            Hence, you can do a fast search and analysis for objects with
+            spherical attributes as used in geographical, astronomical, or
+            other applications using <application>PostgreSQL</application>. 
+            For instance, you can manage data of geographical objects around
+            the world and astronomical data like star and other catalogs
+            conveniently using an <literal>SQL</literal> interface.
+        </para>
+        <para>
+            The aim of <application>pgSphere</application> is to provide 
+            uniform access to spherical data. Because
+            <application>PostgreSQL</application> itself supports a lot of
+            software interfaces, you can now use the same database
+            with different utilities and applications.
+        </para>
+        
+    </sect1>

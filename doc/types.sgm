@@ -1,0 +1,667 @@
+    <sect1 id="types">
+        <title>
+            Data types
+        </title>
+        <sect2 id="dt.over">
+            <title>
+                Overview
+            </title>
+            <para>
+                <productname>pgSphere</productname> provides spherical data
+                types for storing with
+                <application>PostgreSQL</application>. Furthermore, there is
+                a data type to do transformations.
+            </para>
+            <table frame="all" rowsep="1" colsep="1">
+              <title>Data types</title>
+              <tgroup cols="2">
+                <colspec colname="col0" align="left"/>
+                <colspec colname="col1" align="left"/>
+                <thead valign="middle">
+                 <row>
+                   <entry align="center"><literal>SQL</literal> type name</entry>
+                   <entry align="center">spherical type</entry>
+                 </row>
+                </thead>
+                <tbody>
+                  <row>
+                    <entry>
+                      <type>spoint</type>
+                    </entry>
+                    <entry>
+                       point (position)
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>strans</type>
+                    </entry>
+                    <entry>
+                      Euler transformation
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>scircle</type>
+                    </entry>
+                    <entry>
+                      circle
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>sline</type>
+                    </entry>
+                    <entry>
+                      line
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>sellipse</type>
+                    </entry>
+                    <entry>
+                      ellipse
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>spoly</type>
+                    </entry>
+                    <entry>
+                      polygon
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>spath</type>
+                    </entry>
+                    <entry>
+                      path
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <type>sbox</type>
+                    </entry>
+                    <entry>
+                      coordinate range
+                    </entry>
+                  </row>
+                </tbody>
+              </tgroup>
+            </table>
+
+        </sect2>
+        
+        <sect2 id="dt.spoint">
+            <title>
+                Point
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1001;" width="142px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+               A spherical point is an object without expanse
+               but with a position. Usage cases are:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        sites on earth 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        star positions on the sky sphere 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        spherical positions on planets 
+                    </para>
+                </listitem>
+                
+            </itemizedlist>
+            <para>
+                A spherical point (or position) is given by two values:
+                longitude and latitude.  Longitude is a floating point
+                value between <literal>0</literal> and
+                <literal>2&pgr;</literal>.  Latitude is a floating point
+                value, too, but between <literal>-&pgr;/2</literal> and
+                <literal>&pgr;/2</literal>. It is possible to give a
+                spherical position in degrees (<literal>DEG</literal>) or
+                with a triple value of degrees, minutes and seconds
+                (<literal>DMS</literal>). Degrees and minutes are integer
+                values.  The seconds are represented using a floating point
+                value. A fourth method is specifying a longitude value as
+                a triple value of hours, minutes and seconds
+                (<literal>HMS</literal>). But, you can not use it with
+                latitude values.
+            </para>
+            <example>
+              <title>
+                A position specified using longitude and latitude in radians
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT spoint '(0.1,-0.2)';]]>
+              </programlisting>
+            </example>
+            <example>
+              <title>
+                A position specified using longitude and latitude in degrees
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT spoint '( 10.1d, -90d)';]]>
+              </programlisting>
+            </example>
+            <example>
+              <title>
+                A position specified using longitude and latitude
+                (<literal>DMS</literal>)
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT spoint '( 10d 12m 11.3s, -13d 14m)';]]>
+              </programlisting>
+            </example>
+            <example>
+              <title>
+                A position specified using longitude in
+                <literal>HMS</literal>, and latitude in
+                <literal>RAD</literal>
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT spoint '( 23h 44m 10s, -1.4321 )';]]>
+              </programlisting>
+            </example>
+            <para>
+                As you can see you can combine the input format for
+                longitude and latitude. The value pairs are always enclosed
+                within braces. Spaces are optional.
+            </para>
+            
+        </sect2>
+
+        <sect2 id="dt.strans">
+            <title>
+                Euler transformation
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1003;" width="160px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+              A Euler transformation is done with three counterclockwise
+              object rotations around following the axes:
+              <literal>x</literal>-axis, <literal>y</literal>-axis, or
+              <literal>z</literal>-axis.  Usage cases are:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        spherical object transformations 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        spherical coordinates transformations 
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+              The input syntax of a Euler transformation is:
+            </para>
+            <synopsis>angle1, angle2, angle3 &lsqb;, axes &rsqb;</synopsis>
+            <para>
+              where <parameter>axes</parameter> is an optional 3 letter code
+              with letters : <literal>X</literal>, <literal>Y</literal>, or
+              <literal>Z</literal>. Default is <literal>ZXZ</literal>. 
+              <parameter>angleN</parameter> is any valid angle with the input
+              format <literal>RAD</literal>, <literal>DEG</literal>, or
+              <literal>DMS</literal>.
+            </para>
+            <para>
+              To do a transformation, you have to use a
+              transformation operator (see <xref linkend="op.trans"/>).
+            </para>
+            <example>
+              <title>Create a transformation object</title>
+              <simpara>
+                Create a transformation object to rotate a spherical object
+                counterclockwise, first 20&deg; around the
+                <literal>x</literal>-axis, second -270&deg; around the
+                <literal>z</literal>-axis and last 70.5&deg; around the
+                <literal>y</literal>-axis.
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT strans '20d, -270d, 70.5d, XZY';]]>
+              </programlisting>
+            </example>
+            <example>
+              <title>
+                Create a second transformation object
+              </title>
+              <simpara>
+                Create a transformation object to rotate a spherical object
+                counterclockwise, first
+                2&deg; 20' around the <literal>z</literal>-axis, second 10&deg;
+                around the <literal>x</literal>-axis, and last 0&deg; around
+                the <literal>z</literal>-axis.
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT strans '2d 20m, 10d, 0';]]>
+              </programlisting>
+            </example>
+        </sect2>
+        
+        <sect2 id="dt.scircle">
+            <title>
+                Circle
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1002;" width="142px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+              A spherical circle is an area
+              around a point, where all points inside the circle have a
+              distance less than or equal to the radius of the circle.  Usage
+              cases are:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        sites on earth having a maximum distance from
+                        another site
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        round cluster or nebula on sky sphere 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        a position with an undirected position error 
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                A circle is specified using a spherical point (<type>spoint</type>) and a
+                radius :
+            </para>
+            <synopsis>&lt; point , radius &gt;</synopsis>
+            <para>
+                Valid radius units are <literal>RAD</literal>,
+                <literal>DEG</literal>, and <literal>DMS</literal>. The
+                circle radius must be less than or equal to 90&deg; and cannot
+                be less than zero.
+            </para>
+            <example>
+              <title>
+                A circle around the North Pole with a
+                radius of 5&deg;.
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT scircle '< (0d, 90d), 5d >';]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="dt.sline">
+            <title>
+                Line
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1005;" width="142px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+              A spherical line is part of a great circle (meridian) that has
+              a beginning and an end and hence, a direction.  Usage cases are:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        direct connection of two points 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        meteors on the sky sphere 
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+              To allow lines with a length larger than 180&deg;, the input
+i             syntax is a somewhat complex.
+            </para>
+            <para>
+              A general located line with a length
+              <parameter>length</parameter> is defined as a line starting at
+              position <literal>(0d,0d)</literal> and ending at position
+              <literal>(length,0d)</literal> transformed with a Euler
+              transformation <parameter>euler</parameter>.  The input syntax
+              is :
+            </para>
+            <synopsis>( euler ), length</synopsis>
+            <itemizedlist>
+            <title>Note:</title>
+              <listitem>
+                  <para>
+                    For a simpler line input, use casting
+                    operators (<xref linkend="op.casting"/>) or constructor
+                    functions (<xref linkend="construct"/>).
+                  </para>
+              </listitem>
+              <listitem>
+                  <para>
+                      If the length is larger than 360&deg;, the line length
+                      is truncated to 360&deg;.
+                  </para>
+              </listitem>
+              <listitem>
+                  <para>
+                      The transformation <parameter>euler</parameter>
+                      will always be converted to a Euler
+                      transformation using axes <literal>Z</literal>,
+                      <literal>X</literal>, and <literal>Z</literal>.
+                  </para>
+              </listitem>
+            </itemizedlist>
+            <example>
+              <title>A line input</title>
+              <simpara>
+                A line starting at position <literal>(200d,+20d)</literal>
+                and ending at position <literal>(200d,-10d)</literal>.
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT sline '( -90d, -20d, 200d, XYZ ), 30d ';]]>
+              </programlisting>
+            </example>
+        </sect2>
+        
+        <sect2 id="dt.sellipse">
+            <title>
+                Ellipses
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1004;" width="142px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+              Within <application>pgSphere</application>, ellipses are
+              defined as :
+            </para>
+            <blockquote>
+               <para>
+                  <emphasis>
+                    If the center of any spherical ellipse is the North
+                    Pole, the perpendicular projection into the
+                    <literal>x</literal>-<literal>y</literal>-plane gives an
+                    ellipse as in two-dimensional space.
+                  </emphasis>
+               </para>
+            </blockquote>
+            <para>
+                Usage cases are:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        cluster or nebula on the sky sphere where
+                        the `height' is lower than the `width'
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        to describe a position error 
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                An ellipse always has:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        a major radius <parameter>rad_1</parameter> 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        a minor radius <parameter>rad_2</parameter> 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        a center <parameter>center</parameter>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        a position angle <parameter>pos</parameter> (inclination)
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Hence, the input syntax is:
+            </para>
+            <synopsis>&lt; &lcub; rad_1, rad_2 &rcub;, center, pos &gt;</synopsis>
+            <itemizedlist>
+              <title>Note:</title>
+              <listitem>
+                  <para>
+                      The radii <parameter>rad_1</parameter> and
+                      <parameter>rad_2</parameter> have to be less than
+                      90&deg;.
+                  </para>
+              </listitem>
+              <listitem>
+                  <para>
+                      If <parameter>rad_1</parameter> is less than
+                      <parameter>rad_2</parameter> , the values will be
+                      swapped.
+                  </para>
+              </listitem>
+              <listitem>
+                  <para>
+                      The position angle <parameter>pos</parameter>
+                      is defined within
+                      <application>pgSphere</application> as a counterclockwise
+                      rotation around the ellipse center and is zero, if the
+                      ellipse is &ldquo;parallel to the equator&rdquo;
+                  </para>
+              </listitem>
+            </itemizedlist>
+            <example>
+               <title>Input of a spherical ellipse</title>
+               <simpara>
+                An ellipse has a center at 20&deg; longitude and 0&deg;
+                latitude. The minor radius is part of the equator. The major
+                radius is 10&deg;, the minor radius is 5&deg;.
+               </simpara>
+               <programlisting>
+<![CDATA[sql> SELECT sellipse '< { 10d, 5d } , ( 20d, 0d ), 90d >';]]>
+               </programlisting>
+            </example>
+        </sect2>
+
+
+        <sect2 id="dt.spath">
+            <title>
+                Path
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1006;" width="142px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+              A spherical path is a
+              concatination of spherical lines.  Usage cases are:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        rivers on earth 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        trajectories of planets or comets on the sky plane
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Paths within <application>pgSphere</application> are simplified
+                lists of positions. The input syntax is :
+            </para>
+            <synopsis>&lcub;pos1,pos2&lsqb;,pos3&lsqb;,pos4&lsqb;,...&rsqb;&rsqb;&rsqb;&rcub;</synopsis>
+            <itemizedlist>
+              <title>Note:</title>
+              <listitem>
+                  <para>
+                      The distance between 2 sequent positions has to be
+                      less than 180&deg; and greater than zero.
+                  </para>
+              </listitem>
+              <listitem>
+                  <para>
+                      At least 2 positions are required. 
+                  </para>
+              </listitem>
+            </itemizedlist>
+            <example>
+              <title>Path input example</title>
+              <simpara>
+                A path going from <literal>(10d,0d)</literal> to
+                <literal>(80d,30d)</literal> via
+                <literal>(45d,15d)</literal>.
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT spath '{ (10d,0d),(45d,15d),(80d,30d) } ';]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="dt.spoly">
+            <title>
+                Polygon
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1007;" width="142px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+              A spherical polygon is a
+              closed spherical path where line segments cannot be crossed.
+              One main usage case are areas on the earth and sky sphere.
+              Polygons within <application>pgSphere</application> 
+              have the same input syntax as paths:
+            </para>
+            <synopsis>&lcub;pos1,pos2,pos3&lsqb;,pos4&lsqb;,... &rsqb;&rsqb;&rcub;</synopsis>
+            <itemizedlist>
+              <title>Note:</title>
+              <listitem>
+                  <para>
+                      A spherical polygon has the same restrictions as a
+                      spherical path (see <xref linkend="dt.spath" />).
+                      Except that a polygon needs at least 3 positions.
+                  </para>
+              </listitem>
+              <listitem>
+                  <para>
+                      The line segments can not be crossed. 
+                  </para>
+              </listitem>
+              <listitem>
+                  <para>
+                      The maximum dimension of a polygon must be less than
+                      180&deg;.
+                  </para>
+              </listitem>
+            </itemizedlist>
+            <example>
+              <title>Input of polygon</title>
+              <simpara>
+                A polygon going from <literal>(270d,-10d)</literal>.
+                via <literal>(270d,30d)</literal> to <literal>(290d,10d)</literal>
+                back to <literal>(270d,-10d)</literal>
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT spoly '{ (270d,-10d), (270d,30d), (290d,10d) } ';]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="dt.sbox">
+            <title>
+                Coordinates range
+            </title>
+            <para>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="&graph1008;" width="142px" format="JPEG"/>
+                </imageobject>
+              </mediaobject>
+              A spherical box is a
+              coordinates range. Hence, you can select objects within a
+              longitude range and latitude range. The box is represented
+              using two spherical points: the southwest
+              (<parameter>pos_sw</parameter>) and the northeast
+              (<parameter>pos_ne</parameter>) edge of the box.  The input
+              syntax is:
+            </para>
+            <synopsis>( pos_sw, pos_ne )</synopsis>
+            <para>or</para>
+            <synopsis>pos_sw, pos_ne</synopsis>
+            <itemizedlist>
+              <title>Note:</title>
+              <listitem>
+                <para>
+                  If the latitude of the southwest edge is larger than
+                  the latitude of the northeast edge,
+                  <application>pgSphere</application> swaps the edges.
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  If the longitude of the southwest edge is equal to
+                  the longitude of the northeast edge,
+                  <application>pgSphere</application> assumes a full latitude
+                  range, except that the latitudes are equal, too.
+                </para>
+              </listitem>
+            </itemizedlist>
+            <example>
+              <title>
+                Input of a full latitude range
+              </title>
+              <simpara>
+                A full latitude range
+                between +20&deg; and +23&deg;.
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT sbox '( (0d,20d), (0d,23d) )';]]>
+              </programlisting>
+            </example>
+            <example>
+              <title>A simple coordinates range</title>
+              <simpara>
+                A coordinate range between -10&deg; and +10&deg; in latitude
+                and 350&deg; and 10&deg; in longitude.
+              </simpara>
+              <programlisting>
+<![CDATA[sql> SELECT sbox '( (350d,-10d), (10d,+10d) )';]]>
+              </programlisting>
+            </example>
+        </sect2>
+    </sect1>

@@ -1,0 +1,38 @@
+--
+-- first, define the datatype.  Turn off echoing so that expected file
+-- does not depend on contents of pg_sphere.sql.
+--
+\set ECHO none
+psql:pg_sphere.sql:10: NOTICE:  type "spoint" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:17: NOTICE:  argument type spoint is only a shell
+psql:pg_sphere.sql:33: NOTICE:  type "strans" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:40: NOTICE:  argument type strans is only a shell
+psql:pg_sphere.sql:56: NOTICE:  type "scircle" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:63: NOTICE:  argument type scircle is only a shell
+psql:pg_sphere.sql:79: NOTICE:  type "sline" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:86: NOTICE:  argument type sline is only a shell
+psql:pg_sphere.sql:102: NOTICE:  type "sellipse" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:109: NOTICE:  argument type sellipse is only a shell
+psql:pg_sphere.sql:127: NOTICE:  type "spoly" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:134: NOTICE:  argument type spoly is only a shell
+psql:pg_sphere.sql:153: NOTICE:  type "spath" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:160: NOTICE:  argument type spath is only a shell
+psql:pg_sphere.sql:179: NOTICE:  type "sbox" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:186: NOTICE:  argument type sbox is only a shell
+psql:pg_sphere.sql:7235: NOTICE:  type "spherekey" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:7242: NOTICE:  argument type spherekey is only a shell
+psql:pg_sphere.sql:7256: NOTICE:  type "pointkey" is not yet defined
+DETAIL:  Creating a shell type definition.
+psql:pg_sphere.sql:7263: NOTICE:  argument type pointkey is only a shell
+psql:pg_sphere.sql:7269: NOTICE:  argument type pointkey is only a shell
+psql:pg_sphere.sql:7275: NOTICE:  argument type pointkey is only a shell
+psql:pg_sphere.sql:7281: NOTICE:  argument type pointkey is only a shell

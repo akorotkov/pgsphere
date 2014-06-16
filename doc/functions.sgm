@@ -1,0 +1,572 @@
+    <sect1 id="funcs">
+        <title>
+            Functions
+        </title>
+        <para>
+          The functions described below are implemented without having an
+          operator.  If you are missing some functions, see
+          <xref linkend="operators"/> and use the operators.
+        </para>
+        <sect2 id="func.area">
+            <title>
+                Area function
+            </title>
+            <para>
+              The <function>area</function> function returns the area of a
+              spherical object in square radians. Supported data types are:
+              <type>scircle</type>, <type>spolygon</type>, and
+              <type>sbox</type>.
+            </para>
+            <example>
+              <title>Area of a spherical circle as a multiple of &pgr;</title>
+              <programlisting>
+<![CDATA[sql> SELECT area( scircle '<(0d,90d),60d>' ) / pi() AS area;]]>
+<![CDATA[ area]]>
+<![CDATA[------]]>
+<![CDATA[ 1]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="func.spoint">
+          <title>
+            <type>spoint</type> functions
+          </title>
+
+          <sect3 id="func.spoint.ll">
+            <title>
+               Longitude and latitude
+            </title>
+            <para>
+              The functions
+            </para>
+            <funcsynopsis>
+              <funcprototype>
+                <funcdef><function>long</function></funcdef>
+                  <paramdef>spoint <parameter>p</parameter></paramdef>
+              </funcprototype>
+              <funcprototype>
+                <funcdef><function>lat</function></funcdef>
+                  <paramdef>spoint <parameter>p</parameter></paramdef>
+              </funcprototype>
+            </funcsynopsis>
+            <para>
+              returns the longitude or latitude value of a
+              spherical position <parameter>p</parameter> in radians.
+            </para>
+            <example>
+              <title>Get the longitude and latitude of a spherical point in degrees</title>
+              <programlisting>
+<![CDATA[sql> SELECT long ( spoint '(10d,20d)' ) * 180.0 / pi() AS longitude;]]>
+<![CDATA[ longitude]]>
+<![CDATA[------------]]>
+<![CDATA[ 10]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT lat ( spoint '(10d,20d)' ) * 180.0 / pi() AS latitude;]]>
+<![CDATA[ latitude]]>
+<![CDATA[----------]]>
+<![CDATA[ 20]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+          </sect3>
+
+          <sect3 id="func.spoint.cart">
+            <title>
+              Cartesian coordinates
+            </title>
+            <para>
+              The functions
+            </para>
+            <funcsynopsis>
+              <funcprototype>
+                <funcdef><function>x</function></funcdef>
+                  <paramdef>spoint <parameter>p</parameter></paramdef>
+              </funcprototype>
+              <funcprototype>
+                <funcdef><function>y</function></funcdef>
+                  <paramdef>spoint <parameter>p</parameter></paramdef>
+              </funcprototype>
+              <funcprototype>
+                <funcdef><function>z</function></funcdef>
+                  <paramdef>spoint <parameter>p</parameter></paramdef>
+              </funcprototype>
+            </funcsynopsis>
+            <para>
+              return the cartesian
+              <literal>x</literal>, <literal>y</literal> or
+              <literal>z</literal> value of a spherical position
+              <parameter>p</parameter>. The returned values are always
+              between <literal>-1.0</literal> and <literal>+1.0</literal>.
+            </para>
+            <example>
+              <title>
+                Get the cartesian <literal>z</literal>-value
+                of a spherical point
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT z ( spoint '(10d,-90d)' ) AS z;]]>
+<![CDATA[ z]]>
+<![CDATA[----]]>
+<![CDATA[ -1]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+            <para>
+              You can get a <type>float8</type> array of cartesian values using the function
+            </para>
+            <funcsynopsis>
+              <funcprototype>
+                <funcdef><function>xyz</function></funcdef>
+                  <paramdef>spoint <parameter>p</parameter></paramdef>
+              </funcprototype>
+            </funcsynopsis>
+            <example>
+              <title>
+                Get the cartesian values of a spherical point
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT xyz ( spoint '(0d,0d)' ) AS cart;]]>
+<![CDATA[  cart]]>
+<![CDATA[---------]]>
+<![CDATA[ {1,0,0}]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+          </sect3>
+
+        </sect2>
+        
+        <sect2 id="funcs.strans">
+            <title>
+              <type>strans</type> functions
+            </title>
+
+            <sect3 id="funcs.strans.zxz">
+                <title>
+                    Converting to ZXZ
+                </title>
+                <para>
+                    Using the function
+                    <function>strans_zxz(strans),</function> you can convert
+                    a Euler transformation to <literal>ZXZ</literal>-axes
+                    transformation.
+                </para>
+                <example>
+                  <title>Change the transformation axes to <literal>ZXZ</literal></title>
+                  <simpara>
+                    Convert the transformation <literal>strans '20d, -270d, 70.5d,
+                    XZY'</literal> to a <literal>ZXZ</literal>-transformation.
+                  </simpara>
+                  <programlisting>
+<![CDATA[sql> SELECT strans_zxz ( strans '20d, -270d, 70.5d, XZY' );]]>
+                  </programlisting>
+                </example>
+            </sect3>
+
+            <sect3 id="funcs.strans.axes">
+                <title>
+                    Angles and axes
+                </title>
+                <para>
+                    It is possible to get the components of an Euler
+                    transformation.
+                </para>
+                <table frame="all" rowsep="1" colsep="1">
+                <title>Getting Euler transformation attributes</title>
+                  <tgroup cols="2" colsep="1" rowsep="1">
+                    <colspec colname="col0" align="left"/>
+                    <colspec colname="col1" align="left" colwidth="2*"/>
+                    <thead valign="middle">
+                      <row>
+                          <entry>
+                              function
+                          </entry>
+                          <entry>
+                              description
+                          </entry>
+                      </row>
+                    </thead>
+                    <tbody>
+                      <row>
+                        <entry>
+                          <function>phi</function>
+                        </entry>
+                        <entry>
+                          first angle of a transformation
+                        </entry>
+                      </row>
+                      <row>
+                        <entry>
+                          <function>theta</function>
+                        </entry>
+                        <entry>
+                          second angle of a transformation
+                        </entry>
+                      </row>
+                      <row>
+                        <entry>
+                          <function>psi</function>
+                        </entry>
+                        <entry>
+                          third angle of a transformation
+                        </entry>
+                      </row>
+                      <row>
+                        <entry>
+                          <function>axes</function>
+                        </entry>
+                        <entry>
+                          transformation axes as a three letter code
+                        </entry>
+                      </row>
+                    </tbody>
+                  </tgroup>
+                </table>
+                <para>
+                    The angles will always returned as a <type>float8</type> value in radians.
+                    The axes are returned as a three letter code.
+                </para>
+                <example>
+                  <title>Get the second axis and its rotation angle</title>
+                  <programlisting>
+<![CDATA[sql> SELECT theta( strans '20d,30d,40d,XZY' ) * 180 / pi() AS theta;]]>
+<![CDATA[ theta]]>
+<![CDATA[-------]]>
+<![CDATA[ 30]]>
+<![CDATA[(1 row)]]>
+<![CDATA[sql> SELECT substring ( axes ( strans '20d,30d,40d,XZY' ) from 2 for 1 ) AS axis;]]>
+<![CDATA[ axis]]>
+<![CDATA[------]]>
+<![CDATA[  Z]]>
+<![CDATA[(1 row)]]>
+                  </programlisting>
+                </example>
+            </sect3>
+
+        </sect2>
+
+
+        <sect2 id="func.circle">
+            <title>
+                scircle functions
+            </title>
+            <para>
+              You can get the radius of a spherical circle in radians using
+              the <function>radius</function> function.  The center of the
+              circle is available with
+              the operator <literal>@@</literal> (<xref
+              linkend="op.center"/>).
+            </para>
+            <example>
+              <title>Radius of a spherical circle in degrees</title>
+              <programlisting>
+<![CDATA[sql> SELECT 180.0 * radius( scircle '<(0d,90d),60d>' ) / pi() AS radius;]]>
+<![CDATA[ radius]]>
+<![CDATA[--------]]>
+<![CDATA[     60]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+        </sect2>
+
+        <sect2 id="funcs.sellipse">
+            <title>
+                <type>sellipse</type> functions
+            </title>
+
+            <para>
+              <application>pgSphere</application> provides 4 functions to get
+              the parameters of a spherical ellipse:
+            </para>
+            <table frame="all" rowsep="1" colsep="1">
+            <title>Getting spherical ellipse attributes</title>
+              <tgroup cols="2" colsep="1" rowsep="1">
+                <colspec colname="col0" align="left"/>
+                <colspec colname="col1" align="left" colwidth="2*"/>
+                <thead valign="middle">
+                  <row>
+                      <entry>
+                          function
+                      </entry>
+                      <entry>
+                          description
+                      </entry>
+                  </row>
+                </thead>
+                <tbody>
+                  <row>
+                    <entry>
+                      <function>lrad</function>
+                    </entry>
+                    <entry>
+                      the major radius of the ellipse
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <function>srad</function>
+                    </entry>
+                    <entry>
+                      the minor radius of the ellipse
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <function>center</function>
+                    </entry>
+                    <entry>
+                       the center of the ellipse
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      <function>inc</function>
+                    </entry>
+                    <entry>
+                       the inclination of the ellipse
+                    </entry>
+                  </row>
+                </tbody>
+              </tgroup>
+            </table>
+            <para>
+                To get the ellipse center, you can use the 
+                operator <literal>@@</literal> (<xref linkend="op.center"/>)
+                instead of using the function
+                <function>center(sellipse)</function>. 
+            </para>
+            <example>
+              <title>Get the minor radius of an ellipse</title>
+              <programlisting>
+<![CDATA[sql> SELECT srad ( sellipse '< { 10d, 5d }, ( 20d, 0d ), 90d >' )]]>
+<![CDATA[        * 180.0/ pi() AS srad ;]]>
+<![CDATA[ srad]]>
+<![CDATA[------]]>
+<![CDATA[  5]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+
+        </sect2>
+        
+        <sect2 id="funcs.sline">
+            <title>
+              <type>sline</type> functions
+            </title>
+
+            <sect3 id="funcs.sline.be">
+              <title>
+                 Begin and end
+              </title>
+              <para>
+                To get the beginning and the end of a line,
+                <application>pgSphere</application> provides two functions:
+              </para>
+              <funcsynopsis>
+                <funcprototype>
+                  <funcdef><function>sl_beg</function></funcdef>
+                    <paramdef>sline <parameter>line</parameter></paramdef>
+                </funcprototype>
+                <funcprototype>
+                  <funcdef><function>sl_end</function></funcdef>
+                    <paramdef>sline <parameter>line</parameter></paramdef>
+                </funcprototype>
+              </funcsynopsis>
+              <example>
+                <title>Get the beginning of a line</title>
+                <programlisting>
+<![CDATA[sql> SELECT sl_beg( sline '(10d, 90d, 270d, ZXZ ), 20d';]]>
+                </programlisting>
+              </example>
+            </sect3>
+
+            <sect3 id="funcs.sline.meridian">
+                <title>
+                  Create a meridian
+                </title>
+                <para>
+                  You can create a meridian as a line using the function
+                </para>
+                <funcsynopsis>
+                  <funcprototype>
+                    <funcdef><function>meridian</function></funcdef>
+                      <paramdef>float8 <parameter>lng</parameter></paramdef>
+                  </funcprototype>
+                </funcsynopsis>
+                <para>
+                  The function returns a line starting at a latitude of
+                  -90&deg; and ending at a latitude of 90&deg;. The line goes
+                  along the given longitude <parameter>lng</parameter> in
+                  radians.
+                </para>
+                <example>
+                  <title>A meridian for longitude 20&deg;</title>
+                  <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output ]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT meridian (20.0 *pi() / 180.0 );]]>
+<![CDATA[             sline             ]]>
+<![CDATA[-------------------------------]]>
+<![CDATA[ ( 270d, 90d, 20d, ZXZ ), 180d]]>
+<![CDATA[(1 row)]]>
+                  </programlisting>
+                </example>
+            </sect3>
+        </sect2>
+        
+        <sect2 id="funcs.spath">
+          <title>
+            <type>spath</type> functions
+          </title>
+          <sect3 id="funcs.spath.npts">
+            <title>
+              Count of points
+            </title>
+            <para>
+              You can get the count of points of a spherical path using the
+              function:
+            </para>
+            <funcsynopsis>
+              <funcprototype>
+                <funcdef><function>npoints</function></funcdef>
+                  <paramdef>spath <parameter>path</parameter></paramdef>
+              </funcprototype>
+            </funcsynopsis>
+            <example>
+              <title>Count of spath's points</title>
+              <programlisting>
+<![CDATA[sql> SELECT npoints ( spath '{(0,0),(1,0)}' );]]>
+<![CDATA[ npoints]]>
+<![CDATA[---------]]>
+<![CDATA[       2]]>
+<![CDATA[ (1 row)]]>
+<![CDATA[]]>
+              </programlisting>
+            </example>
+                
+          </sect3>
+            
+          <sect3 id="funcs.spath.pos">
+            <title>
+              Positions at a path
+            </title>
+            <para>
+              <application>pgSphere</application> provides two functions to
+              get points at a path.
+            </para>
+            <funcsynopsis>
+              <funcprototype>
+                <funcdef><function>spoint</function></funcdef>
+                  <paramdef>spath <parameter>path</parameter></paramdef>
+                  <paramdef>int4 <parameter>i</parameter></paramdef>
+              </funcprototype>
+              <funcprototype>
+                <funcdef><function>spoint</function></funcdef>
+                  <paramdef>spath  <parameter>path</parameter></paramdef>
+                  <paramdef>float8 <parameter>f</parameter></paramdef>
+              </funcprototype>
+            </funcsynopsis>
+            <para>
+               The first function returns the <parameter>i</parameter>-th
+               point of a path.  If <parameter>i</parameter> is less than 1
+               or larger than the count of <type>spath</type> points, the
+               function returns <literal>NULL</literal>.  The second
+               function does nearly the same, but does linear interpolation
+               between edge positions.
+            </para>
+            <example>
+              <title>
+                Get the &ldquo;center&rdquo; of a one segment <type>spath</type>
+              </title>
+              <programlisting>
+<![CDATA[sql> SELECT spoint ( spath '{(0d,0d),(30d,0d)}', 1.5 );]]>
+<![CDATA[  spoint]]>
+<![CDATA[------------]]>
+<![CDATA[ (15d , 0d)]]>
+<![CDATA[(1 row)]]>
+              </programlisting>
+            </example>
+          </sect3>
+        </sect2>
+        
+        <sect2 id="funcs.spoly">
+          <title>
+            <type>spoly</type> functions
+          </title>
+          <sect3 id="funcs.spoly.npts">
+            <title>
+              Cnunt of edges
+            </title>
+            <para>
+              Similar to an <type>spath</type> (<xref linkend="funcs.spath.npts"/>), 
+              you can get the count of edges of a spherical polygon using the
+              function:
+            </para>
+            <funcsynopsis>
+              <funcprototype>
+                <funcdef><function>npoints</function></funcdef>
+                  <paramdef>spoly <parameter>polygon</parameter></paramdef>
+              </funcprototype>
+            </funcsynopsis>
+            <example>
+              <title>Count of edges of a spherical polygon</title>
+              <programlisting>
+<![CDATA[sql> SELECT npoints ( spoly '{(0,0),(1,0),(1,1)}' );]]>
+<![CDATA[ npoints]]>
+<![CDATA[---------]]>
+<![CDATA[       3]]>
+<![CDATA[ (1 row)]]>
+              </programlisting>
+            </example>
+
+          </sect3>
+            
+        </sect2>
+
+        <sect2 id="funcs.sbox">
+          <title>
+            <type>sbox</type> functions
+          </title>
+          <para>
+            The functions
+          </para>
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef><function>sw</function></funcdef>
+                <paramdef>sbox <parameter>box</parameter></paramdef>
+            </funcprototype>
+            <funcprototype>
+              <funcdef><function>ne</function></funcdef>
+                <paramdef>sbox <parameter>box</parameter></paramdef>
+            </funcprototype>
+            <funcprototype>
+              <funcdef><function>se</function></funcdef>
+                <paramdef>sbox <parameter>box</parameter></paramdef>
+            </funcprototype>
+            <funcprototype>
+              <funcdef><function>nw</function></funcdef>
+                <paramdef>sbox <parameter>box</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+          <para>
+            return the corresponding southwest, northeast, southeast, or
+            northwest edge.
+            The returned value will be a spherical point.
+          </para>
+          <example>
+            <title>The southwest edge of a box</title>
+            <programlisting>
+<![CDATA[sql> SELECT sw ( sbox '( (0d,0d), (90d,0d) )' ) ;]]>
+            </programlisting>
+          </example>
+
+        </sect2>
+        
+    </sect1>

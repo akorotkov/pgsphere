@@ -1,0 +1,222 @@
+
+
+-- spherical transformation functions
+
+CREATE FUNCTION strans_zxz(strans)
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans_zxz'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_zxz(strans) IS
+  'returns Euler transformation as ZXZ transformation'; 
+
+CREATE FUNCTION strans( FLOAT8, FLOAT8, FLOAT8 )
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans_from_float8'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans( FLOAT8, FLOAT8, FLOAT8 ) IS
+  'returns an transformation object using Euler angles (ZXZ)'; 
+
+CREATE FUNCTION strans( FLOAT8, FLOAT8, FLOAT8, CSTRING )
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans_from_float8_and_type'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans( FLOAT8, FLOAT8, FLOAT8, CSTRING ) IS
+  'returns an transformation object using Euler angles and axis'; 
+
+CREATE FUNCTION phi( strans )
+   RETURNS FLOAT8
+   AS 'MODULE_PATHNAME' , 'spheretrans_phi'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION phi( strans ) IS
+  'returns the first angle of Euler angles of a transformation object'; 
+
+CREATE FUNCTION theta( strans )
+   RETURNS FLOAT8
+   AS 'MODULE_PATHNAME' , 'spheretrans_theta'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION theta( strans ) IS
+  'returns the second angle of Euler angles of a transformation object'; 
+
+CREATE FUNCTION psi( strans )
+   RETURNS FLOAT8
+   AS 'MODULE_PATHNAME' , 'spheretrans_psi'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION psi( strans ) IS
+  'returns the third angle of Euler angles of a transformation object'; 
+
+CREATE FUNCTION axes( strans )
+   RETURNS CHARACTER(3)
+   AS 'MODULE_PATHNAME' , 'spheretrans_type'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION axes ( strans ) IS
+  'returns the axis of Euler angles of a transformation object'; 
+
+
+-- spherical transformation operators
+
+CREATE FUNCTION strans_equal(strans,strans)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spheretrans_equal'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_equal(strans,strans) IS
+  'returns true, if Euler transformations are equal'; 
+
+
+CREATE OPERATOR  = (
+   LEFTARG    = strans,
+   RIGHTARG   = strans,
+   COMMUTATOR = = ,
+   NEGATOR    = <>,
+   PROCEDURE  = strans_equal,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR = ( strans, strans ) IS
+  'true, if Euler transformations are equal'; 
+
+
+CREATE FUNCTION strans_not_equal(strans,strans)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME' , 'spheretrans_not_equal'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_not_equal(strans,strans) IS
+  'returns true, if Euler transformations are not equal'; 
+
+CREATE OPERATOR  <> (
+   LEFTARG    = strans,
+   RIGHTARG   = strans,
+   COMMUTATOR = <>,
+   NEGATOR    = = ,
+   PROCEDURE  = strans_not_equal,
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel 
+);
+
+COMMENT ON OPERATOR <> ( strans, strans ) IS
+  'true, if spherical Euler transformations are not equal'; 
+
+
+CREATE FUNCTION strans(strans)
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans(strans) IS
+  'returns Euler transformation'; 
+
+CREATE OPERATOR + (
+   RIGHTARG   = strans,
+   PROCEDURE  = strans
+);
+
+COMMENT ON OPERATOR + ( NONE , strans ) IS
+  'returns Euler transformation';
+
+CREATE FUNCTION strans_invert(strans)
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans_invert'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_invert(strans) IS
+  'returns inverse Euler transformation'; 
+
+CREATE OPERATOR - (
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_invert
+);
+
+COMMENT ON OPERATOR - ( NONE , strans ) IS
+  'inverts Euler transformation';
+
+CREATE FUNCTION strans_point( spoint, strans )
+   RETURNS spoint
+   AS 'MODULE_PATHNAME' , 'spheretrans_point'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_point ( spoint, strans ) IS
+  'returns a transformated spherical point'; 
+
+CREATE OPERATOR + (
+   LEFTARG    = spoint,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_point
+);
+
+COMMENT ON OPERATOR + ( spoint, strans ) IS
+  'transforms a spherical point '; 
+
+CREATE FUNCTION strans_point_inverse( spoint, strans )
+   RETURNS spoint
+   AS 'MODULE_PATHNAME' , 'spheretrans_point_inverse'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_point_inverse ( spoint, strans ) IS
+  'returns a inverse transformated spherical point'; 
+
+CREATE OPERATOR - (
+   LEFTARG    = spoint,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_point_inverse
+);
+
+COMMENT ON OPERATOR - ( spoint, strans ) IS
+  'transforms inverse a spherical point ';
+
+CREATE FUNCTION strans_trans( strans, strans )
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans_trans'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_trans ( strans, strans ) IS
+  'returns a transformated Euler transformation'; 
+
+CREATE OPERATOR + (
+   LEFTARG    = strans,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_trans
+);
+
+COMMENT ON OPERATOR + ( strans, strans ) IS
+  'transforms a Euler transformation '; 
+
+CREATE FUNCTION strans_trans_inv( strans, strans )
+   RETURNS strans
+   AS 'MODULE_PATHNAME' , 'spheretrans_trans_inv'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+COMMENT ON FUNCTION strans_trans_inv ( strans, strans ) IS
+  'returns a inverse transformated Euler transformation'; 
+
+CREATE OPERATOR - (
+   LEFTARG    = strans,
+   RIGHTARG   = strans,
+   PROCEDURE  = strans_trans_inv
+);
+
+COMMENT ON OPERATOR - ( strans, strans ) IS
+  'transforms inverse a Euler transformation '; 

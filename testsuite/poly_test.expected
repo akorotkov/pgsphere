@@ -1,0 +1,1079 @@
+SELECT set_sphere_output('DEG');
+ set_sphere_output 
+-------------------
+ SET DEG
+(1 row)
+
+
+SELECT spoly {(10d,0d),(10d,1d),(15d,0d)} ;
+               spoly                
+------------------------------------
+ {(10d , 0d),(10d , 1d),(15d , 0d)}
+(1 row)
+
+SELECT spoly {(359d,0d),(359d,1d),(4d,0d)} ;
+                spoly                
+-------------------------------------
+ {(359d , 0d),(359d , 1d),(4d , 0d)}
+(1 row)
+
+SELECT spoly {(10d,0d),(10d,1d),(15d,0d)} ;
+               spoly                
+------------------------------------
+ {(10d , 0d),(10d , 1d),(15d , 0d)}
+(1 row)
+
+
+-- incorrect input -----
+SELECT spoly {(10d,0d),(10d,1d)} ;
+
+--- self-crossing input -----
+SELECT spoly {(0d,0d),(10d,10d),(0d,10d),(10d,0d)} ;
+
+--- functions
+SELECT npoints( spoly {(10d,0d),(10d,1d),(15d,0d)} );
+ npoints 
+---------
+       3
+(1 row)
+
+SELECT npoints( spoly {(10d,0d),(10d,1d),(15d,0d),(5d,-5d)} );
+ npoints 
+---------
+       4
+(1 row)
+
+--SELECT npoints( spoly {(0d,0d),(0d,90d),(15d,90d),(15d,0d)} );
+
+SELECT area(spoly {(0d,0d),(0d,90d),(1,0d)} );
+ area 
+------
+    1
+(1 row)
+
+SELECT area(spoly {(0d,0d),(0d,90d),(90d,0d)} )/(4.0*pi());
+ ?column? 
+----------
+    0.125
+(1 row)
+
+
+--- operations
+--- = operator
+--- should be true
+SELECT spoly {(1d,0d),(1d,1d),(2d,1d)} = spoly {(1d,1d),(2d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(1d,0d),(1d,1d),(2d,1d)} = spoly {(2d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} = spoly {(1d,0d),(0d,0d),(0d,1d),(1d,1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} = spoly {(0d,0d),(1d,0d),(1d,1d),(0d,1d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+--- should be false
+SELECT spoly {(1d,0d),(1d,1d),(2d,1d)} = spoly {(1d,1d),(3d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} = spoly {(1d,0d),(0d,0d),(0d,1d),(2d,2d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- <> operator
+--- should be false
+SELECT spoly {(1d,0d),(1d,1d),(2d,1d)} <> spoly {(1d,1d),(2d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(1d,0d),(1d,1d),(2d,1d)} <> spoly {(2d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} <> spoly {(1d,0d),(0d,0d),(0d,1d),(1d,1d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} <> spoly {(0d,0d),(1d,0d),(1d,1d),(0d,1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+--- should be true
+SELECT spoly {(1d,0d),(1d,1d),(2d,1d)} <> spoly {(1d,1d),(3d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} <> spoly {(1d,0d),(0d,0d),(0d,1d),(2d,2d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- spoint @ spoly
+--- should be true
+SELECT (0.5d,0.5d)  @ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (0d,0.5d)  @ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (0d,0d)  @ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (0.5d,0.5d)  @ spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (0d,89.9d)  @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (0d,90d)  @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (0d,-89.9d)  @ spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (0d,-90d)  @ spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT (0.1d,0.5d)  @ spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT (45d,-89d)  @ spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT (0d,1d)  @ spoly {(0d,0d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- spoly ~ spoint
+--- should be true
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ (0.5d,0.5d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ (0d,0.5d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ (0d,0d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ~ (0.5d,0.5d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ (0d,89.9d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ (0d,90d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ~ (0d,-89.9d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ~ (0d,-90d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ~ (0.1d,0.5d) 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ~ (45d,-89d) 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(1d,1d),(1d,0d)} ~ (0d,1d) 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- scircle @ spoly
+--- should be true
+SELECT <(0.5d,0.5d),0.1d>  @ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,89.9d),0.1d>  @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,90d),0.1d>  @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,-89.9d),0.1d>  @ spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,-90d),0.1d>  @ spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT <(0.1d,0.5d),0.1d>  @ spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(45d,-89d),0.1d>  @ spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,1d),0.1d>  @ spoly {(0d,0d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,0.5d),0.1d>  @ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,0d),0.1d>  @ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0.5d,0.5d),0.1d>  @ spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- spoly ~ scircle
+--- should be true
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ <(0.5d,0.5d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ <(0d,89.9d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ <(0d,90d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ~ <(0d,-89.9d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ~ <(0d,-90d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ~ <(0.1d,0.5d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ~ <(45d,-89d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(1d,1d),(1d,0d)} ~ <(0d,1d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ <(0d,0.5d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ <(0d,0d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ <(0.1d,0.5d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ <(0.1d,0.1d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ~ <(0.6d,0.5d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- spoly @ scircle
+--- should be true
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} @ <(0d,0d),2.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} @ <(0d,0d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} @ <(0d,90d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} @ <(180d,-90d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,0d)} @ <(0d,0d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} @ <(0d,0d),1.0d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} @ <(0d,0d),0.99d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} @ <(60d,0d),0.99d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,88d)} @ <(0d,90d),1.0d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,-87d),(90d,-87d),(180d,-87d),(270d,-87d)} @ <(180d,-90d),1.0d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(2d,0d)} @ <(0d,0d),1.0d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- scircle ~ spoly
+--- should be true
+SELECT <(0d,0d),2.0d>  ~ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,0d),1.0d>  ~ spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,90d),1.0d>  ~ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(180d,-90d),1.0d>  ~ spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,0d),1.0d>  ~ spoly {(0d,0d),(0d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT <(0d,0d),1.0d>  ~ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,0d),0.99d>  ~ spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(60d,0d),0.99d>  ~ spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,90d),1.0d>  ~ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,88d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(180d,-90d),1.0d>  ~ spoly {(0d,-87d),(90d,-87d),(180d,-87d),(270d,-87d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,0d),1.0d>  ~ spoly {(0d,0d),(0d,1d),(2d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- scircle && spoly
+--- should be true
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} && <(0.5d,0.5d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && <(0d,89.9d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && <(0d,90d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} && <(0d,-89.9d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} && <(0d,-90d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} && <(0d,0d),2.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} && <(0d,0d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && <(0d,90d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} && <(180d,-90d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,0d)} && <(0d,0d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && <(0d,2d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && <(2d,0d),1.0d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} && <(0.5d,0.5d),0.1d> 
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} && <(1.5d,0.5d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && <(0d,88.0d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} && <(0.3d,0.5d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} && <(0d,-87d),0.1d> 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- spoly && scircle
+--- should be true
+SELECT <(0.5d,0.5d),0.1d>  && spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,89.9d),0.1d>  && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,90d),0.1d>  && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,-89.9d),0.1d>  && spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,-90d),0.1d>  && spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,0d),2.0d>  && spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,0d),1.0d>  && spoly {(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,90d),1.0d>  && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(180d,-90d),1.0d>  && spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,0d),1.0d>  && spoly {(0d,0d),(0d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0d,2d),1.0d>  && spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(2d,0d),1.0d>  && spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT <(0.5d,0.5d),0.1d>  && spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT <(1.5d,0.5d),0.1d>  && spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,88.0d),0.1d>  && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0.3d,0.5d),0.1d>  && spoly {(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT <(0d,-87d),0.1d>  && spoly {(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+--- spoly @ spoly
+--- should be true
+SELECT spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} @ spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)} @ spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} @ spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,0d)} @ spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,0d)} @ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)} @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+--SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} @ spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+SELECT spoly {(45d,89.2d),(135d,89.2d),(225d,89.2d),(315d,89.2d)} @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} @ spoly {(0.5d,0.5d),(0.5d,1.5d),(1.5d,1.5d),(1.5d,0.5d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,88d),(90d,88d),(180d,88d),(270d,88d)} @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+SELECT spoly {(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)} @ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+
+--- spoly ~ spoly
+--- should be true
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ~ spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ~ spoly {(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ~ spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ~ spoly {(0d,0d),(0d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ~ spoly {(0d,0d),(0d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ spoly {(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ spoly {(45d,89.2d),(135d,89.2d),(225d,89.2d),(315d,89.2d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0.5d,0.5d),(0.5d,1.5d),(1.5d,1.5d),(1.5d,0.5d)} ~ spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ spoly {(0d,88d),(90d,88d),(180d,88d),(270d,88d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ~ spoly {(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+
+--- spoly && spoly
+--- should be true
+SELECT spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} && spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)} && spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} && spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,0d)} && spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,0d)} && spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)} && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && spoly {(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && spoly {(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && spoly {(0d,0d),(0d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} && spoly {(0d,0d),(0d,1d),(1d,0d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && spoly {(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+SELECT spoly {(45d,89.2d),(135d,89.2d),(225d,89.2d),(315d,89.2d)} && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,0d),(0d,1d),(1d,1d),(1d,0d)} && spoly {(0.5d,0.5d),(0.5d,1.5d),(1.5d,1.5d),(1.5d,0.5d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly {(0d,88d),(90d,88d),(180d,88d),(270d,88d)} && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+--- should be false
+SELECT spoly {(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)} && spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(0d,89d),(90d,89d),(180d,89d),(270d,89d)} && spoly {(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && spoly {(3d,-1d),(3d,1d),(5d,1d),(5d,-1d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && spoly {(-1d,3d),(-1d,5d),(1d,5d),(1d,3d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly {(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)} && spoly {(179d,-1d),(179d,1d),(181d,1d),(181d,-1d)} ;
+ ?column? 
+----------
+ f
+(1 row)
+
+

@@ -1,0 +1,193 @@
+
+-- Creates a type 'spherical point'
+
+
+CREATE FUNCTION spoint_in(CSTRING)
+   RETURNS spoint
+   AS 'MODULE_PATHNAME' , 'spherepoint_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION spoint_out(spoint)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME' , 'spherepoint_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE spoint (
+   internallength = 16,
+   input   = spoint_in,
+   output  = spoint_out
+);
+
+-- Creates a type 'spherical transformation'
+
+
+CREATE FUNCTION strans_in(CSTRING)
+   RETURNS strans
+   AS 'MODULE_PATHNAME', 'spheretrans_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION strans_out(strans)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME', 'spheretrans_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE strans (
+   internallength = 32,
+   input   = strans_in,
+   output  = strans_out
+);
+
+-- Creates a type 'spherical circle'
+
+
+CREATE FUNCTION scircle_in(CSTRING)
+   RETURNS scircle
+   AS 'MODULE_PATHNAME', 'spherecircle_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION scircle_out(scircle)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME', 'spherecircle_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE scircle (
+   internallength = 24,
+   input   = scircle_in,
+   output  = scircle_out
+);
+
+-- Creates a type 'spherical line'
+
+
+CREATE FUNCTION sline_in(CSTRING)
+   RETURNS sline
+   AS 'MODULE_PATHNAME', 'sphereline_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION sline_out(sline)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME', 'sphereline_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE sline (
+   internallength = 32,
+   input   = sline_in,
+   output  = sline_out
+);
+
+
+-- Creates a type 'spherical ellipse'
+
+CREATE FUNCTION sellipse_in(CSTRING)
+   RETURNS sellipse
+   AS 'MODULE_PATHNAME', 'sphereellipse_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION sellipse_out(sellipse)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME', 'sphereellipse_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE sellipse (
+   internallength = 40,
+   input   = sellipse_in,
+   output  = sellipse_out
+);
+
+
+
+-- Creates a type 'spherical polygon'
+
+
+CREATE FUNCTION spoly_in(CSTRING)
+   RETURNS spoly
+   AS 'MODULE_PATHNAME', 'spherepoly_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION spoly_out(spoly)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME', 'spherepoly_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE spoly (
+   internallength = VARIABLE,
+   input   = spoly_in,
+   output  = spoly_out,
+   storage = external
+);
+
+
+
+-- Creates a type 'spherical path'
+
+
+CREATE FUNCTION spath_in(CSTRING)
+   RETURNS spath
+   AS 'MODULE_PATHNAME', 'spherepath_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION spath_out(spath)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME', 'spherepath_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE spath (
+   internallength = VARIABLE,
+   input   = spath_in,
+   output  = spath_out,
+   storage = external
+);
+
+
+
+-- Creates a type 'spherical box'
+
+
+CREATE FUNCTION sbox_in(CSTRING)
+   RETURNS sbox
+   AS 'MODULE_PATHNAME' , 'spherebox_in'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE FUNCTION sbox_out(sbox)
+   RETURNS CSTRING
+   AS 'MODULE_PATHNAME' , 'spherebox_out'
+   LANGUAGE 'c'
+   WITH (isstrict,iscachable);
+
+
+CREATE TYPE sbox (
+   internallength = 32,
+   input   = sbox_in,
+   output  = sbox_out
+);
+

@@ -1,0 +1,2484 @@
+--
+-- first, define the datatype.  Turn off echoing so that expected file
+-- does not depend on contents of pg_sphere.sql.
+--
+\set ECHO none
+psql:pgs_types.sql:23: NOTICE:  TypeCreate: changing argument type of function spoint_out from OPAQUE to spoint
+psql:pgs_types.sql:23: NOTICE:  TypeCreate: changing return type of function spoint_in from OPAQUE to spoint
+psql:pgs_types.sql:46: NOTICE:  TypeCreate: changing argument type of function scircle_out from OPAQUE to scircle
+psql:pgs_types.sql:46: NOTICE:  TypeCreate: changing return type of function scircle_in from OPAQUE to scircle
+psql:pgs_types.sql:69: NOTICE:  TypeCreate: changing argument type of function sellipse_out from OPAQUE to sellipse
+psql:pgs_types.sql:69: NOTICE:  TypeCreate: changing return type of function sellipse_in from OPAQUE to sellipse
+psql:pgs_types.sql:93: NOTICE:  TypeCreate: changing argument type of function sline_out from OPAQUE to sline
+psql:pgs_types.sql:93: NOTICE:  TypeCreate: changing return type of function sline_in from OPAQUE to sline
+psql:pgs_types.sql:118: NOTICE:  TypeCreate: changing argument type of function spath_out from OPAQUE to spath
+psql:pgs_types.sql:118: NOTICE:  TypeCreate: changing return type of function spath_in from OPAQUE to spath
+psql:pgs_types.sql:142: NOTICE:  TypeCreate: changing argument type of function spoly_out from OPAQUE to spoly
+psql:pgs_types.sql:142: NOTICE:  TypeCreate: changing return type of function spoly_in from OPAQUE to spoly
+psql:pgs_types.sql:166: NOTICE:  TypeCreate: changing argument type of function strans_out from OPAQUE to strans
+psql:pgs_types.sql:166: NOTICE:  TypeCreate: changing return type of function strans_in from OPAQUE to strans
+psql:pgs_gist.sql:22: NOTICE:  TypeCreate: changing argument type of function spherekey_out from OPAQUE to spherekey
+psql:pgs_gist.sql:22: NOTICE:  TypeCreate: changing return type of function spherekey_in from OPAQUE to spherekey
+-- check spherical point operators
+SELECT spoint '(0, 90d)'   = spoint '(0, 90d)';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(0, 90d)'   = spoint '(0,-90d)';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(0,-90d)'   = spoint '(0,-90d)';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(0, 90d)'  != spoint '(0, 90d)';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(0, 90d)'  != spoint '(0,-90d)';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(0,-90d)'  != spoint '(0,-90d)';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(0d,  0)'   = spoint '(360d,0)';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- checking spherical circle operators
+SELECT scircle '<(0, 90d),1>'   = '<(0, 90d),1>' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(0,-90d),1>'  <> '<(0, 90d),1>' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- checking spherical line operators
+SELECT sline ( spoint '(0, 90d)', spoint '(0, -89d)' )   = 
+       sline ( spoint '(0, 90d)', spoint '(0, -89d)' )  ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0,  90d)', spoint '(0, -89d)' )   <>
+       sline ( spoint '(0, -89d)', spoint '(0,  90d)' ) ;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- checking Euler transformation operators
+SELECT strans '-10d,0d,10d,ZZZ'  = '-10d,0d,10d,XXX' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT strans '-40d,0d,40d,ZZZ' <> '-40d,0d,40d,XXX' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+-- checking polygon operators
+\set poly 'spoly \'{(0.1,0),(0.2,0),(0.2,0.1),(0.3,0.1),(0.3,-0.1),(0.4,-0.1),(0.5,0.1),(0.4,0.2),(0.1,0.2)}\''
+SELECT spoint   '(0.15,0.10)' @ :poly;                  -- point inside polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint   '(0.20,0.00)' @ :poly;                  -- point contained polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint   '(0.10,0.10)' @ :poly;                  -- point contained polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint   '(0.25,0.50)' @ :poly;                  -- point outside polygon 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint   '(0.25,0.00)' @ :poly;                  -- point outside polygon 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle  '<(0.15,0.10),0.03>' @  :poly;          -- circle inside polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle  '<(0.20,0.00),0.00>' @  :poly;          -- circle contained polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle  '<(0.20,0.30),0.05>' @  :poly;          -- circle outside  polygon 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle  '<(0.25,0.00),0.05>' @  :poly;          -- circle overlaps polygon
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle  '<(0.25,0.00),0.10>' @  :poly;          -- circle overlaps polygon
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle  '<(0.15,0.10),0.03>' && :poly;          -- circle inside polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle  '<(0.20,0.00),0.00>' && :poly;          -- circle contained polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle  '<(0.20,0.30),0.05>' && :poly;          -- circle outside  polygon 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle  '<(0.25,0.00),0.05>' && :poly;          -- circle overlaps polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle  '<(0.25,0.00),0.10>' && :poly;          -- circle overlaps polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.00, 0.00)', spoint '(0.10,0.20)' ) @  :poly;  -- line touches polygon 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(0.00, 0.10)', spoint '(0.10,0.10)' ) @  :poly;  -- line touches polygon 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(0.50, 0.00)', spoint '(0.50,0.20)' ) @  :poly;  -- line touches polygon
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(0.10, 0.20)', spoint '(0.20,0.00)' ) @  :poly;  -- line touches and inside polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.45,-0.20)', spoint '(0.45,0.20)' ) @  :poly;  -- line overlaps polygon
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(0.45, 0.10)', spoint '(0.45,0.20)' ) @  :poly;  -- line overlaps polygon
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(0.24, 0.17)', spoint '(0.25,0.14)' ) @  :poly;  -- line inside  polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.00, 0.00)', spoint '(0.10,0.20)' ) && :poly;  -- line touches polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.00, 0.10)', spoint '(0.10,0.10)' ) && :poly;  -- line touches polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.50, 0.00)', spoint '(0.50,0.20)' ) && :poly;  -- line touches polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.10, 0.20)', spoint '(0.20,0.00)' ) && :poly;  -- line touches and inside polygon 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.45,-0.20)', spoint '(0.45,0.20)' ) && :poly;  -- line overlaps polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.45, 0.10)', spoint '(0.45,0.20)' ) && :poly;  -- line overlaps polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(0.24, 0.17)', spoint '(0.25,0.14)' ) && :poly;  -- line inside  polygon
+ ?column? 
+----------
+ t
+(1 row)
+
+\unset poly
+\set poly1 'spoly \'{(0,0),(1,0),(0,1)}\''
+\set poly2 'spoly \'{(1,0),(0,0),(0,1)}\''
+\set poly3 'spoly \'{(0,1),(0,0),(1,0)}\''
+\set poly4 'spoly \'{(0.1,0.9),(0.1,0.1),(0.9,0.1)}\''
+\set poly5 'spoly \'{(0.2,0.0),(1.2,0.0),(0.2,1)}\''
+SELECT :poly1  = :poly2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :poly2  = :poly3;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :poly3  = :poly1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly1 && :poly2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly2 && :poly3;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly3 && :poly1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly1  @ :poly2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly2  @ :poly3;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly3  @ :poly1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly1  @ :poly4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :poly4  @ :poly1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly1 && :poly4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly4 && :poly1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly1  @ :poly5;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :poly5  @ :poly1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :poly1 && :poly5;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly5 && :poly1;
+ ?column? 
+----------
+ t
+(1 row)
+
+\unset poly1
+\unset poly2
+\unset poly3
+\unset poly4
+\unset poly5
+-- checking path operators
+\set poly  'spoly \'{(0.1,0),(0.2,0),(0.2,0.1),(0.3,0.1),(0.3,-0.1),(0.4,-0.1),(0.5,0.1),(0.4,0.2),(0.1,0.2)}\''
+\set path1 'spath \'{(0.1,0),(0.2,0),(0.2,0.1),(0.3,0.1),(0.3,-0.1),(0.4,-0.1),(0.5,0.1),(0.4,0.2),(0.1,0.2)}\''
+\set path2 'spath \'{(0,0),(1,0),(2,0),(3,0)}\''
+\set path3 'spath \'{(0,0),(0,1),(0,1.5)}\''
+SELECT @-@ spath '{(0,0),(1,0),(2,0),(3,0)}';
+ ?column? 
+----------
+        3
+(1 row)
+
+SELECT :path1 =  :path2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path1 =  :path1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path1 <> :path2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path1 <> :path1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :poly  && :path1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path1 && :poly ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path1 @  :poly ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path2 @  :poly ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path1 && :path1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path1 && :path1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly  && :path2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path2 && :poly ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path2 && :path1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :poly  && :path3;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path3 && :poly ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path3 && :path1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path3 && :path2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path1 @  scircle '<(0,1),1>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path3 @  scircle '<(0,1),1>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path3 @  scircle '<(0,1),0.7>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path1 && scircle '<(0,1),1>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path3 && scircle '<(0,1),1>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path3 && scircle '<(0,1),0.7>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path3 && scircle '<(0,-1),0.7>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path3 @  scircle '<(0,-1),0.7>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT :path3 && sline ( spoint '(0,-1)', spoint '(0,1)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path3 && sline ( spoint '(-1,0)', spoint '(1,0)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT :path3 && sline ( spoint '(-1,0)', spoint '(-0.3,0)' );
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(0.11,0.15),(0.12,0.15),(0.13,0.15)}' @ :poly;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- ellipse tests
+--equal operator
+SELECT sellipse '<{0d,0d},(170d,-12d),0d>' = sellipse '<{0d,0d},(170d,-12d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{0d,0d},(170d,-12d),0d>' = sellipse '<{0d,0d},(170d,-12d),-2d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,5d},(170d,-12d),0d>' = sellipse '<{5d,5d},(170d,-12d),-2d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,2d},(170d,-12d),0d>' = sellipse '<{5d,2d},(170d,-12d),-2d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- not equal
+SELECT sellipse '<{5d,2d},(170d,-12d),0d>' != sellipse '<{5d,2d},(170d,-12d),-2d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,2d},(170d,-12d),0d>' != sellipse '<{5d,2d},(170d,-12d), 0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d, 5d},(300d,0d),  0d>' = sellipse '<{10d,5d},(300d,0d), 180d>' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d, 5d},(300d,0d), 90d>' = sellipse '<{10d,5d},(300d,0d), 270d>' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- ellipse and point
+SELECT spoint '(280d,-20d)'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(280d,-10d)'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoint '(280d,-9.9d)'  @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' ~ spoint '(280d,-10d)' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' ~ spoint '(280d, -9d)' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(280d,-10d)'   !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoint '(280d,-9.9d)'  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' !~ spoint '(280d,-10d)' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' !~ spoint '(280d, -9d)' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+--
+--ellipse and circle (@,&&)
+--
+-- negators and commutators
+SELECT scircle '<(280d,-10d),0d>'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d, -9d),0d>'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-10d),0d>'   !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d, -9d),0d>'   !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  ~ scircle '<(280d,-10d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  ~ scircle '<(280d, -9d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' !~ scircle '<(280d,-10d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' !~ scircle '<(280d, -9d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-10d),2d>'   &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,  0d),2d>'   &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-10d),2d>'  !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,  0d),2d>'  !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  && scircle '<(280d,-10d),2d>' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  && scircle '<(280d,  0d),2d>' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' !&& scircle '<(280d,-10d),2d>' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>' !&& scircle '<(280d,  0d),2d>' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-10d),0d>'   &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+ 
+-- ellipse is circle
+SELECT scircle '<(280d,-10d),2d>'   @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-18d),2d>'   @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-16d),2d>'   @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-18d),15d>'  @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>' @  scircle '<(280d,-10d),2d>'  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>' @  scircle '<(280d,-18d),2d>'  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>' @  scircle '<(280d,-16d),2d>'  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>' @  scircle '<(280d,-18d),15d>' ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-10d),2d>'  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-18d),2d>'  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-16d),2d>'  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- ellipse is line
+SELECT scircle '<(280d,-10d),0d>'   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-18d),0d>'   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-16d),0d>'   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-18d),15d>'  @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-10d),0d>'  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-18d),0d>'  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT scircle '<(280d,-10d),2d>'   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-18d),2d>'   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-16d),2d>'   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-10d),2d>'  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT scircle '<(280d,-18d),2d>'  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,0d},(280d,-20d),90d>' @ scircle '<(280d,-18d),15d>'  ;
+ ?column? 
+----------
+ t
+(1 row)
+
+--
+--ellipse and line (@,&&)
+--
+-- negators and commutators
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' )   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' )   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' )   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' )  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' )  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' )  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' )  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' )  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' )  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' ) !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' ) !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' ) !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' );
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' );
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  sline ( spoint '(280d, -9d)', spoint '(280d, -8d)' );
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  sline ( spoint '(280d, -9d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  sline ( spoint '(280d,-11d)', spoint '(280d,-12d)' );
+ ?column? 
+----------
+ f
+(1 row)
+
+-- line is point , ellipse is point
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )   @  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )   @  sellipse '<{0d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )  &&  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )  &&  sellipse '<{0d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- line is point , ellipse is circle
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )   @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )   @  sellipse '<{5d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )  &&  sellipse '<{5d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- line is point , ellipse is a real ellipse
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )   @  sellipse '<{10d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -8d)' )  &&  sellipse '<{10d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- line is a real line , ellipse is point
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{0d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{0d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- line is a real line , ellipse is circle
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{5d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{5d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- line is a real line , ellipse is line
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{5d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{5d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- line is a real line , ellipse is a real ellipse
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )   @  sellipse '<{10d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sline ( spoint '(280d, -8d)', spoint '(280d, -9d)' )  &&  sellipse '<{10d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+--
+-- ellipse and path
+--
+-- negators , commutator @,&&
+SELECT spath '{(280d, -9d),(280d, -8d)}'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -9d),(280d,-12d)}'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d,-11d),(280d,-12d)}'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d, -9d),(280d, -8d)}'  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -9d),(280d,-12d)}'  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d,-11d),(280d,-12d)}'  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d, -9d),(280d, -8d)}'  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d, -9d),(280d,-12d)}'  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d,-11d),(280d,-12d)}'  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -9d),(280d, -8d)}' !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d, -9d),(280d,-12d)}' !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d,-11d),(280d,-12d)}' !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spath '{(280d, -9d),(280d, -8d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spath '{(280d, -9d),(280d,-12d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spath '{(280d,-11d),(280d,-12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spath '{(280d, -9d),(280d, -8d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spath '{(280d, -9d),(280d,-12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spath '{(280d,-11d),(280d,-12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spath '{(280d, -9d),(280d, -8d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spath '{(280d, -9d),(280d,-12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spath '{(280d,-11d),(280d,-12d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spath '{(280d, -9d),(280d, -8d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spath '{(280d, -9d),(280d,-12d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spath '{(280d,-11d),(280d,-12d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- path is a line , ellipse is point
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{0d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{0d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- path is a line , ellipse is circle
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{5d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{5d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- path is a line , ellipse is path
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{5d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{5d,0d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- path is a line , ellipse is a real ellipse
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{10d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{10d,5d},(280d, -8d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+--
+-- ellipse and polygon
+--
+-- negators , commutator @,&&
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'    @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'   &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}'  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'   !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}'  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'  !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'  !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}' !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- ellipse is point
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'   @  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{0d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'   @  spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- ellipse is circle
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}'   @  sellipse '<{2d,2d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{2d,2d},(280d,-20d),90d>'   @  spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-18d),(279d, -12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- ellipse is line
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}'   @  sellipse '<{2d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,0d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{2d,0d},(280d,-20d),90d>'   @  spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,0d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{5d,0d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-18d),(279d, -12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- ellipse is a real ellipse
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{5d,2d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}'   @  sellipse '<{2d,1d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{5d,2d},(280d,-20d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{5d,2d},(280d,-20d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,2d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{2d,1d},(280d,-20d),90d>'   @  spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{5d,2d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{5d,2d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-18d),(279d, -12d)}';
+ ?column? 
+----------
+ t
+(1 row)
+
+--
+-- ellipse and ellipse
+--
+-- check @
+SELECT sellipse '<{10d, 5d},(300d,0d),  0d>' @ sellipse '<{10d,5d},(300d,0d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d, 5d},(300d,0d), 90d>' @ sellipse '<{10d,5d},(300d,0d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d, 5d},(300d,0d),180d>' @ sellipse '<{10d,5d},(300d,0d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d, 5d},(300d,0d),270d>' @ sellipse '<{10d,5d},(300d,0d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 2d, 1d},( 52d,6d),  0d>' @ sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- negators , commutator @,&&
+SELECT sellipse '<{ 2d, 1d},( 52d,6d),  0d>'   @ sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 52d,6d),  0d>'   @ sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 90d,9d),  0d>'   @ sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 2d, 1d},( 52d,6d),  0d>'  && sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 52d,6d),  0d>'  && sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 90d,9d),  0d>'  && sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 2d, 1d},( 52d,6d),  0d>'  !@ sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 52d,6d),  0d>'  !@ sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 90d,9d),  0d>'  !@ sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 2d, 1d},( 52d,6d),  0d>' !&& sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 52d,6d),  0d>' !&& sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d, 5d},( 90d,9d),  0d>' !&& sellipse '<{10d,5d},(50d,5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>'  ~ sellipse '<{ 2d, 1d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>'  ~ sellipse '<{10d, 5d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>'  ~ sellipse '<{10d, 5d},( 90d,9d),  0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>'  && sellipse '<{ 2d, 1d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>'  && sellipse '<{10d, 5d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>'  && sellipse '<{10d, 5d},( 90d,9d),  0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>' !~ sellipse '<{ 2d, 1d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>' !~ sellipse '<{10d, 5d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>' !~ sellipse '<{10d, 5d},( 90d,9d),  0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>' !&& sellipse '<{ 2d, 1d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>' !&& sellipse '<{10d, 5d},( 52d,6d),  0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{10d,5d},(50d,5d),45d>' !&& sellipse '<{10d, 5d},( 90d,9d),  0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+-- left ellipse is point         right ellipse is point
+SELECT sellipse '<{ 0d, 0d},( 50d,-5d),  0d>'   @ sellipse '<{0d,0d},(50d,-5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-6d),  0d>'   @ sellipse '<{0d,0d},(50d,-5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-5d),  0d>'  && sellipse '<{0d,0d},(50d,-5d),45d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-6d),  0d>'  && sellipse '<{0d,0d},(50d,-5d),45d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is line          right ellipse is point
+SELECT sellipse '<{ 5d, 0d},( 50d, -2d), 90d>'   @ sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d,-12d), 90d>'   @ sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d, -2d), 90d>'  && sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d,-12d), 90d>'  && sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is circle        right ellipse is point
+SELECT sellipse '<{ 5d, 5d},( 50d, -2d), 90d>'   @ sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d,-12d), 90d>'   @ sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d, -2d), 90d>'  && sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d,-12d), 90d>'  && sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is real ellipse  right ellipse is point
+SELECT sellipse '<{ 5d, 3d},( 50d, -2d), 90d>'   @ sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 3d},( 50d,-12d), 90d>'   @ sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 3d},( 50d, -2d), 90d>'  && sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 3d},( 50d,-12d), 90d>'  && sellipse '<{0d,0d},(50d,-5d),0d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is point         right ellipse is line
+SELECT sellipse '<{ 0d, 0d},( 50d,-5d),  0d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-6d),  0d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d, 6d),  0d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-5d),  0d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-6d),  0d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d, 6d),  0d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is line         right ellipse is line
+SELECT sellipse '<{ 3d, 0d},( 50d,-5d), 90d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 3d, 0d},( 50d,-8d), 90d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 0d},( 50d,-6d),  0d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 0d},( 50d, 6d), 90d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 0d},( 50d,-5d), 90d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 3d, 0d},( 50d,-8d), 90d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 3d, 0d},( 50d,-6d),  0d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 3d, 0d},( 50d, 6d), 90d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is circle         right ellipse is line
+SELECT sellipse '<{ 3d, 3d},( 50d,-5d), 90d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d,-8d), 90d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d,-6d),  0d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d, 6d), 90d>'   @ sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d,-5d), 90d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d,-8d), 90d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d,-6d),  0d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d, 6d), 90d>'  && sellipse '<{5d,0d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is point         right ellipse is circle
+SELECT sellipse '<{ 0d, 0d},( 50d,-5d),  0d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-6d),  0d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d, 6d),  0d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-5d),  0d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d,-6d),  0d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 0d, 0d},( 50d, 6d),  0d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is line         right ellipse is circle
+SELECT sellipse '<{ 5d, 0d},( 50d,-5d), 90d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d,-6d), 90d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d, 6d), 90d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d,-5d), 90d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d,-6d), 90d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 0d},( 50d, 6d), 90d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- left ellipse is circle       right ellipse is circle
+SELECT sellipse '<{ 3d, 3d},( 50d,-4d), 90d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d,-5d), 90d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d,-6d), 90d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d, 6d), 90d>'   @ sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT sellipse '<{ 3d, 3d},( 50d,-4d), 90d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d,-5d), 90d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d,-6d), 90d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT sellipse '<{ 5d, 5d},( 50d, 6d), 90d>'  && sellipse '<{5d,5d},(50d,-5d),90d>';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- index tests
+CREATE TABLE spheretmp1 (p spoint);
+\copy spheretmp1 from 'data/test_spherepoint.data'
+\copy spheretmp1 from 'data/test_spherepoint.data'
+\copy spheretmp1 from 'data/test_spherepoint.data'
+\copy spheretmp1 from 'data/test_spherepoint.data'
+CREATE TABLE spheretmp2 (c scircle);
+\copy spheretmp2 from 'data/test_spherecircle.data'
+\copy spheretmp2 from 'data/test_spherecircle.data'
+\copy spheretmp2 from 'data/test_spherecircle.data'
+\copy spheretmp2 from 'data/test_spherecircle.data'
+CREATE TABLE spheretmp4 AS                
+  SELECT sline ( p , p - strans '-15d,-15d,-15d,ZXZ' ) AS l 
+  FROM spheretmp1;
+-- checking input
+SELECT count(*) FROM spheretmp1 WHERE p @ scircle '< ( 180d 1m 10s , -2d 23m 59s  ) , 10d >';
+ count 
+-------
+    32
+(1 row)
+
+-- without idx
+SELECT count(*) FROM spheretmp1 WHERE p @ scircle '<(1,1),0.3>';
+ count 
+-------
+    32
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c @ scircle '<(1,1),0.3>';
+ count 
+-------
+    12
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c && scircle '<(1,1),0.3>';
+ count 
+-------
+    48
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l @  scircle '<(1,1),0.3>';
+ count 
+-------
+     8
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l && scircle '<(1,1),0.3>';
+ count 
+-------
+    40
+(1 row)
+
+SELECT count(*) FROM spheretmp1 WHERE p = spoint '(3.09 , 1.25)' ;
+ count 
+-------
+     4
+(1 row)
+
+-- create idx
+CREATE INDEX aaaidx ON spheretmp1 USING gist ( p );
+CREATE INDEX bbbidx ON spheretmp2 USING gist ( c );
+CREATE INDEX cccidx ON spheretmp4 USING gist ( l );
+--with idx
+SET enable_seqscan = OFF ;
+SELECT count(*) FROM spheretmp1 WHERE p @ scircle '<(1,1),0.3>'  ;
+ count 
+-------
+    32
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c @ scircle '<(1,1),0.3>'  ;
+ count 
+-------
+    12
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c && scircle '<(1,1),0.3>' ;
+ count 
+-------
+    48
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l @  scircle '<(1,1),0.3>' ;
+ count 
+-------
+     8
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l && scircle '<(1,1),0.3>' ;
+ count 
+-------
+    40
+(1 row)
+
+SELECT count(*) FROM spheretmp1 WHERE p = spoint '(3.09 , 1.25)' ;
+ count 
+-------
+     4
+(1 row)
+

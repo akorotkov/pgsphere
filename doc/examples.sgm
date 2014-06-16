@@ -1,0 +1,122 @@
+    <sect1 id="examples">
+      <title>
+        Usage examples
+      </title>
+      <sect2 id="examp.general">
+        <title>
+            General
+        </title>
+        <para>
+            tbw
+        </para>
+      </sect2>
+      
+      <sect2 id="examp.geo">
+        <title>
+            Geographical 
+        </title>
+        <para>
+            tbw
+        </para>
+      </sect2>
+      
+      <sect2 id="examp.astro">
+        <title>
+            Astronomical
+        </title>
+        <sect3>
+          <title>Coordinates transformation</title>
+          <para>
+            A commonly used task is a coordinate transformation. With the
+            parameters of a new
+            coordinate system (plane) relative to an old one,
+          </para>
+          <informaltable frame="none" rowsep="1" colsep="1">
+            <tgroup cols="3">
+              <colspec colname="col0"  align="left"/>
+              <colspec colname="col1"  align="left" colwidth="4*"/>
+              <colspec colname="col2" align="left" colwidth="6*"/>
+              <tbody>
+                <row>
+                  <entry>
+                    &OHgr;
+                  </entry>
+                  <entry>
+                    longitude of the ascending node
+                  </entry>
+                  <entry>
+                    angle between line of nodes and the zero point of
+                    longitude in the old plane.
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    &ohgr;
+                  </entry>
+                  <entry>
+                    argument of pericenter
+                  </entry>
+                  <entry>
+                    the angle from the ascending node to the position in the new plane.
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    i
+                  </entry>
+                  <entry>
+                    inclination
+                  </entry>
+                  <entry>
+                    angle between the new plane and the old plane.
+                  </entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          <para>
+            you can do a transformation of an object
+            <parameter>object</parameter> from an old into a new coordinate
+            system using:
+          </para>
+          <synopsis> object - strans '&ohgr;, i, &OHgr;'</synopsis>
+          <para>or</para>
+          <synopsis> object - strans (&ohgr;, i, &OHgr;)</synopsis>
+          <para>
+            Otherwise, for a transformation of an object
+            <parameter>object</parameter> from the new into the old
+            coordinate system, use the operator <literal>+</literal>:
+          </para>
+          <synopsis> object + strans '&ohgr;, i, &OHgr;'</synopsis>
+          <para>or</para>
+          <synopsis> object + strans (&ohgr;, i, &OHgr;)</synopsis>
+          <example>
+            <title>Perihel and aphel coordinates of a comet orbit</title>
+            <simpara>
+             We are assuming the orbital elements of a comet are
+             &OHgr;=30&deg;, i=60&deg; and &ohgr;=90&deg;. We get the
+             spherical position of perihel and aphel with:
+            </simpara>
+            <programlisting>
+<![CDATA[sql> SELECT set_sphere_output('DEG');]]>
+<![CDATA[ set_sphere_output ]]>
+<![CDATA[-------------------]]>
+<![CDATA[ SET DEG]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT spoint '(0,0)' + strans '90d,60d,30d' AS perihel;]]>
+<![CDATA[   perihel]]>
+<![CDATA[--------------]]>
+<![CDATA[ (120d , 60d)]]>
+<![CDATA[(1 row)]]>
+<![CDATA[]]>
+<![CDATA[sql> SELECT spoint '(180d,0)' + strans '90d,60d,30d' AS aphel;]]>
+<![CDATA[      aphel]]>
+<![CDATA[---------------]]>
+<![CDATA[ (300d , -60d)]]>
+<![CDATA[(1 row)]]>
+            </programlisting>
+          </example>
+        </sect3>
+      </sect2>
+    </sect1>

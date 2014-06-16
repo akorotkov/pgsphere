@@ -1,0 +1,970 @@
+-- Input/Output ---
+SELECT set_sphere_output( RAD );
+ set_sphere_output 
+-------------------
+ SET RAD
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1.0d > 
+                             scircle                             
+-----------------------------------------------------------------
+ <(0.272707695624114 , 0.0181805130416076) , 0.0174532925199433>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1d 30m > 
+                             scircle                             
+-----------------------------------------------------------------
+ <(0.272707695624114 , 0.0181805130416076) , 0.0261799387799149>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 0.1 > 
+                     scircle                      
+--------------------------------------------------
+ <(0.272707695624114 , 0.0181805130416076) , 0.1>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 90d > 
+                           scircle                            
+--------------------------------------------------------------
+ <(0.272707695624114 , 0.0181805130416076) , 1.5707963267949>
+(1 row)
+
+SELECT set_sphere_output( DEG );
+ set_sphere_output 
+-------------------
+ SET DEG
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1.0d > 
+               scircle                
+--------------------------------------
+ <(15.625d , 1.04166666666667d) , 1d>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1d 30m > 
+                scircle                 
+----------------------------------------
+ <(15.625d , 1.04166666666667d) , 1.5d>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 0.1 > 
+                       scircle                       
+-----------------------------------------------------
+ <(15.625d , 1.04166666666667d) , 5.72957795130823d>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 90d > 
+                scircle                
+---------------------------------------
+ <(15.625d , 1.04166666666667d) , 90d>
+(1 row)
+
+SELECT set_sphere_output( DMS );
+ set_sphere_output 
+-------------------
+ SET DMS
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1.0d > 
+                   scircle                    
+----------------------------------------------
+ <( 15d 37m 30s , + 1d  2m 30s) ,  1d  0m 0s>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1d 30m > 
+                   scircle                    
+----------------------------------------------
+ <( 15d 37m 30s , + 1d  2m 30s) ,  1d 30m 0s>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 0.1 > 
+                       scircle                        
+------------------------------------------------------
+ <( 15d 37m 30s , + 1d  2m 30s) ,  5d 43m 46.480625s>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 90d > 
+                   scircle                    
+----------------------------------------------
+ <( 15d 37m 30s , + 1d  2m 30s) , 90d  0m 0s>
+(1 row)
+
+SELECT set_sphere_output( HMS );
+ set_sphere_output 
+-------------------
+ SET HMS
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1.0d > 
+                   scircle                    
+----------------------------------------------
+ <(  1h  2m 30s , + 1d  2m 30s) ,  1d  0m 0s>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 1d 30m > 
+                   scircle                    
+----------------------------------------------
+ <(  1h  2m 30s , + 1d  2m 30s) ,  1d 30m 0s>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 0.1 > 
+                       scircle                        
+------------------------------------------------------
+ <(  1h  2m 30s , + 1d  2m 30s) ,  5d 43m 46.480625s>
+(1 row)
+
+SELECT < (1h 2m 30s , +1d 2m 30s), 90d > 
+                   scircle                    
+----------------------------------------------
+ <(  1h  2m 30s , + 1d  2m 30s) , 90d  0m 0s>
+(1 row)
+
+SELECT set_sphere_output( DMS );
+ set_sphere_output 
+-------------------
+ SET DMS
+(1 row)
+
+
+-- Functions
+
+-- float8 dist(scircle,scircle)
+SELECT 180.0*dist('<( 0h 2m 30s , 10d 0m 0s), 0.1d>'::scircle,'<( 0h 2m 30s , -10d 0m 0s),0.1d>'::scircle)/pi();
+ ?column? 
+----------
+     19.8
+(1 row)
+
+SELECT 180.0*dist('<( 0h 0m 00s , 0d 0m 0s), 1.0d>'::scircle,'<( 1h 0m 00s , 0d 0m 0s),1.0d>'::scircle)/pi();
+ ?column? 
+----------
+       13
+(1 row)
+
+SELECT 180.0*dist('<( 23h 30m 00s , 0d 0m 0s), 1.0d>'::scircle,'<( 1h 0m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();
+ ?column? 
+----------
+       20
+(1 row)
+
+SELECT 180.0*dist('<( 0h 40m 00s , 0d 0m 0s), 1.0d>'::scircle,'<( 0h 50m 00s , 0d 0m 0s),1.0d>'::scircle)/pi();
+     ?column?      
+-------------------
+ 0.499999999999953
+(1 row)
+
+SELECT 180.0*dist('<( 0h 40m 00s , 0d 0m 0s), 1.5d>'::scircle,'<( 0h 50m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();
+ ?column? 
+----------
+        0
+(1 row)
+
+SELECT 180.0*dist('<( 0h 40m 00s , 90d 0m 0s), 1.5d>'::scircle,'<( 0h 50m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();
+ ?column? 
+----------
+       87
+(1 row)
+
+SELECT 180.0*dist('<( 0h 40m 00s , 90d 0m 0s), 1.0d>'::scircle,'<( 0h 50m 00s , -90d 0m 0s),1.0d>'::scircle)/pi();
+ ?column? 
+----------
+      178
+(1 row)
+
+
+-- spoint spoint(scircle)
+SELECT spoint('< (1h 2m 30s , +1d 2m 30s), 1.0d >'::scircle);
+            spoint             
+-------------------------------
+ ( 15d 37m 30s , + 1d  2m 30s)
+(1 row)
+
+SELECT spoint('< (1h 2m 30s , +90d 0m 0s), 1.0d >'::scircle);
+            spoint            
+------------------------------
+ ( 15d 37m 30s , +90d  0m 0s)
+(1 row)
+
+
+-- scircle scircle(spoint)
+SELECT scircle('(0d,0d)'::spoint);
+                  scircle                   
+--------------------------------------------
+ <(  0d  0m 0s , + 0d  0m 0s) ,  0d  0m 0s>
+(1 row)
+
+SELECT scircle('(0d,90d)'::spoint);
+                  scircle                   
+--------------------------------------------
+ <(  0d  0m 0s , +90d  0m 0s) ,  0d  0m 0s>
+(1 row)
+
+SELECT scircle('(0d,-90d)'::spoint);
+                  scircle                   
+--------------------------------------------
+ <(  0d  0m 0s , -90d  0m 0s) ,  0d  0m 0s>
+(1 row)
+
+
+-- Operators
+-- = operator
+-- should be "true"
+SELECT < (1h 0m 0s,+1d), 1.5d >  (1h 0m 0s,+1d), 1.5d >'::scircle ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+1d), 1.5d >  (25h 0m 0s,+1d), 1d 30m >'::scircle ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+95d), 1.5d >  (13h 0m 0s,+85d), 1.5d >'::scircle ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,-95d), 1.5d >  (13h 0m 0s,-85d), 1.5d >'::scircle ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+90d), 1.5d >  (2h 0m 0s,+90d), 1.5d >'::scircle ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,-90d), 1.5d >  (2h 0m 0s,-90d), 1.5d >'::scircle ;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- should be "false"
+SELECT < (1h 0m 0s,+1d), 1.5d >  (1h 0m 0s,-1d), 1.5d >'::scircle ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,+1d), 1.5d >  (1h 0m 0s,+1d), 2.5d >'::scircle ;
+ ?column? 
+----------
+ f
+(1 row)
+
+
+-- <> operator
+-- should be "false"
+SELECT < (1h 0m 0s,+1d), 1.5d >  <> < (1h 0m 0s,+1d), 1.5d >  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,+1d), 1.5d >  <> < (25h 0m 0s,+1d), 1d 30m >  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,+95d), 1.5d >  <> < (13h 0m 0s,+85d), 1.5d >  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,-95d), 1.5d >  <> < (13h 0m 0s,-85d), 1.5d >  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,+90d), 1.5d >  <> < (2h 0m 0s,+90d), 1.5d >  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,-90d), 1.5d >  <> < (2h 0m 0s,-90d), 1.5d >  ;
+ ?column? 
+----------
+ f
+(1 row)
+
+-- should be "true"
+SELECT < (1h 0m 0s,+1d), 1.5d >  <> < (1h 0m 0s,-1d), 1.5d >  ;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+1d), 1.5d >  <> < (1h 0m 0s,+1d), 2.5d >  ;
+ ?column? 
+----------
+ t
+(1 row)
+
+
+-- && operator
+-- should be "true"
+SELECT < (1h 0m 0s,+1d), 1.5d >  && < (1h 0m 0s,+1d), 1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+1d), 1.5d >  && < (1h 0m 0s,+1d), 0.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+1d), 1.5d >  && < (1h 0m 0s,-1d), 1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,0d), 15d >  && < (0h 0m 0s,0d), 15d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (2h 0m 0s,0d), 15d >  && < (0h 0m 0.1s,0d), 15d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,0d), 15d >  && < (23h 0m 0.1s,0d), 15d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+-- should be "false"
+SELECT < (1h 0m 0s,+1d), 0.5d >  && < (1h 0m 0s,-1d), 0.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1d 0m 0s,+1d), 1.0d >  && < (0d 0m 0s,0d), 0.1d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+-- @@ operator
+SELECT @@ < (1h 2m 3s , +1d 2m 3s), 1.0d > 
+           ?column?           
+------------------------------
+ ( 15d 30m 45s , + 1d  2m 3s)
+(1 row)
+
+SELECT @@ < (1h 2m 3s , +90d 0m 0s), 1.0d > 
+           ?column?           
+------------------------------
+ ( 15d 30m 45s , +90d  0m 0s)
+(1 row)
+
+
+-- <-> operator
+SELECT 180.0*('<( 0h 2m 30s , 10d 0m 0s), 0.1d>'::scircle<->'<( 0h 2m 30s , -10d 0m 0s),0.1d>'::scircle)/pi();
+ ?column? 
+----------
+     19.8
+(1 row)
+
+SELECT 180.0*('<( 0h 0m 00s , 0d 0m 0s), 1.0d>'::scircle<->'<( 1h 0m 00s , 0d 0m 0s),1.0d>'::scircle)/pi();
+ ?column? 
+----------
+       13
+(1 row)
+
+SELECT 180.0*('<( 23h 30m 00s , 0d 0m 0s), 1.0d>'::scircle<->'<( 1h 0m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();
+ ?column? 
+----------
+       20
+(1 row)
+
+SELECT 180.0*('<( 0h 40m 00s , 0d 0m 0s), 1.0d>'::scircle<->'<( 0h 50m 00s , 0d 0m 0s),1.0d>'::scircle)/pi();
+     ?column?      
+-------------------
+ 0.499999999999953
+(1 row)
+
+SELECT 180.0*('<( 0h 40m 00s , 0d 0m 0s), 1.5d>'::scircle<->'<( 0h 50m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();
+ ?column? 
+----------
+        0
+(1 row)
+
+SELECT 180.0*('<( 0h 40m 00s , 90d 0m 0s), 1.5d>'::scircle<->'<( 0h 50m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();
+ ?column? 
+----------
+       87
+(1 row)
+
+SELECT 180.0*('<( 0h 40m 00s , 90d 0m 0s), 1.0d>'::scircle<->'<( 0h 50m 00s , -90d 0m 0s),1.0d>'::scircle)/pi();
+ ?column? 
+----------
+      178
+(1 row)
+
+
+-- scircle @ scircle operator
+-- should be "true"
+SELECT < (1h 0m 0s,+1d),  0.5d >  @ < (1h 0m 0s,+1d),  1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (2d 0m 0s,+1d),  0.5d >  @ < (1d 0m 0s,0d),   3.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+89d), 0.5d >  @ < (1h 0m 0s,+90d), 1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,-89d), 0.5d >  @ < (1h 0m 0s,-90d), 1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+-- should be "false"
+SELECT < (1h 0m 0s,+1d),  0.5d >  @ < (2h 0m 0s,+1d),  1.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (2d 0m 0s,+1d),  1.5d >  @ < (0d 0m 0s, 0d),  3.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,+89d), 0.5d >  @ < (1h 0m 0s,+90d), 1.0d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,-89d), 0.5d >  @ < (1h 0m 0s,-90d), 1.0d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+-- scircle ~ scircle operator
+-- should be "true"
+SELECT < (1h 0m 0s,+1d),  1.5d >  ~ < (1h 0m 0s,+1d),  0.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1d 0m 0s,0d),   3.5d >  ~ < (2d 0m 0s,+1d),  0.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+90d), 1.5d >  ~ < (1h 0m 0s,+89d), 0.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,-90d), 1.5d >  ~ < (1h 0m 0s,-89d), 0.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+-- should be "false"
+SELECT < (2h 0m 0s,+1d),  1.5d >  ~ < (1h 0m 0s,+1d),  0.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (0d 0m 0s, 0d),  3.5d >  ~ < (2d 0m 0s,+1d),  1.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,+90d), 1.0d >  ~ < (1h 0m 0s,+89d), 0.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,-90d), 1.0d >  ~ < (1h 0m 0s,-89d), 0.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+-- spoint @ scircle operator
+-- should be "true"
+SELECT (1h 0m 0s,+1d)   @ < (1h 0m 0s,+1d),  1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (2d 0m 0s,+1d)   @ < (1d 0m 0s, 0d),  3.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (1h 0m 0s,+89d)  @ < (1h 0m 0s,+90d), 1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (1h 0m 0s,-89d)  @ < (1h 0m 0s,-90d), 1.5d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (1h 0m 0s,+89d)  @ < (1h 0m 0s,+90d), 1.0d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT (1h 0m 0s,-89d)  @ < (1h 0m 0s,-90d), 1.0d > 
+ ?column? 
+----------
+ t
+(1 row)
+
+-- should be "false"
+SELECT (1h 0m  0s,+1d    )  @ < (2h 0m 0s,-1d),  1.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT (3d 30m 0s,+1d    )  @ < (0d 0m 0s, 0d),  3.5d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT (1h 0m  0s,+88.99d)  @ < (1h 0m 0s,+90d), 1.0d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT (1h 0m  0s,-88.99d)  @ < (1h 0m 0s,-90d), 1.0d > 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+-- spoint ~ scircle operator
+-- should be "true"
+SELECT < (1h 0m 0s,+1d),  1.5d >  ~ (1h 0m 0s,+1d)  
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1d 0m 0s, 0d),  3.5d >  ~ (2d 0m 0s,+1d)  
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+90d), 1.5d >  ~ (1h 0m 0s,+89d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,-90d), 1.5d >  ~ (1h 0m 0s,-89d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,+90d), 1.0d >  ~ (1h 0m 0s,+89d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT < (1h 0m 0s,-90d), 1.0d >  ~ (1h 0m 0s,-89d) 
+ ?column? 
+----------
+ t
+(1 row)
+
+-- should be "false"
+SELECT < (2h 0m 0s,-1d),  1.5d >  ~ (1h 0m  0s,+1d    ) 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (0d 0m 0s, 0d),  3.5d >  ~ (3d 30m 0s,+1d    ) 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,+90d), 1.0d >  ~ (1h 0m  0s,+88.99d) 
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT < (1h 0m 0s,-90d), 1.0d >  ~ (1h 0m  0s,-88.99d) 
+ ?column? 
+----------
+ f
+(1 row)
+
+
+-- indexed operations.....
+-- spoint_data and scircle_data tables have to be created and indexed using
+-- ./gen_point.pl 1 | psql pgsphere_test
+-- and
+-- ./gen_circle.pl 1 0.1 | psql pgsphere_test
+-- scripts
+
+SET enable_indexscan=off;
+SET
+select count(sp) from spoint_data where sp @ <(0d,90d),1.0d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,90d),1.0d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,90d),1.1d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,90d),1.1d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,-90d),1.0d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,-90d),1.0d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,-90d),1.1d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,-90d),1.1d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,0d),2.1d> 
+ count 
+-------
+    13
+(1 row)
+
+select count(sp) from spoint_data where <(0d,0d),2.1d>  ~ sp;
+ count 
+-------
+    13
+(1 row)
+
+
+select count(sc) from scircle_data where sc && <(0d,90d),1.0d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,90d),1.0d> ;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where <(0d,90d),1.0d> ~ sc;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where <(0d,90d),1.1d> ~ sc;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,-90d),1.0d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,-90d),1.0d> ;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where <(0d,-90d),1.0d> ~ sc;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,-90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,-90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where <(0d,-90d),1.1d> ~ sc;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,0d),2.1d> 
+ count 
+-------
+    13
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,0d),2.1d> 
+ count 
+-------
+    13
+(1 row)
+
+select count(sc) from scircle_data where <(0d,0d),2.1d>  ~ sc;
+ count 
+-------
+    13
+(1 row)
+
+
+SET enable_indexscan=on;
+SET
+select count(sp) from spoint_data where sp @ <(0d,90d),1.0d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,90d),1.0d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,90d),1.1d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,90d),1.1d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,-90d),1.0d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,-90d),1.0d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,-90d),1.1d> 
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where <(0d,-90d),1.1d>  ~ sp;
+ count 
+-------
+   361
+(1 row)
+
+select count(sp) from spoint_data where sp @ <(0d,0d),2.1d> 
+ count 
+-------
+    13
+(1 row)
+
+select count(sp) from spoint_data where <(0d,0d),2.1d>  ~ sp;
+ count 
+-------
+    13
+(1 row)
+
+
+select count(sc) from scircle_data where sc && <(0d,90d),1.0d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,90d),1.0d> ;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where <(0d,90d),1.0d> ~ sc;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where <(0d,90d),1.1d> ~ sc;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,-90d),1.0d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,-90d),1.0d> ;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where <(0d,-90d),1.0d> ~ sc;
+ count 
+-------
+     1
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,-90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,-90d),1.1d> ;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where <(0d,-90d),1.1d> ~ sc;
+ count 
+-------
+   361
+(1 row)
+
+select count(sc) from scircle_data where sc && <(0d,0d),2.1d> 
+ count 
+-------
+    13
+(1 row)
+
+select count(sc) from scircle_data where sc @ <(0d,0d),2.1d> 
+ count 
+-------
+    13
+(1 row)
+
+select count(sc) from scircle_data where <(0d,0d),2.1d>  ~ sc;
+ count 
+-------
+    13
+(1 row)
+
+

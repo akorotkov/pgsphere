@@ -1,0 +1,28 @@
+    <sect1 id="appendixes">
+      <title>
+        Appendixes
+      </title>
+      <sect2 id="appendixes.changelog">
+        <title>
+          Changes from version 1.0 to 1.1
+        </title>
+        <itemizedlist>
+          <listitem>
+            <para>
+              Speed up index query time. The index scan is much faster than in 1.0.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+               Remove btree index. It was used to cluster the index.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              This version is compatible to <application>PostgreSQL</application> 8.4 
+            </para>
+          </listitem>
+        </itemizedlist>
+      </sect2>
+        
+    </sect1>

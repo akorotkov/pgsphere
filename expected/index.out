@@ -1,0 +1,104 @@
+-- without idx
+SELECT count(*) FROM spheretmp1 WHERE p @ scircle '<(1,1),0.3>';
+ count 
+-------
+    32
+(1 row)
+
+SELECT count(*) FROM spheretmp1 WHERE p = spoint '(3.09 , 1.25)' ;
+ count 
+-------
+     4
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c @ scircle '<(1,1),0.3>';
+ count 
+-------
+    12
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c && scircle '<(1,1),0.3>';
+ count 
+-------
+    48
+(1 row)
+
+SELECT count(*) FROM spheretmp3 WHERE b && scircle '<(1,1),0.3>';
+ count 
+-------
+    28
+(1 row)
+
+SELECT count(*) FROM spheretmp3 WHERE spoint '(3.09 , 1.25)' @ b ;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l @  scircle '<(1,1),0.3>';
+ count 
+-------
+     8
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l && scircle '<(1,1),0.3>';
+ count 
+-------
+    40
+(1 row)
+
+-- create idx
+CREATE INDEX aaaidx ON spheretmp1 USING gist ( p );
+CREATE INDEX bbbidx ON spheretmp2 USING gist ( c );
+CREATE INDEX cccidx ON spheretmp3 USING gist ( b );
+CREATE INDEX dddidx ON spheretmp4 USING gist ( l );
+--with idx
+SET enable_seqscan = OFF ;
+SELECT count(*) FROM spheretmp1 WHERE p @ scircle '<(1,1),0.3>'  ;
+ count 
+-------
+    32
+(1 row)
+
+SELECT count(*) FROM spheretmp1 WHERE p = spoint '(3.09 , 1.25)' ;
+ count 
+-------
+     4
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c @ scircle '<(1,1),0.3>'  ;
+ count 
+-------
+    12
+(1 row)
+
+SELECT count(*) FROM spheretmp2 WHERE c && scircle '<(1,1),0.3>' ;
+ count 
+-------
+    48
+(1 row)
+
+SELECT count(*) FROM spheretmp3 WHERE b && scircle '<(1,1),0.3>';
+ count 
+-------
+    28
+(1 row)
+
+SELECT count(*) FROM spheretmp3 WHERE spoint '(3.09 , 1.25)' @ b ;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l @  scircle '<(1,1),0.3>' ;
+ count 
+-------
+     8
+(1 row)
+
+SELECT count(*) FROM spheretmp4 WHERE l && scircle '<(1,1),0.3>' ;
+ count 
+-------
+    40
+(1 row)
+
