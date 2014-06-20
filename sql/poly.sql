@@ -1,0 +1,590 @@
+-- checking polygon operators
+
+\set poly 'spoly \'{(0.1,0),(0.2,0),(0.2,0.1),(0.3,0.1),(0.3,-0.1),(0.4,-0.1),(0.5,0.1),(0.4,0.2),(0.1,0.2)}\''
+SELECT spoint   '(0.15,0.10)' @ :poly;                  -- point inside polygon
+SELECT spoint   '(0.20,0.00)' @ :poly;                  -- point contained polygon 
+SELECT spoint   '(0.10,0.10)' @ :poly;                  -- point contained polygon 
+SELECT spoint   '(0.25,0.50)' @ :poly;                  -- point outside polygon 
+SELECT spoint   '(0.25,0.00)' @ :poly;                  -- point outside polygon 
+SELECT scircle  '<(0.15,0.10),0.03>' @  :poly;          -- circle inside polygon
+SELECT scircle  '<(0.20,0.00),0.00>' @  :poly;          -- circle contained polygon 
+SELECT scircle  '<(0.20,0.30),0.05>' @  :poly;          -- circle outside  polygon 
+SELECT scircle  '<(0.25,0.00),0.05>' @  :poly;          -- circle overlaps polygon
+SELECT scircle  '<(0.25,0.00),0.10>' @  :poly;          -- circle overlaps polygon
+SELECT scircle  '<(0.15,0.10),0.03>' && :poly;          -- circle inside polygon
+SELECT scircle  '<(0.20,0.00),0.00>' && :poly;          -- circle contained polygon 
+SELECT scircle  '<(0.20,0.30),0.05>' && :poly;          -- circle outside  polygon 
+SELECT scircle  '<(0.25,0.00),0.05>' && :poly;          -- circle overlaps polygon
+SELECT scircle  '<(0.25,0.00),0.10>' && :poly;          -- circle overlaps polygon
+SELECT sline ( spoint '(0.00, 0.00)', spoint '(0.10,0.20)' ) @  :poly;  -- line touches polygon 
+SELECT sline ( spoint '(0.00, 0.10)', spoint '(0.10,0.10)' ) @  :poly;  -- line touches polygon 
+SELECT sline ( spoint '(0.50, 0.00)', spoint '(0.50,0.20)' ) @  :poly;  -- line touches polygon
+SELECT sline ( spoint '(0.10, 0.20)', spoint '(0.20,0.00)' ) @  :poly;  -- line touches and inside polygon 
+SELECT sline ( spoint '(0.45,-0.20)', spoint '(0.45,0.20)' ) @  :poly;  -- line overlaps polygon
+SELECT sline ( spoint '(0.45, 0.10)', spoint '(0.45,0.20)' ) @  :poly;  -- line overlaps polygon
+SELECT sline ( spoint '(0.24, 0.17)', spoint '(0.25,0.14)' ) @  :poly;  -- line inside  polygon
+SELECT sline ( spoint '(0.00, 0.00)', spoint '(0.10,0.20)' ) && :poly;  -- line touches polygon 
+SELECT sline ( spoint '(0.00, 0.10)', spoint '(0.10,0.10)' ) && :poly;  -- line touches polygon 
+SELECT sline ( spoint '(0.50, 0.00)', spoint '(0.50,0.20)' ) && :poly;  -- line touches polygon
+SELECT sline ( spoint '(0.10, 0.20)', spoint '(0.20,0.00)' ) && :poly;  -- line touches and inside polygon 
+SELECT sline ( spoint '(0.45,-0.20)', spoint '(0.45,0.20)' ) && :poly;  -- line overlaps polygon
+SELECT sline ( spoint '(0.45, 0.10)', spoint '(0.45,0.20)' ) && :poly;  -- line overlaps polygon
+SELECT sline ( spoint '(0.24, 0.17)', spoint '(0.25,0.14)' ) && :poly;  -- line inside  polygon
+\unset poly
+
+\set poly1 'spoly \'{(0,0),(1,0),(0,1)}\''
+\set poly2 'spoly \'{(1,0),(0,0),(0,1)}\''
+\set poly3 'spoly \'{(0,1),(0,0),(1,0)}\''
+\set poly4 'spoly \'{(0.1,0.9),(0.1,0.1),(0.9,0.1)}\''
+\set poly5 'spoly \'{(0.2,0.0),(1.2,0.0),(0.2,1)}\''
+
+SELECT :poly1  = :poly2;
+SELECT :poly2  = :poly3;
+SELECT :poly3  = :poly1;
+SELECT :poly1 && :poly2;
+SELECT :poly2 && :poly3;
+SELECT :poly3 && :poly1;
+SELECT :poly1  @ :poly2;
+SELECT :poly2  @ :poly3;
+SELECT :poly3  @ :poly1;
+SELECT :poly1  @ :poly4;
+SELECT :poly4  @ :poly1;
+SELECT :poly1 && :poly4;
+SELECT :poly4 && :poly1;
+SELECT :poly1  @ :poly5;
+SELECT :poly5  @ :poly1;
+SELECT :poly1 && :poly5;
+SELECT :poly5 && :poly1;
+
+\unset poly1
+\unset poly2
+\unset poly3
+\unset poly4
+\unset poly5
+
+
+-- From testsuite/poly_test.sql
+
+SELECT set_sphere_output('DEG');
+
+SELECT spoly '{(10d,0d),(10d,1d),(15d,0d)}';
+
+SELECT spoly '{(359d,0d),(359d,1d),(4d,0d)}';
+
+SELECT spoly '{(10d,0d),(10d,1d),(15d,0d)}';
+
+-- incorrect input -----
+
+SELECT spoly '{(10d,0d),(10d,1d)}';
+
+--- self-crossing input -----
+
+SELECT spoly '{(0d,0d),(10d,10d),(0d,10d),(10d,0d)}';
+
+--- functions
+
+SELECT npoints( spoly '{(10d,0d),(10d,1d),(15d,0d)}');
+
+SELECT npoints( spoly '{(10d,0d),(10d,1d),(15d,0d),(5d,-5d)}');
+
+--SELECT npoints( spoly '{(0d,0d),(0d,90d),(15d,90d),(15d,0d)}');
+
+SELECT area(spoly '{(0d,0d),(0d,90d),(1,0d)}');
+
+SELECT area(spoly '{(0d,0d),(0d,90d),(90d,0d)}')/(4.0*pi());
+
+--- operations
+
+--- = operator
+
+--- should be true
+
+SELECT spoly '{(1d,0d),(1d,1d),(2d,1d)}' = spoly '{(1d,1d),(2d,1d),(1d,0d)}';
+
+SELECT spoly '{(1d,0d),(1d,1d),(2d,1d)}' = spoly '{(2d,1d),(1d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' = spoly '{(1d,0d),(0d,0d),(0d,1d),(1d,1d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' = spoly '{(0d,0d),(1d,0d),(1d,1d),(0d,1d)}';
+
+--- should be false
+
+SELECT spoly '{(1d,0d),(1d,1d),(2d,1d)}' = spoly '{(1d,1d),(3d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' = spoly '{(1d,0d),(0d,0d),(0d,1d),(2d,2d)}';
+
+--- <> operator
+
+--- should be false
+
+SELECT spoly '{(1d,0d),(1d,1d),(2d,1d)}' <> spoly '{(1d,1d),(2d,1d),(1d,0d)}';
+
+SELECT spoly '{(1d,0d),(1d,1d),(2d,1d)}' <> spoly '{(2d,1d),(1d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' <> spoly '{(1d,0d),(0d,0d),(0d,1d),(1d,1d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' <> spoly '{(0d,0d),(1d,0d),(1d,1d),(0d,1d)}';
+
+--- should be true
+
+SELECT spoly '{(1d,0d),(1d,1d),(2d,1d)}' <> spoly '{(1d,1d),(3d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' <> spoly '{(1d,0d),(0d,0d),(0d,1d),(2d,2d)}';
+
+--- spoint @ spoly
+
+--- should be true
+SELECT spoly '{(1d,0d),(1d,1d),(2d,1d)}' <> spoly '{(1d,1d),(3d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' <> spoly '{(1d,0d),(0d,0d),(0d,1d),(2d,2d)}';
+
+--- spoint @ spoly
+
+--- should be true
+
+SELECT '(0.5d,0.5d)'::spoint @ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '(0d,0.5d)'::spoint @ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '(0d,0d)'::spoint @ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '(0.5d,0.5d)'::spoint @ spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '(0d,89.9d)'::spoint @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT '(0d,90d)'::spoint @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT '(0d,-89.9d)'::spoint @ spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT '(0d,-90d)'::spoint @ spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+--- should be false
+
+SELECT '(0.1d,0.5d)'::spoint @ spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '(45d,-89d)'::spoint @ spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT '(0d,1d)'::spoint @ spoly '{(0d,0d),(1d,1d),(1d,0d)}';
+
+--- spoly ~ spoint
+
+--- should be true
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '(0.5d,0.5d)'::spoint;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '(0d,0.5d)'::spoint;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '(0d,0d)'::spoint;
+
+SELECT  spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}' ~ '(0.5d,0.5d)'::spoint;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ '(0d,89.9d)'::spoint;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ '(0d,90d)'::spoint;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' ~ '(0d,-89.9d)'::spoint;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' ~ '(0d,-90d)'::spoint;
+
+--- should be false
+
+SELECT  spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}' ~ '(0.1d,0.5d)'::spoint;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' ~ '(45d,-89d)'::spoint;
+
+SELECT  spoly '{(0d,0d),(1d,1d),(1d,0d)}' ~ '(0d,1d)'::spoint;
+
+--- scircle @ spoly
+
+--- should be true
+
+SELECT '<(0.5d,0.5d),0.1d>'::scircle @ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '<(0d,89.9d),0.1d>'::scircle @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT '<(0d,90d),0.1d>'::scircle @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT '<(0d,-89.9d),0.1d>'::scircle @ spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT '<(0d,-90d),0.1d>'::scircle @ spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+--- should be false
+
+SELECT '<(0.1d,0.5d),0.1d>'::scircle @ spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '<(45d,-89d),0.1d>'::scircle @ spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT '<(0d,1d),0.1d>'::scircle @ spoly '{(0d,0d),(1d,1d),(1d,0d)}';
+
+SELECT '<(0d,0.5d),0.1d>'::scircle @ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '<(0d,0d),0.1d>'::scircle @ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '<(0.5d,0.5d),0.1d>'::scircle @ spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}';
+
+--- spoly ~ scircle
+
+--- should be true
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '<(0.5d,0.5d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ '<(0d,89.9d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ '<(0d,90d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' ~ '<(0d,-89.9d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' ~ '<(0d,-90d),0.1d>'::scircle;
+
+--- should be false
+
+SELECT  spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}' ~ '<(0.1d,0.5d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' ~ '<(45d,-89d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(1d,1d),(1d,0d)}' ~ '<(0d,1d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '<(0d,0.5d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '<(0d,0d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '<(0.1d,0.5d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ '<(0.1d,0.1d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}' ~ '<(0.6d,0.5d),0.1d>'::scircle;
+
+--- spoly @ scircle
+
+--- should be true
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' @ '<(0d,0d),2.0d>'::scircle;
+
+SELECT spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}' @ '<(0d,0d),1.0d>'::scircle;
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' @ '<(0d,90d),1.0d>'::scircle;
+
+SELECT spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' @ '<(180d,-90d),1.0d>'::scircle;
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,0d)}' @ '<(0d,0d),1.0d>'::scircle;
+
+--- should be false
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' @ '<(0d,0d),1.0d>'::scircle;
+
+SELECT spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}' @ '<(0d,0d),0.99d>'::scircle;
+
+SELECT spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}' @ '<(60d,0d),0.99d>'::scircle;
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,88d)}' @ '<(0d,90d),1.0d>'::scircle;
+
+SELECT spoly '{(0d,-87d),(90d,-87d),(180d,-87d),(270d,-87d)}' @ '<(180d,-90d),1.0d>'::scircle;
+
+SELECT spoly '{(0d,0d),(0d,1d),(2d,0d)}' @ '<(0d,0d),1.0d>'::scircle;
+
+--- scircle ~ spoly
+
+--- should be true
+
+SELECT '<(0d,0d),2.0d>'::scircle ~ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '<(0d,0d),1.0d>'::scircle ~ spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}';
+
+SELECT '<(0d,90d),1.0d>'::scircle ~ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT '<(180d,-90d),1.0d>'::scircle ~ spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT '<(0d,0d),1.0d>'::scircle ~ spoly '{(0d,0d),(0d,1d),(1d,0d)}';
+
+--- should be false
+
+SELECT '<(0d,0d),1.0d>'::scircle ~ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT '<(0d,0d),0.99d>'::scircle ~ spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}';
+
+SELECT '<(60d,0d),0.99d>'::scircle ~ spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}';
+
+SELECT '<(0d,90d),1.0d>'::scircle ~ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,88d)}';
+
+SELECT '<(180d,-90d),1.0d>'::scircle ~ spoly '{(0d,-87d),(90d,-87d),(180d,-87d),(270d,-87d)}';
+
+SELECT '<(0d,0d),1.0d>'::scircle ~ spoly '{(0d,0d),(0d,1d),(2d,0d)}';
+
+--- scircle && spoly
+
+--- should be true
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' && '<(0.5d,0.5d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && '<(0d,89.9d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && '<(0d,90d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' && '<(0d,-89.9d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' && '<(0d,-90d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' && '<(0d,0d),2.0d>'::scircle;
+
+SELECT  spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}' && '<(0d,0d),1.0d>'::scircle;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && '<(0d,90d),1.0d>'::scircle;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' && '<(180d,-90d),1.0d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,0d)}' && '<(0d,0d),1.0d>'::scircle;
+
+SELECT  spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && '<(0d,2d),1.0d>'::scircle;
+
+SELECT  spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && '<(2d,0d),1.0d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}' && '<(0.5d,0.5d),0.1d>'::scircle;
+
+--- should be false
+
+SELECT  spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' && '<(1.5d,0.5d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && '<(0d,88.0d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}' && '<(0.3d,0.5d),0.1d>'::scircle;
+
+SELECT  spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}' && '<(0d,-87d),0.1d>'::scircle;
+
+--- spoly && scircle
+
+--- should be true
+
+SELECT  '<(0.5d,0.5d),0.1d>'::scircle && spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT  '<(0d,89.9d),0.1d>'::scircle && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT  '<(0d,90d),0.1d>'::scircle && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT  '<(0d,-89.9d),0.1d>'::scircle && spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT  '<(0d,-90d),0.1d>'::scircle && spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT  '<(0d,0d),2.0d>'::scircle && spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT  '<(0d,0d),1.0d>'::scircle && spoly '{(-1d,0d),(0d,1d),(1d,0d),(0d,-1d)}';
+
+SELECT  '<(0d,90d),1.0d>'::scircle && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT  '<(180d,-90d),1.0d>'::scircle && spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+SELECT  '<(0d,0d),1.0d>'::scircle && spoly '{(0d,0d),(0d,1d),(1d,0d)}';
+
+SELECT  '<(0d,2d),1.0d>'::scircle && spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT  '<(2d,0d),1.0d>'::scircle && spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT  '<(0.5d,0.5d),0.1d>'::scircle && spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}';
+
+--- should be false
+
+SELECT  '<(1.5d,0.5d),0.1d>'::scircle && spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT  '<(0d,88.0d),0.1d>'::scircle && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT  '<(0.3d,0.5d),0.1d>'::scircle && spoly '{(0d,0d),(0.5d,0.5d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT  '<(0d,-87d),0.1d>'::scircle && spoly '{(0d,-89d),(90d,-89d),(180d,-89d),(270d,-89d)}';
+
+--- spoly @ spoly
+
+--- should be true
+
+SELECT spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}' @ spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)}' @ spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}' @ spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,0d)}' @ spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,0d)}' @ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)}' @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+--- should be false
+
+--SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' @ spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(45d,89.2d),(135d,89.2d),(225d,89.2d),(315d,89.2d)}' @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' @ spoly '{(0.5d,0.5d),(0.5d,1.5d),(1.5d,1.5d),(1.5d,0.5d)}';
+
+SELECT spoly '{(0d,88d),(90d,88d),(180d,88d),(270d,88d)}' @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)}' @ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+--- spoly ~ spoly
+
+--- should be true                                                                                       
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' ~ spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' ~ spoly '{(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' ~ spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' ~ spoly '{(0d,0d),(0d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' ~ spoly '{(0d,0d),(0d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ spoly '{(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)}';
+
+--- should be false
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ spoly '{(45d,89.2d),(135d,89.2d),(225d,89.2d),(315d,89.2d)}';
+
+SELECT spoly '{(0.5d,0.5d),(0.5d,1.5d),(1.5d,1.5d),(1.5d,0.5d)}' ~ spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ spoly '{(0d,88d),(90d,88d),(180d,88d),(270d,88d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' ~ spoly '{(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)}';
+
+--- spoly && spoly
+
+--- should be true                                                                                       
+
+SELECT spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}' && spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)}' && spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}' && spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,0d)}' && spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,0d)}' && spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)}' && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && spoly '{(-0.5d,-0.5d),(-0.5d,0.5d),(0.5d,0.5d),(0.5d,-0.5d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && spoly '{(0d,0d),(0d,0.5d),(0.5d,0.5d),(0.5d,0d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && spoly '{(0d,0d),(0d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' && spoly '{(0d,0d),(0d,1d),(1d,0d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && spoly '{(45d,89.3d),(135d,89.3d),(225d,89.3d),(315d,89.3d)}';
+
+SELECT spoly '{(45d,89.2d),(135d,89.2d),(225d,89.2d),(315d,89.2d)}' && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(0d,0d),(0d,1d),(1d,1d),(1d,0d)}' && spoly '{(0.5d,0.5d),(0.5d,1.5d),(1.5d,1.5d),(1.5d,0.5d)}';
+
+SELECT spoly '{(0d,88d),(90d,88d),(180d,88d),(270d,88d)}' && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+--- should be false
+
+SELECT spoly '{(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)}' && spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}';
+
+SELECT spoly '{(0d,89d),(90d,89d),(180d,89d),(270d,89d)}' && spoly '{(0d,-88d),(90d,-88d),(180d,-88d),(270d,-88d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && spoly '{(3d,-1d),(3d,1d),(5d,1d),(5d,-1d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && spoly '{(-1d,3d),(-1d,5d),(1d,5d),(1d,3d)}';
+
+SELECT spoly '{(-1d,-1d),(-1d,1d),(1d,1d),(1d,-1d)}' && spoly '{(179d,-1d),(179d,1d),(181d,1d),(181d,-1d)}';
+
+--
+-- ellipse and polygon
+--
+  
+-- negators , commutator @,&&
+
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'    @  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}'   @  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'   &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}'  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'   !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}'  !@  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'  !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}'  !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}' !&&  sellipse '<{10d,5d},(280d,-20d),90d>';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   ~  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'   &&  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !~  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spoly '{(280d, -9d),(280d,-12d),(279d, -8d)}';
+SELECT sellipse '<{10d,5d},(280d,-20d),90d>'  !&&  spoly '{(280d,-11d),(280d,-12d),(279d, -12d)}';
+
+-- ellipse is point
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{0d,0d},(280d,-20d),90d>'; 
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'   @  sellipse '<{0d,0d},(280d,-20d),90d>'; 
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{0d,0d},(280d,-20d),90d>'; 
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{0d,0d},(280d,-20d),90d>'; 
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ; 
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'   @  spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'; 
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ; 
+SELECT sellipse '<{0d,0d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'; 
+
+-- ellipse is circle
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{5d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}'   @  sellipse '<{2d,2d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{5d,5d},(280d,-20d),90d>';
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+SELECT sellipse '<{2d,2d},(280d,-20d),90d>'   @  spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}';
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+SELECT sellipse '<{5d,5d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-18d),(279d, -12d)}';
+
+-- ellipse is line
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{5d,0d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}'   @  sellipse '<{2d,0d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{5d,0d},(280d,-20d),90d>';
+SELECT sellipse '<{5d,0d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+SELECT sellipse '<{2d,0d},(280d,-20d),90d>'   @  spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}';
+SELECT sellipse '<{5d,0d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+SELECT sellipse '<{5d,0d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-18d),(279d, -12d)}';
+
+-- ellipse is a real ellipse
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'    @  sellipse '<{5d,2d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}'   @  sellipse '<{2d,1d},(280d,-20d),90d>';
+SELECT spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}'   &&  sellipse '<{5d,2d},(280d,-20d),90d>';
+SELECT spoly '{(280d,-11d),(280d,-20d),(279d, -12d)}'  &&  sellipse '<{5d,2d},(280d,-20d),90d>';
+SELECT sellipse '<{5d,2d},(280d,-20d),90d>'   @  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+SELECT sellipse '<{2d,1d},(280d,-20d),90d>'   @  spoly '{(280d,-10d),(290d,-30d),(270d, -30d)}';
+SELECT sellipse '<{5d,2d},(280d,-20d),90d>'  &&  spoly '{(280d, -9d),(280d, -8d),(279d, -8d)}' ;
+SELECT sellipse '<{5d,2d},(280d,-20d),90d>'  &&  spoly '{(280d,-11d),(280d,-18d),(279d, -12d)}';
+
+-- create polygon as aggregate
+SELECT spoly(data.p) FROM ( SELECT spoint '(0,1)' as p UNION ALL SELECT spoint '(1,1)' UNION ALL SELECT '(1,0)' ) AS data ;
+
+-- test stored data
+SELECT count(id) FROM spheretmp5 WHERE id=2  AND area(p) BETWEEN 5.735555 AND 5.735556 ;
+
+-- check to create this small polygon without errors
+SELECT area( spoly '{
+  (3.09472232280407 , 1.47261266025223),
+  (3.0947320190777 , 1.47261266025223),
+  (3.0947320190777 , 1.47262235652586),
+  (3.09472232280407 , 1.47262235652586) }') >= 0 ;
+
+SELECT npoints( spoly '{
+  (1.51214841579108 , -2.90888208684947e-05),
+  (1.5121581120647 , -2.90888208684947e-05),
+  (1.5121581120647 , -1.93925472462553e-05),
+  (1.51214841579108 , -1.93925472462553e-05)
+}');

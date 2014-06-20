@@ -1,6 +1,6 @@
 *.o
 *.so
-*.sql
-results
+/*.sql
+/results
 regression.out
 regression.diffs
