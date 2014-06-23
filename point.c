@@ -37,8 +37,10 @@
     static bool lat_is_neg;
     lat_is_neg = ( spoint->lat < 0 )?( TRUE ):( FALSE );
 
-    spoint->lng  = spoint->lng - floor(spoint->lng / ( PID ) )  * PID;
-    spoint->lat  = spoint->lat - floor(spoint->lat / ( PID ) )  * PID;
+    if(spoint->lng < 0 || spoint->lng > PID)
+	  spoint->lng  = spoint->lng - floor(spoint->lng / ( PID ) )  * PID;
+    if(spoint->lat < -PIH || spoint->lat > PIH)
+	  spoint->lat  = spoint->lat - floor(spoint->lat / ( PID ) )  * PID;
     if( spoint->lng < 0.0 ){
       spoint->lng +=  ( PID );
     }
