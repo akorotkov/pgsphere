@@ -14,11 +14,15 @@
   vector.
   \brief three-dimensional vector
 */
- typedef struct {
-    float8    x;         //!< x value ( -1.0 .. 1.0 )
-    float8    y;         //!< y value ( -1.0 .. 1.0 )
-    float8    z;         //!< z value ( -1.0 .. 1.0 ) 
- } Vector3D;
+typedef struct
+{
+	float8		x;
+	/* !<x value(-1.0..1.0) */
+	float8		y;
+	/* !<y value(-1.0..1.0) */
+	float8		z;
+	/* !<z value(-1.0..1.0) */
+} Vector3D;
 
 
 /*!
@@ -28,7 +32,7 @@
   \param out pointer to result vector
   \return pointer to result vector
 */
-Vector3D * vector3d_cross     ( Vector3D * out , const Vector3D * v1 , const Vector3D * v2 );
+Vector3D   *vector3d_cross(Vector3D *out, const Vector3D *v1, const Vector3D *v2);
 
 /*!
   \brief checks equalness of two vectors
@@ -36,7 +40,7 @@ Vector3D * vector3d_cross     ( Vector3D * out , const Vector3D * v1 , const Vec
   \param b pointer to second vector
   \return true, if equal
 */
-bool       vector3d_eq        ( const Vector3D * a   , const Vector3D * b  );
+bool		vector3d_eq(const Vector3D *a, const Vector3D *b);
 
 
 /*!
@@ -45,13 +49,13 @@ bool       vector3d_eq        ( const Vector3D * a   , const Vector3D * b  );
   \param v2  pointer to second vector
   \return scalar product
 */
-float8 vector3d_scalar ( Vector3D * v1 , Vector3D * v2 );
+float8		vector3d_scalar(Vector3D *v1, Vector3D *v2);
 
 /*!
   \brief calculate the length of a vector
   \param v pointer to vector
   \return length
 */
-float8 vector3d_length ( const Vector3D * v );
+float8		vector3d_length(const Vector3D *v);
 
 #endif

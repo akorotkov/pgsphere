@@ -20,6 +20,6 @@
 #endif
 
 
-Datum crossmatch(PG_FUNCTION_ARGS);
+Datum		crossmatch(PG_FUNCTION_ARGS);
 
-#endif /* __PGS_CROSSMATCH_H_ */
+#endif   /* __PGS_CROSSMATCH_H_ */

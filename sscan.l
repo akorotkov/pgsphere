@@ -21,19 +21,6 @@ void sphere_flush_scanner_buffer(void) {
 } 
 
 
-FILE *sphereget_in(void);
-FILE *sphereget_out(void);
-int  sphereget_leng(void);
-char *sphereget_text(void);
-int  sphereget_debug(void) ;
-void sphereset_debug(int bdebug);
-void sphereset_out (FILE * out_str);
-int  sphereget_debug(void);
-void sphereset_debug(int  bdebug);
-void sphereset_in(FILE * in_str );  
-int  spherelex_destroy(void);
-
-
 %}
 
 %option 8bit

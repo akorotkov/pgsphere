@@ -2,225 +2,231 @@
 
 /*!
   \file
-  \brief Functions needed to build a GIST index 
+  \brief Functions needed to build a GIST index
 */
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  PG_FUNCTION_INFO_V1(pointkey_in);
-  PG_FUNCTION_INFO_V1(pointkey_out);
-  PG_FUNCTION_INFO_V1(pointkey_volume);
-  PG_FUNCTION_INFO_V1(pointkey_area);
-  PG_FUNCTION_INFO_V1(pointkey_perimeter);
-  PG_FUNCTION_INFO_V1(spherekey_in);
-  PG_FUNCTION_INFO_V1(spherekey_out);
-  PG_FUNCTION_INFO_V1(g_spherekey_decompress);
-  PG_FUNCTION_INFO_V1(g_scircle_compress);
-  PG_FUNCTION_INFO_V1(g_spoint_compress);
-  PG_FUNCTION_INFO_V1(g_spoint2_compress);
-  PG_FUNCTION_INFO_V1(g_sline_compress);
-  PG_FUNCTION_INFO_V1(g_spath_compress);
-  PG_FUNCTION_INFO_V1(g_spoly_compress);
-  PG_FUNCTION_INFO_V1(g_sellipse_compress);
-  PG_FUNCTION_INFO_V1(g_sbox_compress);
-  PG_FUNCTION_INFO_V1(g_spherekey_union );
-  PG_FUNCTION_INFO_V1(g_spherekey_same);
-  PG_FUNCTION_INFO_V1(g_spoint2_union );
-  PG_FUNCTION_INFO_V1(g_spoint2_same);
-  PG_FUNCTION_INFO_V1(g_spoint_consistent);
-  PG_FUNCTION_INFO_V1(g_spoint2_consistent);
-  PG_FUNCTION_INFO_V1(g_scircle_consistent);
-  PG_FUNCTION_INFO_V1(g_sline_consistent);
-  PG_FUNCTION_INFO_V1(g_spath_consistent);
-  PG_FUNCTION_INFO_V1(g_spoly_consistent);
-  PG_FUNCTION_INFO_V1(g_sellipse_consistent);
-  PG_FUNCTION_INFO_V1(g_sbox_consistent);
-  PG_FUNCTION_INFO_V1(g_spherekey_penalty);
-  PG_FUNCTION_INFO_V1(g_spherekey_picksplit);
-  PG_FUNCTION_INFO_V1(g_spoint2_penalty);
-  PG_FUNCTION_INFO_V1(g_spoint2_picksplit);
-  PG_FUNCTION_INFO_V1(g_spoint2_distance);
+PG_FUNCTION_INFO_V1(pointkey_in);
+PG_FUNCTION_INFO_V1(pointkey_out);
+PG_FUNCTION_INFO_V1(pointkey_volume);
+PG_FUNCTION_INFO_V1(pointkey_area);
+PG_FUNCTION_INFO_V1(pointkey_perimeter);
+PG_FUNCTION_INFO_V1(spherekey_in);
+PG_FUNCTION_INFO_V1(spherekey_out);
+PG_FUNCTION_INFO_V1(g_spherekey_decompress);
+PG_FUNCTION_INFO_V1(g_scircle_compress);
+PG_FUNCTION_INFO_V1(g_spoint_compress);
+PG_FUNCTION_INFO_V1(g_spoint2_compress);
+PG_FUNCTION_INFO_V1(g_sline_compress);
+PG_FUNCTION_INFO_V1(g_spath_compress);
+PG_FUNCTION_INFO_V1(g_spoly_compress);
+PG_FUNCTION_INFO_V1(g_sellipse_compress);
+PG_FUNCTION_INFO_V1(g_sbox_compress);
+PG_FUNCTION_INFO_V1(g_spherekey_union);
+PG_FUNCTION_INFO_V1(g_spherekey_same);
+PG_FUNCTION_INFO_V1(g_spoint2_union);
+PG_FUNCTION_INFO_V1(g_spoint2_same);
+PG_FUNCTION_INFO_V1(g_spoint_consistent);
+PG_FUNCTION_INFO_V1(g_spoint2_consistent);
+PG_FUNCTION_INFO_V1(g_scircle_consistent);
+PG_FUNCTION_INFO_V1(g_sline_consistent);
+PG_FUNCTION_INFO_V1(g_spath_consistent);
+PG_FUNCTION_INFO_V1(g_spoly_consistent);
+PG_FUNCTION_INFO_V1(g_sellipse_consistent);
+PG_FUNCTION_INFO_V1(g_sbox_consistent);
+PG_FUNCTION_INFO_V1(g_spherekey_penalty);
+PG_FUNCTION_INFO_V1(g_spherekey_picksplit);
+PG_FUNCTION_INFO_V1(g_spoint2_penalty);
+PG_FUNCTION_INFO_V1(g_spoint2_picksplit);
+PG_FUNCTION_INFO_V1(g_spoint2_distance);
 
 #endif
 
 
-  /*!
-    \brief Returns the \link  PGS_KEY_REL Relationship \endlink of two keys
-    \param k1 pointer to first key
-    \param k2 pointer to second key
-    \return \link  PGS_KEY_REL Relationship \endlink
+ /*
+  * ! \brief Returns the \link	PGS_KEY_REL Relationship \endlink of two keys
+  * \param k1 pointer to first key \param k2 pointer to second key \return
+  * \link  PGS_KEY_REL Relationship \endlink
   */
-  uchar  spherekey_interleave ( const int32 * k1 ,  const int32 * k2 )
-  {
-    uchar          i ;
-    static char    tb;
+uchar
+spherekey_interleave(const int32 *k1, const int32 *k2)
+{
+	uchar		i;
+	static char tb;
 
-    // i represents x,y,z
+	/* i represents x,y,z */
 
-    tb = 0;
-    for ( i = 0 ; i<3 ; i++ ){
-      tb |= ( ( k2[i] > k1[i+3] ) || ( k1[i] > k2[i+3] ) );
-      if ( tb ) break;
-    }
-    if ( tb ){
-     return SCKEY_DISJ;
-    }
-    tb = 1;
-    for ( i = 0 ; i<3 ; i++ ){
-      tb &= ( ( k1[i] == k2[i] ) && ( k1[i+3] == k2[i+3] ) );
-      if ( ! tb ) break;
-    }
-    if ( tb ){
-     return SCKEY_SAME;
-    }
-    tb = 1;
-    for ( i = 0 ; i<3 ; i++ ){
-      tb &= ( k1[i] <= k2[i] && k1[i+3] >= k2[i+3] );
-      if ( ! tb ) break;
-    }
-    if ( tb ){
-      // v2 in v1
-      return SCKEY_IN;
-    }
-    return SCKEY_OVERLAP;
-  }
+	tb = 0;
+	for (i = 0; i < 3; i++)
+	{
+		tb |= ((k2[i] > k1[i + 3]) || (k1[i] > k2[i + 3]));
+		if (tb)
+			break;
+	}
+	if (tb)
+	{
+		return SCKEY_DISJ;
+	}
+	tb = 1;
+	for (i = 0; i < 3; i++)
+	{
+		tb &= ((k1[i] == k2[i]) && (k1[i + 3] == k2[i + 3]));
+		if (!tb)
+			break;
+	}
+	if (tb)
+	{
+		return SCKEY_SAME;
+	}
+	tb = 1;
+	for (i = 0; i < 3; i++)
+	{
+		tb &= (k1[i] <= k2[i] && k1[i + 3] >= k2[i + 3]);
+		if (!tb)
+			break;
+	}
+	if (tb)
+	{
+		/* v2 in v1 */
+		return SCKEY_IN;
+	}
+	return SCKEY_OVERLAP;
+}
 
-  Datum  spherekey_in(PG_FUNCTION_ARGS)
-  {
-    elog ( ERROR , "Not implemented!" );
-    PG_RETURN_POINTER ( NULL );
-  }
+Datum
+spherekey_in(PG_FUNCTION_ARGS)
+{
+	elog(ERROR, "Not implemented!");
+	PG_RETURN_POINTER(NULL);
+}
 
-  Datum spherekey_out(PG_FUNCTION_ARGS)
-  {
+Datum
+spherekey_out(PG_FUNCTION_ARGS)
+{
+	static const float8 ks = (float8) MAXCVALUE;
+	int32	   *k = (int32 *) PG_GETARG_POINTER(0);
+	char	   *buffer = (char *) MALLOC(1024);
 
-    static const float8  ks =  (float8) MAXCVALUE ;
-    int32 * k     =  ( int32 * ) PG_GETARG_POINTER ( 0 ) ;
-    char * buffer =  ( char  * ) MALLOC ( 1024 ) ;
-
-    sprintf( 
-      buffer,
-      "(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
-      k[0]/ks,
-      k[1]/ks,
-      k[2]/ks,
-      k[3]/ks,
-      k[4]/ks,
-      k[5]/ks
-    );
-
-    PG_RETURN_CSTRING ( buffer ) ;
-
-  }
-
-  /*static void
-  checkKey(GiSTSPointKey *k)
-  {
-	  if (!IS_LEAF(k))
-	  {
-		  int i;
-		  for (i = 0; i < 6; i++)
-		  {
-			  if (k->k[i] < -MAXCVALUE || k->k[i] > MAXCVALUE)
-			  {
-				  elog(ERROR, "Invalid key!");
-			  }
-		  }
-	  }
-  }*/
-
-  static bool get_sizes(GiSTSPointKey * k, float8 sizes[3])
-  {
-	 int i;
-	 static const float8  ks =  (float8) MAXCVALUE;
-
-	 if (IS_LEAF(k))
-		 return false;
-
-	 for (i = 0; i < 3; i++)
-	 {
-		 sizes[i] = (((uint64)k->k[i + 3] - (uint64)k->k[i]) + 1) / ks;
-	 }
-	 return true;
-  }
-
-  Datum  pointkey_volume(PG_FUNCTION_ARGS)
-  {
-	 GiSTSPointKey * k     =  ( GiSTSPointKey * ) PG_GETARG_POINTER ( 0 ) ;
-	 float8 sizes[3];
-
-	 if (!get_sizes(k, sizes))
-		 PG_RETURN_FLOAT8(0.0);
-
-	 PG_RETURN_FLOAT8(sizes[0] * sizes[1] * sizes[2]);
-  }
-
-  Datum  pointkey_area(PG_FUNCTION_ARGS)
-  {
-	 GiSTSPointKey * k     =  ( GiSTSPointKey * ) PG_GETARG_POINTER ( 0 ) ;
-	 float8 sizes[3];
-
-	 if (!get_sizes(k, sizes))
-		 PG_RETURN_FLOAT8(0.0);
-
-	 PG_RETURN_FLOAT8(sizes[0] * sizes[1] + sizes[0] * sizes[2] + sizes[1] * sizes[2]);
-  }
-
-  Datum  pointkey_perimeter(PG_FUNCTION_ARGS)
-  {
-	 GiSTSPointKey * k     =  ( GiSTSPointKey * ) PG_GETARG_POINTER ( 0 ) ;
-	 float8 sizes[3];
-
-	 if (!get_sizes(k, sizes))
-		 PG_RETURN_FLOAT8(0.0);
-
-	 PG_RETURN_FLOAT8(sizes[0] + sizes[1] + sizes[2]);
-  }
-
-    Datum  pointkey_in(PG_FUNCTION_ARGS)
-    {
-      elog ( ERROR , "Not implemented!" );
-      PG_RETURN_POINTER ( NULL );
-    }
-
-    Datum pointkey_out(PG_FUNCTION_ARGS)
-    {
-
-      static const float8  ks =  (float8) MAXCVALUE ;
-      GiSTSPointKey * k     =  ( GiSTSPointKey * ) PG_GETARG_POINTER ( 0 ) ;
-      char * buffer =  ( char  * ) MALLOC ( 1024 ) ;
-
-      if (IS_LEAF(k))
-      {
-    	  sprintf(
-    		buffer,
-    		"(%.9f,%.9f)",
-    		k->lng,
-    		k->lat
-		  );
-      }
-      else
-      {
-		  sprintf(
+	sprintf(
 			buffer,
 			"(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
-			k->k[0]/ks,
-			k->k[1]/ks,
-			k->k[2]/ks,
-			k->k[3]/ks,
-			k->k[4]/ks,
-			k->k[5]/ks
-		  );
-      }
+			k[0] / ks,
+			k[1] / ks,
+			k[2] / ks,
+			k[3] / ks,
+			k[4] / ks,
+			k[5] / ks
+		);
 
-      PG_RETURN_CSTRING ( buffer ) ;
+	PG_RETURN_CSTRING(buffer);
 
-    }
+}
 
-  Datum g_spherekey_decompress(PG_FUNCTION_ARGS)
-  {
-    PG_RETURN_DATUM(PG_GETARG_DATUM(0));
-  }
+ /*
+  * static void checkKey(GiSTSPointKey *k) { if (!IS_LEAF(k)) { int i; for (i
+  * = 0; i < 6; i++) { if (k->k[i] < -MAXCVALUE || k->k[i] > MAXCVALUE) {
+  * elog(ERROR, "Invalid key!"); } } } }
+  */
+
+static bool
+get_sizes(GiSTSPointKey *k, float8 sizes[3])
+{
+	int			i;
+	static const float8 ks = (float8) MAXCVALUE;
+
+	if (IS_LEAF(k))
+		return false;
+
+	for (i = 0; i < 3; i++)
+	{
+		sizes[i] = (((uint64) k->k[i + 3] - (uint64) k->k[i]) + 1) / ks;
+	}
+	return true;
+}
+
+Datum
+pointkey_volume(PG_FUNCTION_ARGS)
+{
+	GiSTSPointKey *k = (GiSTSPointKey *) PG_GETARG_POINTER(0);
+	float8		sizes[3];
+
+	if (!get_sizes(k, sizes))
+		PG_RETURN_FLOAT8(0.0);
+
+	PG_RETURN_FLOAT8(sizes[0] * sizes[1] * sizes[2]);
+}
+
+Datum
+pointkey_area(PG_FUNCTION_ARGS)
+{
+	GiSTSPointKey *k = (GiSTSPointKey *) PG_GETARG_POINTER(0);
+	float8		sizes[3];
+
+	if (!get_sizes(k, sizes))
+		PG_RETURN_FLOAT8(0.0);
+
+	PG_RETURN_FLOAT8(sizes[0] * sizes[1] + sizes[0] * sizes[2] + sizes[1] * sizes[2]);
+}
+
+Datum
+pointkey_perimeter(PG_FUNCTION_ARGS)
+{
+	GiSTSPointKey *k = (GiSTSPointKey *) PG_GETARG_POINTER(0);
+	float8		sizes[3];
+
+	if (!get_sizes(k, sizes))
+		PG_RETURN_FLOAT8(0.0);
+
+	PG_RETURN_FLOAT8(sizes[0] + sizes[1] + sizes[2]);
+}
+
+Datum
+pointkey_in(PG_FUNCTION_ARGS)
+{
+	elog(ERROR, "Not implemented!");
+	PG_RETURN_POINTER(NULL);
+}
+
+Datum
+pointkey_out(PG_FUNCTION_ARGS)
+{
+	static const float8 ks = (float8) MAXCVALUE;
+	GiSTSPointKey *k = (GiSTSPointKey *) PG_GETARG_POINTER(0);
+	char	   *buffer = (char *) MALLOC(1024);
+
+	if (IS_LEAF(k))
+	{
+		sprintf(
+				buffer,
+				"(%.9f,%.9f)",
+				k->lng,
+				k->lat
+			);
+	}
+	else
+	{
+		sprintf(
+				buffer,
+				"(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
+				k->k[0] / ks,
+				k->k[1] / ks,
+				k->k[2] / ks,
+				k->k[3] / ks,
+				k->k[4] / ks,
+				k->k[5] / ks
+			);
+	}
+
+	PG_RETURN_CSTRING(buffer);
+
+}
+
+Datum
+g_spherekey_decompress(PG_FUNCTION_ARGS)
+{
+	PG_RETURN_DATUM(PG_GETARG_DATUM(0));
+}
 
 /*!
   \brief general compress method for all data types
@@ -230,120 +236,129 @@
 */
 #if PG_VERSION_NUM < 80200
 #define PGS_COMPRESS( type, genkey, detoast )  do { \
-    GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
-    GISTENTRY  *retval; \
-    if (entry->leafkey) \
-    { \
-      retval  =  MALLOC ( sizeof ( GISTENTRY ) ); \
-      if ( DatumGetPointer(entry->key) != NULL ){ \
-        int32 * k = ( int32 * ) MALLOC ( KEYSIZE ) ; \
-        if( detoast ) \
-        { \
-          genkey ( k , ( type * )  DatumGetPointer( PG_DETOAST_DATUM( entry->key ) ) ) ; \
-        } else { \
-          genkey ( k , ( type * )  DatumGetPointer( entry->key ) ) ; \
-        } \
-        gistentryinit(*retval, PointerGetDatum(k) , \
-          entry->rel, entry->page, \
-          entry->offset, KEYSIZE , FALSE ); \
-      } else { \
-        gistentryinit(*retval, (Datum) 0, \
-          entry->rel, entry->page, \
-          entry->offset, 0, FALSE ); \
-      } \
-    } else { \
-      retval = entry; \
-    } \
-    PG_RETURN_POINTER(retval); \
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
+	GISTENTRY  *retval; \
+	if (entry->leafkey) \
+	{ \
+	  retval  =  MALLOC ( sizeof ( GISTENTRY ) ); \
+	  if ( DatumGetPointer(entry->key) != NULL ){ \
+		int32 * k = ( int32 * ) MALLOC ( KEYSIZE ) ; \
+		if( detoast ) \
+		{ \
+		  genkey ( k , ( type * )  DatumGetPointer( PG_DETOAST_DATUM( entry->key ) ) ) ; \
+		} else { \
+		  genkey ( k , ( type * )  DatumGetPointer( entry->key ) ) ; \
+		} \
+		gistentryinit(*retval, PointerGetDatum(k) , \
+		  entry->rel, entry->page, \
+		  entry->offset, KEYSIZE , FALSE ); \
+	  } else { \
+		gistentryinit(*retval, (Datum) 0, \
+		  entry->rel, entry->page, \
+		  entry->offset, 0, FALSE ); \
+	  } \
+	} else { \
+	  retval = entry; \
+	} \
+	PG_RETURN_POINTER(retval); \
   } while (0) ;
 #else
 
 #define PGS_COMPRESS( type, genkey, detoast )  do { \
-    GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
-    GISTENTRY  *retval; \
-    if (entry->leafkey) \
-    { \
-      retval  =  MALLOC ( sizeof ( GISTENTRY ) ); \
-      if ( DatumGetPointer(entry->key) != NULL ){ \
-        int32 * k = ( int32 * ) MALLOC ( KEYSIZE ) ; \
-        if( detoast ) \
-        { \
-          genkey ( k , ( type * )  DatumGetPointer( PG_DETOAST_DATUM( entry->key ) ) ) ; \
-        } else { \
-          genkey ( k , ( type * )  DatumGetPointer( entry->key ) ) ; \
-        } \
-        gistentryinit(*retval, PointerGetDatum(k) , \
-          entry->rel, entry->page, \
-          entry->offset, FALSE ); \
-      } else { \
-        gistentryinit(*retval, (Datum) 0, \
-          entry->rel, entry->page, \
-          entry->offset, FALSE ); \
-      } \
-    } else { \
-      retval = entry; \
-    } \
-    PG_RETURN_POINTER(retval); \
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
+	GISTENTRY  *retval; \
+	if (entry->leafkey) \
+	{ \
+	  retval  =  MALLOC ( sizeof ( GISTENTRY ) ); \
+	  if ( DatumGetPointer(entry->key) != NULL ){ \
+		int32 * k = ( int32 * ) MALLOC ( KEYSIZE ) ; \
+		if( detoast ) \
+		{ \
+		  genkey ( k , ( type * )  DatumGetPointer( PG_DETOAST_DATUM( entry->key ) ) ) ; \
+		} else { \
+		  genkey ( k , ( type * )  DatumGetPointer( entry->key ) ) ; \
+		} \
+		gistentryinit(*retval, PointerGetDatum(k) , \
+		  entry->rel, entry->page, \
+		  entry->offset, FALSE ); \
+	  } else { \
+		gistentryinit(*retval, (Datum) 0, \
+		  entry->rel, entry->page, \
+		  entry->offset, FALSE ); \
+	  } \
+	} else { \
+	  retval = entry; \
+	} \
+	PG_RETURN_POINTER(retval); \
   } while (0) ;
 #endif
 
-  Datum g_scircle_compress(PG_FUNCTION_ARGS)
-  {
-    PGS_COMPRESS( SCIRCLE , spherecircle_gen_key, 0 )
-  }
-  
-  Datum g_spoint_compress(PG_FUNCTION_ARGS)
-  {
-    PGS_COMPRESS( SPoint , spherepoint_gen_key, 0 )
-  }
+Datum
+g_scircle_compress(PG_FUNCTION_ARGS)
+{
+	PGS_COMPRESS(SCIRCLE, spherecircle_gen_key, 0)
+}
 
-  Datum g_sline_compress(PG_FUNCTION_ARGS)
-  {
-    PGS_COMPRESS( SLine , sphereline_gen_key, 0 )
-  }
+Datum
+g_spoint_compress(PG_FUNCTION_ARGS)
+{
+	PGS_COMPRESS(SPoint, spherepoint_gen_key, 0)
+}
 
-  Datum g_spath_compress(PG_FUNCTION_ARGS)
-  {
-    PGS_COMPRESS( SPATH , spherepath_gen_key, 1 )
-  }
+Datum
+g_sline_compress(PG_FUNCTION_ARGS)
+{
+	PGS_COMPRESS(SLine, sphereline_gen_key, 0)
+}
 
-  Datum g_spoly_compress(PG_FUNCTION_ARGS)
-  {
-    PGS_COMPRESS( SPOLY , spherepoly_gen_key, 1)
-  }
+Datum
+g_spath_compress(PG_FUNCTION_ARGS)
+{
+	PGS_COMPRESS(SPATH, spherepath_gen_key, 1)
+}
 
-  Datum g_sellipse_compress(PG_FUNCTION_ARGS)
-  {
-    PGS_COMPRESS( SELLIPSE , sphereellipse_gen_key, 0)
-  }
+Datum
+g_spoly_compress(PG_FUNCTION_ARGS)
+{
+	PGS_COMPRESS(SPOLY, spherepoly_gen_key, 1)
+}
 
-  Datum g_sbox_compress(PG_FUNCTION_ARGS)
-  {
-    PGS_COMPRESS( SBOX , spherebox_gen_key, 0)
-  }
+Datum
+g_sellipse_compress(PG_FUNCTION_ARGS)
+{
+	PGS_COMPRESS(SELLIPSE, sphereellipse_gen_key, 0)
+}
+
+Datum
+g_sbox_compress(PG_FUNCTION_ARGS)
+{
+	PGS_COMPRESS(SBOX, spherebox_gen_key, 0)
+}
 
 Datum
 g_spoint2_compress(PG_FUNCTION_ARGS)
 {
-	GISTENTRY *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-	GISTENTRY *retval;
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	GISTENTRY  *retval;
+
 	if (entry->leafkey)
 	{
 		retval = palloc(sizeof(GISTENTRY));
-		if (DatumGetPointer(entry->key) != NULL )
+		if (DatumGetPointer(entry->key) != NULL)
 		{
 			GiSTSPointKey *key;
-			SPoint *p = (SPoint *)DatumGetPointer(entry->key);
+			SPoint	   *p = (SPoint *) DatumGetPointer(entry->key);
+
 			ALLOC_LEAF_KEY(key);
 			key->lat = p->lat;
 			key->lng = p->lng;
 			gistentryinit(*retval, PointerGetDatum(key), entry->rel, entry->page,
-					entry->offset, FALSE);
+						  entry->offset, FALSE);
 		}
 		else
 		{
-			gistentryinit(*retval, (Datum ) 0, entry->rel, entry->page,
-					entry->offset, FALSE);
+			gistentryinit(*retval, (Datum) 0, entry->rel, entry->page,
+						  entry->offset, FALSE);
 		}
 	}
 	else
@@ -353,105 +368,116 @@ g_spoint2_compress(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(retval);
 }
 
-  Datum g_spherekey_union (PG_FUNCTION_ARGS)
-  {
-    #ifdef GEVHDRSZ
-      GistEntryVector    *entryvec = ( GistEntryVector *) PG_GETARG_POINTER(0);
-    #else
-      bytea              *entryvec = (bytea *) PG_GETARG_POINTER(0);
-    #endif
-    int                   *sizep = (int *)   PG_GETARG_POINTER(1);
-    int             numranges, i;
-    int32                 * ret  = ( int32 * ) MALLOC ( KEYSIZE ) ;
+Datum
+g_spherekey_union(PG_FUNCTION_ARGS)
+{
+#ifdef GEVHDRSZ
+	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
 
-    #ifdef GEVHDRSZ
-      numranges = entryvec->n;
-      memcpy( (void *) ret , (void *) DatumGetPointer(entryvec->vector[0].key) , KEYSIZE );
-    #else
-      numranges = (VARSIZE(entryvec) - VARHDRSZ) / sizeof(GISTENTRY);
-      memcpy( (void *) ret , (void *) DatumGetPointer(((GISTENTRY *) VARDATA(entryvec))[0].key) , KEYSIZE );
-    #endif
+#else
+	bytea	   *entryvec = (bytea *) PG_GETARG_POINTER(0);
 
-    for (i = 1; i < numranges; i++)
-    {
-      #ifdef GEVHDRSZ
-        spherekey_union_two ( ret , ( int32 *) DatumGetPointer(entryvec->vector[i].key) );
-      #else
-        spherekey_union_two ( ret , ( int32 *) DatumGetPointer(((GISTENTRY *) VARDATA(entryvec))[i].key) );
-      #endif
-    }
-    *sizep = KEYSIZE;
-    PG_RETURN_POINTER( ret );
-  }
+#endif
+	int		   *sizep = (int *) PG_GETARG_POINTER(1);
+	int			numranges,
+				i;
+	int32	   *ret = (int32 *) MALLOC(KEYSIZE);
+
+#ifdef GEVHDRSZ
+	numranges = entryvec->n;
+	memcpy((void *) ret, (void *) DatumGetPointer(entryvec->vector[0].key), KEYSIZE);
+#else
+	numranges = (VARSIZE(entryvec) - VARHDRSZ) / sizeof(GISTENTRY);
+	memcpy((void *) ret, (void *) DatumGetPointer(((GISTENTRY *) VARDATA(entryvec))[0].key), KEYSIZE);
+#endif
+
+	for (i = 1; i < numranges; i++)
+	{
+#ifdef GEVHDRSZ
+		spherekey_union_two(ret, (int32 *) DatumGetPointer(entryvec->vector[i].key));
+#else
+		spherekey_union_two(ret, (int32 *) DatumGetPointer(((GISTENTRY *) VARDATA(entryvec))[i].key));
+#endif
+	}
+	*sizep = KEYSIZE;
+	PG_RETURN_POINTER(ret);
+}
 
 Datum
 g_spoint2_union(PG_FUNCTION_ARGS)
 {
-  	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
-  	int *sizep = (int *) PG_GETARG_POINTER(1);
-  	int numranges, i;
-  	GiSTSPointKey *ret;
+	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
+	int		   *sizep = (int *) PG_GETARG_POINTER(1);
+	int			numranges,
+				i;
+	GiSTSPointKey *ret;
 
-  	ALLOC_INTERNAL_KEY(ret);
-  	numranges = entryvec->n;
+	ALLOC_INTERNAL_KEY(ret);
+	numranges = entryvec->n;
 
-  	for (i = 0; i < numranges; i++)
-  	{
-  		GiSTSPointKey *key;
-  		int32 *p;
-		int32 k[6];
+	for (i = 0; i < numranges; i++)
+	{
+		GiSTSPointKey *key;
+		int32	   *p;
+		int32		k[6];
 
-  		key = (GiSTSPointKey *)DatumGetPointer(entryvec->vector[i].key);
+		key = (GiSTSPointKey *) DatumGetPointer(entryvec->vector[i].key);
 
-  		if (IS_LEAF(key))
-  		{
-  			SPoint point;
-  			point.lat = key->lat;
-  			point.lng = key->lng;
-  			spherepoint_gen_key(k, &point);
-  			p = k;
-  		}
-  		else
-  		{
-  			p = key->k;
-  		}
+		if (IS_LEAF(key))
+		{
+			SPoint		point;
 
-  		if (i == 0)
-  			memcpy(ret->k, p, KEYSIZE);
-  		else
-	  		spherekey_union_two(ret->k, p);
-  		//checkKey(ret);
- 	}
-  	*sizep = KEYSIZE;
-  	PG_RETURN_POINTER(ret);
+			point.lat = key->lat;
+			point.lng = key->lng;
+			spherepoint_gen_key(k, &point);
+			p = k;
+		}
+		else
+		{
+			p = key->k;
+		}
+
+		if (i == 0)
+			memcpy(ret->k, p, KEYSIZE);
+		else
+			spherekey_union_two(ret->k, p);
+		/* checkKey(ret); */
+	}
+	*sizep = KEYSIZE;
+	PG_RETURN_POINTER(ret);
 }
 
-  Datum g_spherekey_same(PG_FUNCTION_ARGS)
-  {
-    int32          *c1 = ( int32 * ) PG_GETARG_POINTER(0);
-    int32          *c2 = ( int32 * ) PG_GETARG_POINTER(1);
-    bool       *result = ( bool  * ) PG_GETARG_POINTER(2);
-    static int       i ;
- 
-    *result            = TRUE;
+Datum
+g_spherekey_same(PG_FUNCTION_ARGS)
+{
+	int32	   *c1 = (int32 *) PG_GETARG_POINTER(0);
+	int32	   *c2 = (int32 *) PG_GETARG_POINTER(1);
+	bool	   *result = (bool *) PG_GETARG_POINTER(2);
+	static int	i;
 
-    if ( c1 && c2 ){
-      for ( i=0; i<6; i++ ){
-        *result &= ( c1[i] == c2[i] );
-      }
-    } else {
-      *result = (c1 == NULL && c2 == NULL) ? TRUE : FALSE;
-    }
+	*result = TRUE;
 
-    PG_RETURN_POINTER(result);
-  }
+	if (c1 && c2)
+	{
+		for (i = 0; i < 6; i++)
+		{
+			*result &= (c1[i] == c2[i]);
+		}
+	}
+	else
+	{
+		*result = (c1 == NULL && c2 == NULL) ? TRUE : FALSE;
+	}
+
+	PG_RETURN_POINTER(result);
+}
 
 Datum
 g_spoint2_same(PG_FUNCTION_ARGS)
 {
 	GiSTSPointKey *key1 = (GiSTSPointKey *) PG_GETARG_POINTER(0);
 	GiSTSPointKey *key2 = (GiSTSPointKey *) PG_GETARG_POINTER(1);
-	bool *result = (bool *) PG_GETARG_POINTER(2);
+	bool	   *result = (bool *) PG_GETARG_POINTER(2);
 
 	*result = TRUE;
 	if (key1 && key2)
@@ -467,7 +493,7 @@ g_spoint2_same(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-		*result = (key1 == NULL && key2 == NULL ) ? TRUE : FALSE;
+		*result = (key1 == NULL && key2 == NULL) ? TRUE : FALSE;
 	}
 
 	PG_RETURN_POINTER(result);
@@ -479,83 +505,34 @@ g_spoint2_same(PG_FUNCTION_ARGS)
   \param type \link PGS_DATA_TYPES data type \endlink
   \param genkey function to generate the key value
   \param dir for spherekey_interleave what value is the first
-          - 0 : the query key
-          - not 0 : the key entry
+		  - 0 : the query key
+		  - not 0 : the key entry
   \see key.c gq_cache.c
 */
 #define SCK_INTERLEAVE( type , genkey , dir ) do { \
   int32 * q = NULL ; \
   if ( ! gq_cache_get_value ( PGS_TYPE_##type , query, &q ) ){ \
-    q = ( int32 *) malloc ( KEYSIZE ); \
-    genkey ( q, ( type * ) query ); \
-    gq_cache_set_value ( PGS_TYPE_##type , query, q ) ; \
-    free ( q ); \
-    gq_cache_get_value ( PGS_TYPE_##type , query, &q ) ; \
+	q = ( int32 *) malloc ( KEYSIZE ); \
+	genkey ( q, ( type * ) query ); \
+	gq_cache_set_value ( PGS_TYPE_##type , query, q ) ; \
+	free ( q ); \
+	gq_cache_get_value ( PGS_TYPE_##type , query, &q ) ; \
   } \
   if ( dir ){ \
-    i = spherekey_interleave ( ent, q  ); \
+	i = spherekey_interleave ( ent, q  ); \
   } else { \
-    i = spherekey_interleave ( q , ent ); \
+	i = spherekey_interleave ( q , ent ); \
   } \
 } while (0);
 
 
-  Datum g_spoint_consistent(PG_FUNCTION_ARGS)
-  { 
-    GISTENTRY          *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    void               *query = ( void * ) PG_GETARG_POINTER(1) ;
-    StrategyNumber strategy   = (StrategyNumber) PG_GETARG_UINT16(2);
-    bool             result   = FALSE ;
-
-    if ( DatumGetPointer(entry->key) == NULL || ! query ) {
-      PG_RETURN_BOOL(FALSE);
-    } else {
-
-#if PG_VERSION_NUM >= 80400
-      bool           *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
-      int32            *ent   = ( int32 * ) DatumGetPointer( entry->key ) ;
-      int i = SCKEY_DISJ ;
-#if PG_VERSION_NUM >= 80400
-      *recheck = true;
-#endif
-
-      switch ( strategy ) {
-        case  1 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-        case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 12 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 0 ); break;
-        case 13 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 0 ); break;
-        case 14 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 15 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 16 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-      }
-
-      if (GIST_LEAF(entry)) {
-        switch ( strategy ) {
-          case  1 : if ( i == SCKEY_SAME     )  result = TRUE; break;
-          default : if ( i >  SCKEY_OVERLAP  )  result = TRUE; break;
-        }
-      } else {
-
-        switch ( strategy ) {
-          case  1 : if ( i > SCKEY_OVERLAP )  result = TRUE; break;
-          default : if ( i > SCKEY_DISJ    )  result = TRUE; break;
-        }
-
-      }
-
-      PG_RETURN_BOOL( result );
-
-    }
-    PG_RETURN_BOOL(FALSE);
-  }
-  
-Datum g_spoint2_consistent(PG_FUNCTION_ARGS)
+Datum
+g_spoint_consistent(PG_FUNCTION_ARGS)
 {
-	GISTENTRY *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-	void *query = (void *) PG_GETARG_POINTER(1);
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool result = FALSE;
+	bool		result = FALSE;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
@@ -565,67 +542,169 @@ Datum g_spoint2_consistent(PG_FUNCTION_ARGS)
 	{
 
 #if PG_VERSION_NUM >= 80400
-		bool *recheck = (bool *) PG_GETARG_POINTER(4);
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
+#endif
+		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
+		int			i = SCKEY_DISJ;
+#if PG_VERSION_NUM >= 80400
+		*recheck = true;
+#endif
+
+		switch (strategy)
+		{
+			case 1:
+				SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+				break;
+			case 11:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 12:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 0);
+				break;
+			case 13:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 0);
+				break;
+			case 14:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 15:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 16:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+		}
+
+		if (GIST_LEAF(entry))
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i == SCKEY_SAME)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+			}
+		}
+		else
+		{
+
+			switch (strategy)
+			{
+				case 1:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+
+		}
+
+		PG_RETURN_BOOL(result);
+
+	}
+	PG_RETURN_BOOL(FALSE);
+}
+
+Datum
+g_spoint2_consistent(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
+	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
+	bool		result = FALSE;
+
+	if (DatumGetPointer(entry->key) == NULL || !query)
+	{
+		PG_RETURN_BOOL(FALSE);
+	}
+	else
+	{
+
+#if PG_VERSION_NUM >= 80400
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 #endif
 		GiSTSPointKey *key = (GiSTSPointKey *) DatumGetPointer(entry->key);
-		int i = SCKEY_DISJ;
+		int			i = SCKEY_DISJ;
 #if PG_VERSION_NUM >= 80400
 		*recheck = false;
 #endif
 
 		if (!IS_LEAF(key))
 		{
-			int32 *ent = key->k;
+			int32	   *ent = key->k;
+
 			switch (strategy)
 			{
-				case  1 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-				case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-				case 12 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 0 ); break;
-				case 13 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 0 ); break;
-				case 14 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-				case 15 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-				case 16 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
+				case 1:
+					SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+					break;
+				case 11:
+					SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+					break;
+				case 12:
+					SCK_INTERLEAVE(SLine, sphereline_gen_key, 0);
+					break;
+				case 13:
+					SCK_INTERLEAVE(SPATH, spherepath_gen_key, 0);
+					break;
+				case 14:
+					SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+					break;
+				case 15:
+					SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+					break;
+				case 16:
+					SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+					break;
 			}
 			switch (strategy)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
 						result = TRUE;
-				break;
+					break;
 				default:
 					if (i > SCKEY_DISJ)
 						result = TRUE;
-				break;
+					break;
 			}
 		}
 		else
 		{
-			SPoint point;
+			SPoint		point;
+
 			point.lat = key->lat;
 			point.lng = key->lng;
 			switch (strategy)
 			{
-				case  1:
-					result = spoint_eq(&point, (SPoint *)query);
-				break;
+				case 1:
+					result = spoint_eq(&point, (SPoint *) query);
+					break;
 				case 11:
-					result = spoint_in_circle(&point, (SCIRCLE *)query);
-				break;
+					result = spoint_in_circle(&point, (SCIRCLE *) query);
+					break;
 				case 12:
-					result = spoint_at_sline(&point, (SLine *)query);
-				break;
+					result = spoint_at_sline(&point, (SLine *) query);
+					break;
 				case 13:
-					result = spath_cont_point((SPATH *)query, &point);
-				break;
+					result = spath_cont_point((SPATH *) query, &point);
+					break;
 				case 14:
-					result = spoly_contains_point((SPOLY *)query, &point);
-				break;
+					result = spoly_contains_point((SPOLY *) query, &point);
+					break;
 				case 15:
-					result = sellipse_cont_point((SELLIPSE *)query, &point);
-				break;
+					result = sellipse_cont_point((SELLIPSE *) query, &point);
+					break;
 				case 16:
-					result = sbox_cont_point((SBOX *)query, &point);
-				break;
+					result = sbox_cont_point((SBOX *) query, &point);
+					break;
 			}
 		}
 		PG_RETURN_BOOL(result);
@@ -633,404 +712,739 @@ Datum g_spoint2_consistent(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(FALSE);
 }
 
-Datum g_spoint2_distance(PG_FUNCTION_ARGS)
+Datum
+g_spoint2_distance(PG_FUNCTION_ARGS)
 {
-	GISTENTRY *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-	SPoint *query = (SPoint *) PG_GETARG_POINTER(1);
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	SPoint	   *query = (SPoint *) PG_GETARG_POINTER(1);
+
 	/* StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2); */
 	GiSTSPointKey *key = (GiSTSPointKey *) DatumGetPointer(entry->key);
 
 	if (IS_LEAF(key))
 	{
-		SPoint point;
+		SPoint		point;
+
 		point.lat = key->lat;
 		point.lng = key->lng;
 		PG_RETURN_FLOAT8(spoint_dist(&point, query));
 	}
 	else
 	{
-	    Vector3D v;
-	    float8 sum = 0.0, x_min, x_max, y_min, y_max, z_min, z_max;
+		Vector3D	v;
+		float8		sum = 0.0,
+					x_min,
+					x_max,
+					y_min,
+					y_max,
+					z_min,
+					z_max;
 
-	    spoint_vector3d(&v, query);
+		spoint_vector3d(&v, query);
 
-	    x_min = (float8) key->k[0] / (float8) MAXCVALUE;
-	    x_max = (float8) (key->k[3] + 1) / (float8) MAXCVALUE;
-	    if (v.x < x_min)
-	    	sum += sqr(v.x - x_min);
-	    else if (v.x > x_max)
-	    	sum += sqr(v.x - x_max);
+		x_min = (float8) key->k[0] / (float8) MAXCVALUE;
+		x_max = (float8) (key->k[3] + 1) / (float8) MAXCVALUE;
+		if (v.x < x_min)
+			sum += sqr(v.x - x_min);
+		else if (v.x > x_max)
+			sum += sqr(v.x - x_max);
 
-	    y_min = (float8) key->k[1] / (float8) MAXCVALUE;
-	    y_max = (float8) (key->k[4] + 1) / (float8) MAXCVALUE;
-	    if (v.y < y_min)
-	    	sum += sqr(v.y - y_min);
-	    else if (v.y > y_max)
-	    	sum += sqr(v.y - y_max);
+		y_min = (float8) key->k[1] / (float8) MAXCVALUE;
+		y_max = (float8) (key->k[4] + 1) / (float8) MAXCVALUE;
+		if (v.y < y_min)
+			sum += sqr(v.y - y_min);
+		else if (v.y > y_max)
+			sum += sqr(v.y - y_max);
 
-	    z_min = (float8) key->k[2] / (float8) MAXCVALUE;
-	    z_max = (float8) (key->k[5] + 1) / (float8) MAXCVALUE;
-	    if (v.z < z_min)
-	    	sum += sqr(v.z - z_min);
-	    else if (v.z > z_max)
-	    	sum += sqr(v.z - z_max);
+		z_min = (float8) key->k[2] / (float8) MAXCVALUE;
+		z_max = (float8) (key->k[5] + 1) / (float8) MAXCVALUE;
+		if (v.z < z_min)
+			sum += sqr(v.z - z_min);
+		else if (v.z > z_max)
+			sum += sqr(v.z - z_max);
 
 		PG_RETURN_FLOAT8(sqrt(sum));
 	}
 }
 
-  Datum g_scircle_consistent(PG_FUNCTION_ARGS)
-  { 
-    GISTENTRY          *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    void               *query = ( void * ) PG_GETARG_POINTER(1) ;
-    StrategyNumber strategy   = (StrategyNumber) PG_GETARG_UINT16(2);
-    bool             result   = FALSE ;
+Datum
+g_scircle_consistent(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
+	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
+	bool		result = FALSE;
 
-    if ( DatumGetPointer(entry->key) == NULL || ! query ) {
-      PG_RETURN_BOOL(FALSE);
-    } else {
-
-#if PG_VERSION_NUM >= 80400
-      bool           *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
-      int32            *ent   = ( int32 * ) DatumGetPointer( entry->key ) ;
-      int i = SCKEY_DISJ ;
-#if PG_VERSION_NUM >= 80400
-      *recheck = true;
-#endif
-
-      switch ( strategy ) {
-        case  1 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 1 ); break;
-        case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 12 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 13 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 14 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-        case 21 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-        case 22 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 1 ); break;
-        case 23 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 1 ); break;
-        case 24 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 25 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 1 ); break;
-        case 26 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 1 ); break;
-        case 27 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 1 ); break;
-        case 31 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 32 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 0 ); break;
-        case 33 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 0 ); break;
-        case 34 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 35 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 36 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-      }
-
-      if (GIST_LEAF(entry)) {
-
-        switch ( strategy ) {
-          case  1 : if ( i == SCKEY_SAME     )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      } else {
-        switch ( strategy ) {
-          case  1 : if ( i >  SCKEY_OVERLAP  )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      }
-      PG_RETURN_BOOL( result );
-    }
-    PG_RETURN_BOOL(FALSE);
-  }
-  
-
-
-  Datum g_sline_consistent(PG_FUNCTION_ARGS)
-  { 
-    GISTENTRY          *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    void               *query = ( void * ) PG_GETARG_POINTER(1) ;
-    StrategyNumber strategy   = (StrategyNumber) PG_GETARG_UINT16(2);
-    bool             result   = FALSE ;
-
-    if ( DatumGetPointer(entry->key) == NULL || ! query ) {
-      PG_RETURN_BOOL(FALSE);
-    } else {
+	if (DatumGetPointer(entry->key) == NULL || !query)
+	{
+		PG_RETURN_BOOL(FALSE);
+	}
+	else
+	{
 
 #if PG_VERSION_NUM >= 80400
-      bool           *recheck = (bool *) PG_GETARG_POINTER(4);
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 #endif
-      int32            *ent   = ( int32 * ) DatumGetPointer( entry->key ) ;
-      int i = SCKEY_DISJ ;
+		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
+		int			i = SCKEY_DISJ;
 #if PG_VERSION_NUM >= 80400
-      *recheck = true;
+		*recheck = true;
 #endif
 
-      switch ( strategy ) {
-        case  1 : 
-        case  2 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 1 ); break;
-        case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 12 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 13 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 14 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-        case 21 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-        case 31 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 1 ); break;
-        case 32 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 1 ); break;
-        case 33 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 34 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 1 ); break;
-        case 35 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 1 ); break;
-        case 36 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 1 ); break;
+		switch (strategy)
+		{
+			case 1:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 1);
+				break;
+			case 11:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 12:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 13:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 14:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+			case 21:
+				SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+				break;
+			case 22:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 1);
+				break;
+			case 23:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 1);
+				break;
+			case 24:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 25:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 1);
+				break;
+			case 26:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 1);
+				break;
+			case 27:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
+				break;
+			case 31:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 32:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 0);
+				break;
+			case 33:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 0);
+				break;
+			case 34:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 35:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 36:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+		}
 
-      }
+		if (GIST_LEAF(entry))
+		{
 
-      if (GIST_LEAF(entry)) {
-        switch ( strategy ) {
-          case  1 : if ( i == SCKEY_SAME     )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      } else {
-        switch ( strategy ) {
-          case  1 : if ( i >  SCKEY_OVERLAP  )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      }
-      PG_RETURN_BOOL( result );
-    }
-    PG_RETURN_BOOL(FALSE);
-  }
-  
-
-
-  Datum g_spath_consistent(PG_FUNCTION_ARGS)
-  { 
-    GISTENTRY          *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    void               *query = ( void * ) PG_GETARG_POINTER(1) ;
-    StrategyNumber strategy   = (StrategyNumber) PG_GETARG_UINT16(2);
-    bool             result   = FALSE ;
-
-    if ( DatumGetPointer(entry->key) == NULL || ! query ) {
-      PG_RETURN_BOOL(FALSE);
-    } else {
-
-#if PG_VERSION_NUM >= 80400
-      bool           *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
-      int32            *ent   = ( int32 * ) DatumGetPointer( entry->key ) ;
-      int i = SCKEY_DISJ ;
-#if PG_VERSION_NUM >= 80400
-      *recheck = true;
-#endif
-
-      switch ( strategy ) {
-        case  1 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 12 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 13 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 14 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-        case 21 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-        case 31 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 1 ); break;
-        case 32 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 1 ); break;
-        case 33 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 34 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 1 ); break;
-        case 35 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 1 ); break;
-        case 36 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 1 ); break;
-
-      }
-
-      if (GIST_LEAF(entry)) {
-        switch ( strategy ) {
-          case  1 : if ( i == SCKEY_SAME     )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      } else {
-        switch ( strategy ) {
-          case  1 : if ( i >  SCKEY_OVERLAP  )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      }
-      PG_RETURN_BOOL( result );
-    }
-    PG_RETURN_BOOL(FALSE);
-  }
-  
-
-  Datum g_spoly_consistent(PG_FUNCTION_ARGS)
-  { 
-    GISTENTRY          *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    void               *query = ( void * ) PG_GETARG_POINTER(1) ;
-    StrategyNumber strategy   = (StrategyNumber) PG_GETARG_UINT16(2);
-    bool             result   = FALSE ;
-
-    if ( DatumGetPointer(entry->key) == NULL || ! query ) {
-      PG_RETURN_BOOL(FALSE);
-    } else {
-
-#if PG_VERSION_NUM >= 80400
-      bool           *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
-      int32            *ent   = ( int32 * ) DatumGetPointer( entry->key ) ;
-      int i = SCKEY_DISJ ;
-#if PG_VERSION_NUM >= 80400
-      *recheck = true;
-#endif
-
-      switch ( strategy ) {
-        case  1 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 12 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 13 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 14 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-        case 21 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-        case 22 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 1 ); break;
-        case 23 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 1 ); break;
-        case 24 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 25 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 1 ); break;
-        case 26 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 1 ); break;
-        case 27 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 1 ); break;
-        case 31 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 32 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 0 ); break;
-        case 33 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 0 ); break;
-        case 34 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 35 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 36 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-      }
-
-      if (GIST_LEAF(entry)) {
-        switch ( strategy ) {
-          case  1 : if ( i == SCKEY_SAME     )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      } else {
-        switch ( strategy ) {
-          case  1 : if ( i >  SCKEY_OVERLAP  )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      }
-      PG_RETURN_BOOL( result );
-    }
-    PG_RETURN_BOOL(FALSE);
-  }
+			switch (strategy)
+			{
+				case 1:
+					if (i == SCKEY_SAME)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		else
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		PG_RETURN_BOOL(result);
+	}
+	PG_RETURN_BOOL(FALSE);
+}
 
 
-  Datum g_sellipse_consistent(PG_FUNCTION_ARGS)
-  { 
-    GISTENTRY          *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    void               *query = ( void * ) PG_GETARG_POINTER(1) ;
-    StrategyNumber strategy   = (StrategyNumber) PG_GETARG_UINT16(2);
-    bool             result   = FALSE ;
 
-    if ( DatumGetPointer(entry->key) == NULL || ! query ) {
-      PG_RETURN_BOOL(FALSE);
-    } else {
+Datum
+g_sline_consistent(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
+	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
+	bool		result = FALSE;
+
+	if (DatumGetPointer(entry->key) == NULL || !query)
+	{
+		PG_RETURN_BOOL(FALSE);
+	}
+	else
+	{
 
 #if PG_VERSION_NUM >= 80400
-      bool           *recheck = (bool *) PG_GETARG_POINTER(4);
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 #endif
-      int32            *ent   = ( int32 * ) DatumGetPointer( entry->key ) ;
-      int i = SCKEY_DISJ ;
+		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
+		int			i = SCKEY_DISJ;
 #if PG_VERSION_NUM >= 80400
-      *recheck = true;
+		*recheck = true;
 #endif
 
-      switch ( strategy ) {
-        case  1 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 1 ); break;
-        case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 12 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 13 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 14 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-        case 21 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-        case 22 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 1 ); break;
-        case 23 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 1 ); break;
-        case 24 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 25 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 1 ); break;
-        case 26 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 1 ); break;
-        case 27 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 1 ); break;
-        case 31 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 32 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 0 ); break;
-        case 33 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 0 ); break;
-        case 34 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 35 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 36 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-      }
+		switch (strategy)
+		{
+			case 1:
+			case 2:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 1);
+				break;
+			case 11:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 12:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 13:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 14:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+			case 21:
+				SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+				break;
+			case 31:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 1);
+				break;
+			case 32:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 1);
+				break;
+			case 33:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 34:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 1);
+				break;
+			case 35:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 1);
+				break;
+			case 36:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
+				break;
 
-      if (GIST_LEAF(entry)) {
-        switch ( strategy ) {
-          case  1 : if ( i == SCKEY_SAME     )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      } else {
-        switch ( strategy ) {
-          case  1 : if ( i >  SCKEY_OVERLAP  )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      }
-      PG_RETURN_BOOL( result );
-    }
-    PG_RETURN_BOOL(FALSE);
-  }
+		}
+
+		if (GIST_LEAF(entry))
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i == SCKEY_SAME)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		else
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		PG_RETURN_BOOL(result);
+	}
+	PG_RETURN_BOOL(FALSE);
+}
 
 
-  Datum g_sbox_consistent(PG_FUNCTION_ARGS)
-  { 
-    GISTENTRY          *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    void               *query = ( void * ) PG_GETARG_POINTER(1) ;
-    StrategyNumber strategy   = (StrategyNumber) PG_GETARG_UINT16(2);
-    bool             result   = FALSE ;
 
-    if ( DatumGetPointer(entry->key) == NULL || ! query ) {
-      PG_RETURN_BOOL(FALSE);
-    } else {
+Datum
+g_spath_consistent(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
+	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
+	bool		result = FALSE;
+
+	if (DatumGetPointer(entry->key) == NULL || !query)
+	{
+		PG_RETURN_BOOL(FALSE);
+	}
+	else
+	{
 
 #if PG_VERSION_NUM >= 80400
-      bool           *recheck = (bool *) PG_GETARG_POINTER(4);
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 #endif
-      int32            *ent   = ( int32 * ) DatumGetPointer( entry->key ) ;
-      int i = SCKEY_DISJ ;
+		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
+		int			i = SCKEY_DISJ;
 #if PG_VERSION_NUM >= 80400
-      *recheck = true;
+		*recheck = true;
 #endif
 
-      switch ( strategy ) {
-        case  1 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 1 ); break;
-        case 11 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 12 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 13 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 14 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-        case 21 : SCK_INTERLEAVE ( SPoint   , spherepoint_gen_key   , 1 ); break;
-        case 22 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 1 ); break;
-        case 23 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 1 ); break;
-        case 24 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 1 ); break;
-        case 25 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 1 ); break;
-        case 26 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 1 ); break;
-        case 27 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 1 ); break;
-        case 31 : SCK_INTERLEAVE ( SCIRCLE  , spherecircle_gen_key  , 0 ); break;
-        case 32 : SCK_INTERLEAVE ( SLine    , sphereline_gen_key    , 0 ); break;
-        case 33 : SCK_INTERLEAVE ( SPATH    , spherepath_gen_key    , 0 ); break;
-        case 34 : SCK_INTERLEAVE ( SPOLY    , spherepoly_gen_key    , 0 ); break;
-        case 35 : SCK_INTERLEAVE ( SELLIPSE , sphereellipse_gen_key , 0 ); break;
-        case 36 : SCK_INTERLEAVE ( SBOX     , spherebox_gen_key     , 0 ); break;
-      }
+		switch (strategy)
+		{
+			case 1:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 11:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 12:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 13:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 14:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+			case 21:
+				SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+				break;
+			case 31:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 1);
+				break;
+			case 32:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 1);
+				break;
+			case 33:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 34:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 1);
+				break;
+			case 35:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 1);
+				break;
+			case 36:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
+				break;
 
-      if (GIST_LEAF(entry)) {
-        switch ( strategy ) {
-          case  1 : if ( i == SCKEY_SAME     )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      } else {
-        switch ( strategy ) {
-          case  1 : if ( i >  SCKEY_OVERLAP  )  result = TRUE; break;
-          default : if ( i >  SCKEY_DISJ     )  result = TRUE; break;
-        }
-      }
-      PG_RETURN_BOOL( result );
-    }
-    PG_RETURN_BOOL(FALSE);
-  }
+		}
+
+		if (GIST_LEAF(entry))
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i == SCKEY_SAME)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		else
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		PG_RETURN_BOOL(result);
+	}
+	PG_RETURN_BOOL(FALSE);
+}
+
+
+Datum
+g_spoly_consistent(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
+	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
+	bool		result = FALSE;
+
+	if (DatumGetPointer(entry->key) == NULL || !query)
+	{
+		PG_RETURN_BOOL(FALSE);
+	}
+	else
+	{
+
+#if PG_VERSION_NUM >= 80400
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
+#endif
+		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
+		int			i = SCKEY_DISJ;
+#if PG_VERSION_NUM >= 80400
+		*recheck = true;
+#endif
+
+		switch (strategy)
+		{
+			case 1:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 11:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 12:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 13:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 14:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+			case 21:
+				SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+				break;
+			case 22:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 1);
+				break;
+			case 23:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 1);
+				break;
+			case 24:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 25:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 1);
+				break;
+			case 26:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 1);
+				break;
+			case 27:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
+				break;
+			case 31:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 32:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 0);
+				break;
+			case 33:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 0);
+				break;
+			case 34:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 35:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 36:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+		}
+
+		if (GIST_LEAF(entry))
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i == SCKEY_SAME)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		else
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		PG_RETURN_BOOL(result);
+	}
+	PG_RETURN_BOOL(FALSE);
+}
+
+
+Datum
+g_sellipse_consistent(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
+	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
+	bool		result = FALSE;
+
+	if (DatumGetPointer(entry->key) == NULL || !query)
+	{
+		PG_RETURN_BOOL(FALSE);
+	}
+	else
+	{
+
+#if PG_VERSION_NUM >= 80400
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
+#endif
+		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
+		int			i = SCKEY_DISJ;
+#if PG_VERSION_NUM >= 80400
+		*recheck = true;
+#endif
+
+		switch (strategy)
+		{
+			case 1:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 1);
+				break;
+			case 11:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 12:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 13:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 14:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+			case 21:
+				SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+				break;
+			case 22:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 1);
+				break;
+			case 23:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 1);
+				break;
+			case 24:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 25:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 1);
+				break;
+			case 26:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 1);
+				break;
+			case 27:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
+				break;
+			case 31:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 32:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 0);
+				break;
+			case 33:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 0);
+				break;
+			case 34:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 35:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 36:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+		}
+
+		if (GIST_LEAF(entry))
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i == SCKEY_SAME)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		else
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		PG_RETURN_BOOL(result);
+	}
+	PG_RETURN_BOOL(FALSE);
+}
+
+
+Datum
+g_sbox_consistent(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	void	   *query = (void *) PG_GETARG_POINTER(1);
+	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
+	bool		result = FALSE;
+
+	if (DatumGetPointer(entry->key) == NULL || !query)
+	{
+		PG_RETURN_BOOL(FALSE);
+	}
+	else
+	{
+
+#if PG_VERSION_NUM >= 80400
+		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
+#endif
+		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
+		int			i = SCKEY_DISJ;
+#if PG_VERSION_NUM >= 80400
+		*recheck = true;
+#endif
+
+		switch (strategy)
+		{
+			case 1:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
+				break;
+			case 11:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 12:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 13:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 14:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+			case 21:
+				SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
+				break;
+			case 22:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 1);
+				break;
+			case 23:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 1);
+				break;
+			case 24:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 1);
+				break;
+			case 25:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 1);
+				break;
+			case 26:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 1);
+				break;
+			case 27:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
+				break;
+			case 31:
+				SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
+				break;
+			case 32:
+				SCK_INTERLEAVE(SLine, sphereline_gen_key, 0);
+				break;
+			case 33:
+				SCK_INTERLEAVE(SPATH, spherepath_gen_key, 0);
+				break;
+			case 34:
+				SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
+				break;
+			case 35:
+				SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
+				break;
+			case 36:
+				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
+				break;
+		}
+
+		if (GIST_LEAF(entry))
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i == SCKEY_SAME)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		else
+		{
+			switch (strategy)
+			{
+				case 1:
+					if (i > SCKEY_OVERLAP)
+						result = TRUE;
+					break;
+				default:
+					if (i > SCKEY_DISJ)
+						result = TRUE;
+					break;
+			}
+		}
+		PG_RETURN_BOOL(result);
+	}
+	PG_RETURN_BOOL(FALSE);
+}
 
 
 typedef int32 coord_t;
 
-typedef struct { 
-    coord_t coord[3];
+typedef struct
+{
+	coord_t		coord[3];
 } Point3D;
 
 
-typedef struct {
-    Point3D low;
-    Point3D high;
+typedef struct
+{
+	Point3D		low;
+	Point3D		high;
 } Box3D;
 
 /*static void
@@ -1053,29 +1467,31 @@ checkBox3D(Box3D *box)
 static void
 adjustBox3D(Box3D *b, Box3D *addon)
 {
-    int i;
-    for (i = 0; i < 3; i++) { 
-        if (b->high.coord[i] < addon->high.coord[i])
-            b->high.coord[i] = addon->high.coord[i];
-        if (b->low.coord[i] > addon->low.coord[i])
-            b->low.coord[i] = addon->low.coord[i];
-    }
+	int			i;
+
+	for (i = 0; i < 3; i++)
+	{
+		if (b->high.coord[i] < addon->high.coord[i])
+			b->high.coord[i] = addon->high.coord[i];
+		if (b->low.coord[i] > addon->low.coord[i])
+			b->low.coord[i] = addon->low.coord[i];
+	}
 }
 
-static inline double 
+static inline double
 sizeBox3D(Box3D *b)
 {
-    return (double)((int64)b->high.coord[0] - (int64)b->low.coord[0])/MAXCVALUE
-        *  (double)((int64)b->high.coord[1] - (int64)b->low.coord[1])/MAXCVALUE
-        *  (double)((int64)b->high.coord[2] - (int64)b->low.coord[2])/MAXCVALUE;
+	return (double) ((int64) b->high.coord[0] - (int64) b->low.coord[0]) / MAXCVALUE
+		* (double) ((int64) b->high.coord[1] - (int64) b->low.coord[1]) / MAXCVALUE
+		* (double) ((int64) b->high.coord[2] - (int64) b->low.coord[2]) / MAXCVALUE;
 }
 
-static inline double 
-unionSizeBox3D(Box3D* a, Box3D *b)
+static inline double
+unionSizeBox3D(Box3D *a, Box3D *b)
 {
-    return (double)((int64)Max(a->high.coord[0], b->high.coord[0]) - (int64)Min(a->low.coord[0], b->low.coord[0]))/MAXCVALUE
-        *  (double)((int64)Max(a->high.coord[1], b->high.coord[1]) - (int64)Min(a->low.coord[1], b->low.coord[1]))/MAXCVALUE
-        *  (double)((int64)Max(a->high.coord[2], b->high.coord[2]) - (int64)Min(a->low.coord[2], b->low.coord[2]))/MAXCVALUE;
+	return (double) ((int64) Max(a->high.coord[0], b->high.coord[0]) - (int64) Min(a->low.coord[0], b->low.coord[0])) / MAXCVALUE
+		* (double) ((int64) Max(a->high.coord[1], b->high.coord[1]) - (int64) Min(a->low.coord[1], b->low.coord[1])) / MAXCVALUE
+		* (double) ((int64) Max(a->high.coord[2], b->high.coord[2]) - (int64) Min(a->low.coord[2], b->low.coord[2])) / MAXCVALUE;
 }
 
 /*
@@ -1097,14 +1513,14 @@ fallbackSplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
 
 	for (i = FirstOffsetNumber; i <= maxoff; i = OffsetNumberNext(i))
 	{
-		Box3D		   *cur = &boxes[i];
+		Box3D	   *cur = &boxes[i];
 
 		if (i <= (maxoff - FirstOffsetNumber + 1) / 2)
 		{
 			v->spl_left[v->spl_nleft] = i;
 			if (unionL == NULL)
 			{
-				unionL = (Box3D*) palloc(sizeof(Box3D));
+				unionL = (Box3D *) palloc(sizeof(Box3D));
 				*unionL = *cur;
 			}
 			else
@@ -1128,11 +1544,11 @@ fallbackSplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
 	}
 
 	if (v->spl_ldatum_exists)
-		adjustBox3D(unionL, (Box3D*)DatumGetPointer(v->spl_ldatum));
+		adjustBox3D(unionL, (Box3D *) DatumGetPointer(v->spl_ldatum));
 	v->spl_ldatum = PointerGetDatum(unionL);
 
 	if (v->spl_rdatum_exists)
-		adjustBox3D(unionR, (Box3D*)DatumGetPointer(v->spl_rdatum));
+		adjustBox3D(unionR, (Box3D *) DatumGetPointer(v->spl_rdatum));
 	v->spl_rdatum = PointerGetDatum(unionR);
 
 	v->spl_ldatum_exists = v->spl_rdatum_exists = false;
@@ -1157,7 +1573,7 @@ typedef struct
 typedef struct
 {
 	int			entriesCount;	/* total number of entries being split */
-	Box3D   	boundingBox;	/* minimum bounding box across all entries */
+	Box3D		boundingBox;	/* minimum bounding box across all entries */
 
 	/* Information about currently selected split follows */
 
@@ -1280,8 +1696,8 @@ g_box_consider_split(ConsiderSplitContext *context, int dimNum,
 		 * overlaps. We switch dimension if find less overlap (non-negative)
 		 * or less range with same overlap.
 		 */
-        range = (float8)context->boundingBox.high.coord[dimNum] - (float8)context->boundingBox.low.coord[dimNum];
-		overlap = ((float8)leftUpper - (float8)rightLower) / range;
+		range = (float8) context->boundingBox.high.coord[dimNum] - (float8) context->boundingBox.low.coord[dimNum];
+		overlap = ((float8) leftUpper - (float8) rightLower) / range;
 
 		/* If there is no previous selection, select this */
 		if (context->first)
@@ -1378,8 +1794,9 @@ common_entry_cmp(const void *i1, const void *i2)
  * http://syrcose.ispras.ru/2011/files/SYRCoSE2011_Proceedings.pdf#page=36
  * --------------------------------------------------------------------------
  */
-  static void do_picksplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
-  {
+static void
+do_picksplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
+{
 	OffsetNumber i;
 	ConsiderSplitContext context;
 	Box3D	   *box,
@@ -1391,7 +1808,8 @@ common_entry_cmp(const void *i1, const void *i2)
 			   *intervalsUpper;
 	CommonEntry *commonEntries;
 	int			nentries;
-    double      leftBoxSize, rightBoxSize;
+	double		leftBoxSize,
+				rightBoxSize;
 
 	memset(&context, 0, sizeof(ConsiderSplitContext));
 
@@ -1428,8 +1846,8 @@ common_entry_cmp(const void *i1, const void *i2)
 		for (i = FirstOffsetNumber; i <= maxoff; i = OffsetNumberNext(i))
 		{
 			box = &boxes[i];
-            intervalsLower[i - FirstOffsetNumber].lower = box->low.coord[dim];
-            intervalsLower[i - FirstOffsetNumber].upper = box->high.coord[dim];
+			intervalsLower[i - FirstOffsetNumber].lower = box->low.coord[dim];
+			intervalsLower[i - FirstOffsetNumber].upper = box->high.coord[dim];
 		}
 
 		/*
@@ -1572,8 +1990,8 @@ common_entry_cmp(const void *i1, const void *i2)
 	leftBox = palloc0(sizeof(Box3D));
 	rightBox = palloc0(sizeof(Box3D));
 
-    leftBoxSize = sizeBox3D(leftBox);
-    rightBoxSize = sizeBox3D(rightBox);
+	leftBoxSize = sizeBox3D(leftBox);
+	rightBoxSize = sizeBox3D(rightBox);
 
 	/*
 	 * Allocate an array for "common entries" - entries which can be placed to
@@ -1614,8 +2032,8 @@ common_entry_cmp(const void *i1, const void *i2)
 		 * Get upper and lower bounds along selected axis.
 		 */
 		box = &boxes[i];
-        lower = box->low.coord[context.dim];
-        upper = box->high.coord[context.dim];
+		lower = box->low.coord[context.dim];
+		upper = box->high.coord[context.dim];
 
 		if (upper <= context.leftUpper)
 		{
@@ -1629,7 +2047,7 @@ common_entry_cmp(const void *i1, const void *i2)
 			{
 				/* Doesn't fit to the right group, so join to the left group */
 				PLACE_LEFT(box, i);
-				//checkBox3D(leftBox);
+				/* checkBox3D(leftBox); */
 			}
 		}
 		else
@@ -1643,7 +2061,7 @@ common_entry_cmp(const void *i1, const void *i2)
 
 			/* Doesn't fit to the left group, so join to the right group */
 			PLACE_RIGHT(box, i);
-			//checkBox3D(rightBox);
+			/* checkBox3D(rightBox); */
 		}
 	}
 
@@ -1665,8 +2083,8 @@ common_entry_cmp(const void *i1, const void *i2)
 		for (i = 0; i < commonEntriesCount; i++)
 		{
 			box = &boxes[i];
-			commonEntries[i].delta = Abs((unionSizeBox3D(leftBox, box) - leftBoxSize) - 
-										 (unionSizeBox3D(rightBox, box) - rightBoxSize));
+			commonEntries[i].delta = Abs((unionSizeBox3D(leftBox, box) - leftBoxSize) -
+							 (unionSizeBox3D(rightBox, box) - rightBoxSize));
 		}
 
 		/*
@@ -1689,80 +2107,88 @@ common_entry_cmp(const void *i1, const void *i2)
 			if (v->spl_nleft + (commonEntriesCount - i) <= m)
 			{
 				PLACE_LEFT(box, commonEntries[i].index);
-				//checkBox3D(leftBox);
+				/* checkBox3D(leftBox); */
 			}
 			else if (v->spl_nright + (commonEntriesCount - i) <= m)
 			{
 				PLACE_RIGHT(box, commonEntries[i].index);
-				//checkBox3D(rightBox);
+				/* checkBox3D(rightBox); */
 			}
 			else
 			{
 				/* Otherwise select the group by minimal penalty */
-				if (unionSizeBox3D(leftBox, box) - leftBoxSize  < unionSizeBox3D(rightBox, box) - rightBoxSize)
+				if (unionSizeBox3D(leftBox, box) - leftBoxSize < unionSizeBox3D(rightBox, box) - rightBoxSize)
 				{
 					PLACE_LEFT(box, commonEntries[i].index);
-					//checkBox3D(leftBox);
+					/* checkBox3D(leftBox); */
 				}
 				else
 				{
 					PLACE_RIGHT(box, commonEntries[i].index);
-					//checkBox3D(rightBox);
+					/* checkBox3D(rightBox); */
 				}
 			}
 		}
 	}
 
-	/*checkBox3D(leftBox);
-	checkBox3D(rightBox);*/
+	/*
+	 * checkBox3D(leftBox); checkBox3D(rightBox);
+	 */
 
 	v->spl_ldatum = PointerGetDatum(leftBox);
 	v->spl_rdatum = PointerGetDatum(rightBox);
 }
 
-  Datum g_spherekey_picksplit(PG_FUNCTION_ARGS)
-  {
+Datum
+g_spherekey_picksplit(PG_FUNCTION_ARGS)
+{
 	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
 	GIST_SPLITVEC *v = (GIST_SPLITVEC *) PG_GETARG_POINTER(1);
-	OffsetNumber i, maxoff;
-	Box3D *boxes;
+	OffsetNumber i,
+				maxoff;
+	Box3D	   *boxes;
 
 	maxoff = entryvec->n - 1;
-	boxes = (Box3D *)palloc(sizeof(Box3D) * entryvec->n);
+	boxes = (Box3D *) palloc(sizeof(Box3D) * entryvec->n);
 	for (i = FirstOffsetNumber; i <= maxoff; i = OffsetNumberNext(i))
-		boxes[i] = *((Box3D *)DatumGetPointer(entryvec->vector[i].key));
+		boxes[i] = *((Box3D *) DatumGetPointer(entryvec->vector[i].key));
 
 	do_picksplit(boxes, maxoff, v);
 
 	PG_RETURN_POINTER(v);
-  }
+}
 
-  Datum g_spoint2_picksplit(PG_FUNCTION_ARGS)
-  {
+Datum
+g_spoint2_picksplit(PG_FUNCTION_ARGS)
+{
 	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
 	GIST_SPLITVEC *v = (GIST_SPLITVEC *) PG_GETARG_POINTER(1);
-	OffsetNumber i, maxoff;
-	Box3D *boxes;
-	GiSTSPointKey *leftKey, *rightKey;
+	OffsetNumber i,
+				maxoff;
+	Box3D	   *boxes;
+	GiSTSPointKey *leftKey,
+			   *rightKey;
 
 	maxoff = entryvec->n - 1;
-	boxes = (Box3D *)palloc(sizeof(Box3D) * entryvec->n);
+	boxes = (Box3D *) palloc(sizeof(Box3D) * entryvec->n);
 	for (i = FirstOffsetNumber; i <= maxoff; i = OffsetNumberNext(i))
 	{
-		GiSTSPointKey *key = (GiSTSPointKey *)DatumGetPointer(entryvec->vector[i].key);
-  		//checkKey(key);
+		GiSTSPointKey *key = (GiSTSPointKey *) DatumGetPointer(entryvec->vector[i].key);
+
+		/* checkKey(key); */
 		if (IS_LEAF(key))
 		{
-  			SPoint point;
-  			point.lat = key->lat;
-  			point.lng = key->lng;
-	  		spherepoint_gen_key((int32 *)&boxes[i], &point);
+			SPoint		point;
+
+			point.lat = key->lat;
+			point.lng = key->lng;
+			spherepoint_gen_key((int32 *) &boxes[i], &point);
 		}
 		else
 		{
-			boxes[i] = *((Box3D *)key->k);
+			boxes[i] = *((Box3D *) key->k);
 		}
-		//checkBox3D(&boxes[i]);
+		/* checkBox3D(&boxes[i]); */
 	}
 
 	do_picksplit(boxes, maxoff, v);
@@ -1774,35 +2200,41 @@ common_entry_cmp(const void *i1, const void *i2)
 	v->spl_ldatum = PointerGetDatum(leftKey);
 	v->spl_rdatum = PointerGetDatum(rightKey);
 
-	//checkKey(leftKey);
-	//checkKey(rightKey);
+	/* checkKey(leftKey); */
+	/* checkKey(rightKey); */
 
 	PG_RETURN_POINTER(v);
-  }
+}
 
-  /* The GiST Penalty method for boxes.
-     We have to make panalty as fast as possible ( offen called ! )
+ /*
+  * The GiST Penalty method for boxes. We have to make panalty as fast as
+  * possible ( offen called ! )
   */
-  Datum g_spherekey_penalty(PG_FUNCTION_ARGS)
-  {
-    GISTENTRY  *origentry = (GISTENTRY *) PG_GETARG_POINTER(0);
-    GISTENTRY  *newentry  = (GISTENTRY *) PG_GETARG_POINTER(1);
-    float      *result    = (float *) PG_GETARG_POINTER(2);
-    Box3D      *o         = (Box3D *) DatumGetPointer( origentry->key );
+Datum
+g_spherekey_penalty(PG_FUNCTION_ARGS)
+{
+	GISTENTRY  *origentry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	GISTENTRY  *newentry = (GISTENTRY *) PG_GETARG_POINTER(1);
+	float	   *result = (float *) PG_GETARG_POINTER(2);
+	Box3D	   *o = (Box3D *) DatumGetPointer(origentry->key);
 
-    if ( newentry != NULL ){
-        Box3D* n = (Box3D*) DatumGetPointer( newentry->key );
-        *result = (float)(((uint64)(Max(o->high.coord[0], n->high.coord[0]) - Min(o->low.coord[0], n->low.coord[0]))>>10)
-                          * ((uint64)(Max(o->high.coord[1], n->high.coord[1]) - Min(o->low.coord[1], n->low.coord[1]))>>10)
-                          * ((uint64)(Max(o->high.coord[2], n->high.coord[2]) - Min(o->low.coord[2], n->low.coord[2]))>>10)
-                          - ((uint64)(o->high.coord[0] - o->low.coord[0])>>10)
-                          * ((uint64)(o->high.coord[1] - o->low.coord[1])>>10)
-                          * ((uint64)(o->high.coord[2] - o->low.coord[2])>>10));
-        PG_RETURN_POINTER(result);
-    } else {
-        PG_RETURN_POINTER( NULL );
-    }
-  }
+	if (newentry != NULL)
+	{
+		Box3D	   *n = (Box3D *) DatumGetPointer(newentry->key);
+
+		*result = (float) (((uint64) (Max(o->high.coord[0], n->high.coord[0]) - Min(o->low.coord[0], n->low.coord[0])) >> 10)
+						   * ((uint64) (Max(o->high.coord[1], n->high.coord[1]) - Min(o->low.coord[1], n->low.coord[1])) >> 10)
+						   * ((uint64) (Max(o->high.coord[2], n->high.coord[2]) - Min(o->low.coord[2], n->low.coord[2])) >> 10)
+					  - ((uint64) (o->high.coord[0] - o->low.coord[0]) >> 10)
+					  * ((uint64) (o->high.coord[1] - o->low.coord[1]) >> 10)
+					* ((uint64) (o->high.coord[2] - o->low.coord[2]) >> 10));
+		PG_RETURN_POINTER(result);
+	}
+	else
+	{
+		PG_RETURN_POINTER(NULL);
+	}
+}
 
 /*
 * The GiST Penalty method for spherical points.
@@ -1811,59 +2243,63 @@ common_entry_cmp(const void *i1, const void *i2)
 Datum
 g_spoint2_penalty(PG_FUNCTION_ARGS)
 {
-  	GISTENTRY *origentry = (GISTENTRY *) PG_GETARG_POINTER(0);
-  	GISTENTRY *newentry = (GISTENTRY *) PG_GETARG_POINTER(1);
-  	float *result = (float *) PG_GETARG_POINTER(2);
-  	GiSTSPointKey *origkey = (GiSTSPointKey *) DatumGetPointer(origentry->key);
-  	GiSTSPointKey *newkey = (GiSTSPointKey *) DatumGetPointer(newentry->key);
-  	Box3D *o, *n;
-  	int32 k[6], ok[6];
+	GISTENTRY  *origentry = (GISTENTRY *) PG_GETARG_POINTER(0);
+	GISTENTRY  *newentry = (GISTENTRY *) PG_GETARG_POINTER(1);
+	float	   *result = (float *) PG_GETARG_POINTER(2);
+	GiSTSPointKey *origkey = (GiSTSPointKey *) DatumGetPointer(origentry->key);
+	GiSTSPointKey *newkey = (GiSTSPointKey *) DatumGetPointer(newentry->key);
+	Box3D	   *o,
+			   *n;
+	int32		k[6],
+				ok[6];
 
-  	if (IS_LEAF(origkey))
-  	{
-		SPoint point;
+	if (IS_LEAF(origkey))
+	{
+		SPoint		point;
+
 		point.lat = origkey->lat;
 		point.lng = origkey->lng;
 		spherepoint_gen_key(ok, &point);
-  		o = (Box3D *)ok;
-  	}
-  	else
-  	{
-  		o = (Box3D *)origkey->k;
-  	}
+		o = (Box3D *) ok;
+	}
+	else
+	{
+		o = (Box3D *) origkey->k;
+	}
 
-  	if (newentry == NULL)
-  		PG_RETURN_NULL();
+	if (newentry == NULL)
+		PG_RETURN_NULL();
 
 	if (IS_LEAF(newkey))
 	{
-		int32 *ptr;
-		SPoint point;
+		int32	   *ptr;
+		SPoint		point;
+
 		point.lat = newkey->lat;
 		point.lng = newkey->lng;
 		if (!gq_cache_get_value(PGS_TYPE_SPoint, &point, &ptr))
 		{
 			spherepoint_gen_key(k, &point);
 			gq_cache_set_value(PGS_TYPE_SPoint, &point, k);
-			n = (Box3D *)k;
+			n = (Box3D *) k;
 		}
 		else
 		{
-			n = (Box3D *)ptr;
+			n = (Box3D *) ptr;
 		}
 	}
-  	else
-  	{
-  		n = (Box3D *)newkey->k;
-  	}
+	else
+	{
+		n = (Box3D *) newkey->k;
+	}
 
 	*result =
-			(
-				(float) ((int64)Max(o->high.coord[0], n->high.coord[0])
-					- (int64)Min(o->low.coord[0], n->low.coord[0])))*((float)((int64)Max(o->high.coord[1], n->high.coord[1]) - (int64)Min(o->low.coord[1], n->low.coord[1])))
-			* ((float)((int64)Max(o->high.coord[2], n->high.coord[2]) - (int64)Min(o->low.coord[2], n->low.coord[2])))
-			- ((float)((int64)o->high.coord[0] - (int64)o->low.coord[0]))
-			* ((float)((int64)o->high.coord[1] - (int64)o->low.coord[1]))
-			* ((float)((int64)o->high.coord[2] - (int64)o->low.coord[2]));
+		(
+		 (float) ((int64) Max(o->high.coord[0], n->high.coord[0])
+				  - (int64) Min(o->low.coord[0], n->low.coord[0]))) * ((float) ((int64) Max(o->high.coord[1], n->high.coord[1]) - (int64) Min(o->low.coord[1], n->low.coord[1])))
+		* ((float) ((int64) Max(o->high.coord[2], n->high.coord[2]) - (int64) Min(o->low.coord[2], n->low.coord[2])))
+		- ((float) ((int64) o->high.coord[0] - (int64) o->low.coord[0]))
+		* ((float) ((int64) o->high.coord[1] - (int64) o->low.coord[1]))
+		* ((float) ((int64) o->high.coord[2] - (int64) o->low.coord[2]));
 	PG_RETURN_POINTER(result);
 }
