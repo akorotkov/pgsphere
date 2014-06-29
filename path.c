@@ -1022,7 +1022,7 @@ spherepath_add_point(PG_FUNCTION_ARGS)
 
 	size = offsetof(SPATH, p[0]) +sizeof(SPoint) * (path->npts + 1);
 	path_new = palloc(size);
-	memcpy((void *) path, (void *) path_new, VARSIZE(path));
+	memcpy((void *) path_new, (void *) path, VARSIZE(path));
 	path_new->npts++;
 
 #if PG_VERSION_NUM < 80300
