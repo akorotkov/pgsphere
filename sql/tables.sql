@@ -1,5 +1,7 @@
 -- Create tables
 
+SET client_min_messages = 'warning';
+
 CREATE TABLE spheretmp1 (p spoint);
 
 \copy spheretmp1 from 'data/test_spherepoint.data'

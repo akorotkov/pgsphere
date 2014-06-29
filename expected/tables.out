@@ -1,4 +1,5 @@
 -- Create tables
+SET client_min_messages = 'warning';
 CREATE TABLE spheretmp1 (p spoint);
 \copy spheretmp1 from 'data/test_spherepoint.data'
 \copy spheretmp1 from 'data/test_spherepoint.data'
@@ -15,8 +16,6 @@ CREATE TABLE spheretmp4 AS
   SELECT sline ( p , p - strans '-15d,-15d,-15d,ZXZ' ) AS l
   FROM spheretmp1;
 CREATE TABLE spheretmp5 (id int PRIMARY KEY , p spoly );
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "spheretmp5_pkey" for table "spheretmp5"
 \copy spheretmp5 from 'data/test_spherepolygon.data'
 CREATE TABLE spheretmp6 (id int PRIMARY KEY , p spath );
-NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "spheretmp6_pkey" for table "spheretmp6"
 \copy spheretmp6 from 'data/test_spherepath.data'
