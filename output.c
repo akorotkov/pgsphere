@@ -141,7 +141,7 @@ Datum
 set_sphere_output_precision(PG_FUNCTION_ARGS)
 {
 	short int	c = PG_GETARG_INT16(0);
-	char	   *buf = (char *) MALLOC(20);
+	char	   *buf = (char *) palloc(20);
 
 	if (c > DBL_DIG)
 		c = -1;
@@ -157,7 +157,7 @@ Datum
 set_sphere_output(PG_FUNCTION_ARGS)
 {
 	char	   *c = PG_GETARG_CSTRING(0);
-	char	   *buf = (char *) MALLOC(20);
+	char	   *buf = (char *) palloc(20);
 
 	if (strcmp(c, "RAD") == 0)
 	{
@@ -178,7 +178,7 @@ set_sphere_output(PG_FUNCTION_ARGS)
 	else
 	{
 		elog(ERROR, "Unknown format");
-		FREE(buf);
+		pfree(buf);
 		PG_RETURN_NULL();
 	}
 	sprintf(buf, "SET %s", c);
@@ -189,7 +189,7 @@ Datum
 spherepoint_out(PG_FUNCTION_ARGS)
 {
 	SPoint	   *sp = (SPoint *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) MALLOC(255);
+	char	   *buffer = (char *) palloc(255);
 	unsigned int latdeg,
 				latmin,
 				lngdeg,
@@ -288,7 +288,7 @@ Datum
 spherecircle_out(PG_FUNCTION_ARGS)
 {
 	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) MALLOC(255);
+	char	   *buffer = (char *) palloc(255);
 	char	   *pointstr = DatumGetPointer(DirectFunctionCall1(spherepoint_out, PointerGetDatum(&c->center)));
 
 	unsigned int rdeg,
@@ -348,7 +348,7 @@ spherecircle_out(PG_FUNCTION_ARGS)
 			break;
 	}
 
-	FREE(pointstr);
+	pfree(pointstr);
 	PG_RETURN_CSTRING(buffer);
 
 }
@@ -358,7 +358,7 @@ Datum
 sphereellipse_out(PG_FUNCTION_ARGS)
 {
 	SELLIPSE   *e = (SELLIPSE *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) MALLOC(255);
+	char	   *buffer = (char *) palloc(255);
 	char	   *pointstr;
 	unsigned int rdeg[3],
 				rmin[3];
@@ -432,7 +432,7 @@ sphereellipse_out(PG_FUNCTION_ARGS)
 			break;
 	}
 
-	FREE(pointstr);
+	pfree(pointstr);
 	PG_RETURN_CSTRING(buffer);
 }
 
@@ -440,7 +440,7 @@ Datum
 sphereline_out(PG_FUNCTION_ARGS)
 {
 	SLine	   *sl = (SLine *) PG_GETARG_POINTER(0);
-	char	   *out = (char *) MALLOC(255);
+	char	   *out = (char *) palloc(255);
 	char	   *tstr = NULL;
 	SEuler		se;
 
@@ -515,7 +515,7 @@ Datum
 spheretrans_out(PG_FUNCTION_ARGS)
 {
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) MALLOC(255);
+	char	   *buffer = (char *) palloc(255);
 	char		buf[100];
 	char		etype[4];
 	SPoint		val[3];
@@ -629,7 +629,7 @@ spherepath_out(PG_FUNCTION_ARGS)
 {
 	SPATH	   *path = PG_GETARG_SPATH(0);
 	int32		i;
-	char	   *out = (char *) MALLOC(128 * path->npts);
+	char	   *out = (char *) palloc(128 * path->npts);
 	char	   *tmp;
 
 	strcpy(out, "{");
@@ -641,7 +641,7 @@ spherepath_out(PG_FUNCTION_ARGS)
 		}
 		tmp = DatumGetPointer(DirectFunctionCall1(spherepoint_out, PointerGetDatum(&path->p[i])));
 		strcat(out, tmp);
-		FREE(tmp);
+		pfree(tmp);
 	}
 	strcat(out, "}");
 	PG_RETURN_CSTRING(out);
@@ -653,7 +653,7 @@ spherepoly_out(PG_FUNCTION_ARGS)
 {
 	SPOLY	   *poly = PG_GETARG_SPOLY(0);
 	int32		i;
-	char	   *out = (char *) MALLOC(128 * poly->npts);
+	char	   *out = (char *) palloc(128 * poly->npts);
 	char	   *tmp;
 
 	strcpy(out, "{");
@@ -665,7 +665,7 @@ spherepoly_out(PG_FUNCTION_ARGS)
 		}
 		tmp = DatumGetPointer(DirectFunctionCall1(spherepoint_out, PointerGetDatum(&poly->p[i])));
 		strcat(out, tmp);
-		FREE(tmp);
+		pfree(tmp);
 	}
 	strcat(out, "}");
 	PG_RETURN_CSTRING(out);
@@ -676,13 +676,13 @@ Datum
 spherebox_out(PG_FUNCTION_ARGS)
 {
 	SBOX	   *box = (SBOX *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) MALLOC(255);
+	char	   *buffer = (char *) palloc(255);
 	char	   *str1 = DatumGetPointer(DirectFunctionCall1(spherepoint_out, PointerGetDatum(&box->sw)));
 	char	   *str2 = DatumGetPointer(DirectFunctionCall1(spherepoint_out, PointerGetDatum(&box->ne)));
 
 	sprintf(buffer, "(%s, %s)", str1, str2);
-	FREE(str1);
-	FREE(str2);
+	pfree(str1);
+	pfree(str2);
 	PG_RETURN_CSTRING(buffer);
 
 }
@@ -691,7 +691,7 @@ spherebox_out(PG_FUNCTION_ARGS)
 Datum
 pg_sphere_version(PG_FUNCTION_ARGS)
 {
-	char	   *buffer = (char *) MALLOC(20);
+	char	   *buffer = (char *) palloc(20);
 
 	sprintf(buffer, "1.1.1pre2");
 	PG_RETURN_CSTRING(buffer);

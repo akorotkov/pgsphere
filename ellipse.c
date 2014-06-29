@@ -1,12 +1,8 @@
 #include "ellipse.h"
 
-/*!
-  \file
-  \brief Ellipse functions
-*/
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+/*
+ * Ellipse functions
+ */
 
 PG_FUNCTION_INFO_V1(sphereellipse_in);
 PG_FUNCTION_INFO_V1(sphereellipse_infunc);
@@ -52,8 +48,6 @@ PG_FUNCTION_INFO_V1(sphereellipse_overlap_ellipse);
 PG_FUNCTION_INFO_V1(sphereellipse_overlap_ellipse_neg);
 PG_FUNCTION_INFO_V1(spheretrans_ellipse);
 PG_FUNCTION_INFO_V1(spheretrans_ellipse_inv);
-
-#endif
 
 
  /*
@@ -128,16 +122,16 @@ sellipse_circle(SCIRCLE *sc, const SELLIPSE *e)
 static SELLIPSE *
 sellipse_in(float8 r1, float8 r2, const SPoint *c, float8 inc)
 {
-	SELLIPSE   *e = (SELLIPSE *) MALLOC(sizeof(SELLIPSE));
+	SELLIPSE   *e = (SELLIPSE *) palloc(sizeof(SELLIPSE));
 
-	e->rad[0] = max(r1, r2);
-	e->rad[1] = min(r1, r2);
+	e->rad[0] = Max(r1, r2);
+	e->rad[1] = Min(r1, r2);
 	e->phi = inc;
 	e->theta = -c->lat;
 	e->psi = c->lng;
 	if (FPge(e->rad[0], PIH) || FPge(e->rad[1], PIH))
 	{
-		FREE(e);
+		pfree(e);
 		e = NULL;
 		elog(ERROR, "sphereellipse_in: radius must be less than 90 degrees");
 	}
@@ -158,8 +152,8 @@ sellipse_dist(float8 rada, float8 radb, float8 ang)
 {
 	static float8 e;
 
-	e = (1 - sqr(sin(radb)) / sqr(sin(rada)));
-	return (asin(sin(radb) / sqrt(1 - e * sqr(cos(ang)))));
+	e = (1 - Sqr(sin(radb)) / Sqr(sin(rada)));
+	return (asin(sin(radb) / sqrt(1 - e * Sqr(cos(ang)))));
 }
 
 
@@ -468,7 +462,7 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 				}
 				else if (diff[0] <= diff[2] && diff[2] <= diff[1])
 				{
-					if (pgs_abs(sp[0].lng - elng) < pgs_abs(sp[2].lng - elng))
+					if (Abs(sp[0].lng - elng) < Abs(sp[2].lng - elng))
 					{
 						memcpy((void *) &sp[2], (void *) &sp[1], sizeof(SPoint));
 					}
@@ -488,7 +482,7 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 				}
 				else if (diff[2] <= diff[0] && diff[0] <= diff[1])
 				{
-					if (pgs_abs(sp[0].lng - elng) < pgs_abs(sp[2].lng - elng))
+					if (Abs(sp[0].lng - elng) < Abs(sp[2].lng - elng))
 					{
 						memcpy((void *) &sp[2], (void *) &sp[1], sizeof(SPoint));
 					}
@@ -830,7 +824,7 @@ sellipse_line_pos(const SELLIPSE *se, const SLine *sl)
 			lp[0].lat = lp[1].lat = lp[2].lat = 0.0;
 			cn.lng = 0.0;
 			cn.lat = 0.0;
-			eps = (1 - sqr(sin(se->rad[1])) / sqr(sin(se->rad[0])));
+			eps = (1 - Sqr(sin(se->rad[1])) / Sqr(sin(se->rad[0])));
 			sinr = sin(se->rad[1]);
 
 			while (FPgt(lp[2].lng, lp[0].lng))
@@ -848,7 +842,7 @@ sellipse_line_pos(const SELLIPSE *se, const SLine *sl)
 					{
 						d[i] = tan(lpt[i].lng) / tan(dist);
 					}
-					d[i] = asin(sinr / sqrt(1 - eps * sqr(d[i])));
+					d[i] = asin(sinr / sqrt(1 - eps * Sqr(d[i])));
 					if (FPge(d[i], dist))
 					{
 						return PGS_ELLIPSE_LINE_OVER;
@@ -1089,7 +1083,7 @@ Datum
 sphereellipse_center(PG_FUNCTION_ARGS)
 {
 	SELLIPSE   *e = (SELLIPSE *) PG_GETARG_POINTER(0);
-	SPoint	   *p = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 
 	sellipse_center(p, e);
 	PG_RETURN_POINTER(p);
@@ -1099,7 +1093,7 @@ Datum
 sphereellipse_trans(PG_FUNCTION_ARGS)
 {
 	SELLIPSE   *e = (SELLIPSE *) PG_GETARG_POINTER(0);
-	SEuler	   *t = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *t = (SEuler *) palloc(sizeof(SEuler));
 
 	sellipse_trans(t, e);
 	PG_RETURN_POINTER(t);
@@ -1109,7 +1103,7 @@ Datum
 sphereellipse_circle(PG_FUNCTION_ARGS)
 {
 	SELLIPSE   *e = (SELLIPSE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c = (SCIRCLE *) MALLOC(sizeof(SCIRCLE));
+	SCIRCLE    *c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 
 	sellipse_circle(c, e);
 	PG_RETURN_POINTER(c);
@@ -1451,7 +1445,7 @@ spheretrans_ellipse(PG_FUNCTION_ARGS)
 {
 	SELLIPSE   *e = (SELLIPSE *) PG_GETARG_POINTER(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SELLIPSE   *out = (SELLIPSE *) MALLOC(sizeof(SELLIPSE));
+	SELLIPSE   *out = (SELLIPSE *) palloc(sizeof(SELLIPSE));
 
 	euler_sellipse_trans(out, e, se);
 	PG_RETURN_POINTER(sellipse_check(out));
@@ -1462,7 +1456,7 @@ spheretrans_ellipse_inv(PG_FUNCTION_ARGS)
 {
 	SELLIPSE   *e = (SELLIPSE *) PG_GETARG_POINTER(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SELLIPSE   *out = (SELLIPSE *) MALLOC(sizeof(SELLIPSE));
+	SELLIPSE   *out = (SELLIPSE *) palloc(sizeof(SELLIPSE));
 	SEuler		tmp;
 
 	spheretrans_inverse(&tmp, se);

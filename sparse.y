@@ -5,6 +5,9 @@
 #include "utils/elog.h"
 #include "sbuffer.h"
 
+#define YYMALLOC palloc
+#define YYFREE   pfree
+
 void sphere_yyerror(const char *str)
 {
   reset_buffer();

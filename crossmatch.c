@@ -326,13 +326,13 @@ pointLineSweep(CrossmatchContext *ctx, PointInfo *points1, int count1,
 			avg1 += points1[i1].v[coordIdx];
 		avg1 /= count1;
 		for (i1 = 0; i1 < count1; i1++)
-			stddev += sqr(points1[i1].v[coordIdx] - avg1);
+			stddev += Sqr(points1[i1].v[coordIdx] - avg1);
 
 		for (i2 = 0; i2 < count2; i2++)
 			avg2 += points2[i2].v[coordIdx];
 		avg2 /= count2;
 		for (i2 = 0; i2 < count2; i2++)
-			stddev += sqr(points2[i2].v[coordIdx] - avg2);
+			stddev += Sqr(points2[i2].v[coordIdx] - avg2);
 
 		stddev = sqrt(stddev / (count1 + count2 - 2));
 		factor = Abs(avg1 - avg2) / stddev;
@@ -374,9 +374,9 @@ pointLineSweep(CrossmatchContext *ctx, PointInfo *points1, int count1,
 		{
 
 			/* Add result pair if two points is threshold close to each other */
-			if (sqrt(sqr(points2[j].v[0] - points1[i1].v[0]) +
-					 sqr(points2[j].v[1] - points1[i1].v[1]) +
-					 sqr(points2[j].v[2] - points1[i1].v[2])) <= threshold)
+			if (sqrt(Sqr(points2[j].v[0] - points1[i1].v[0]) +
+					 Sqr(points2[j].v[1] - points1[i1].v[1]) +
+					 Sqr(points2[j].v[2] - points1[i1].v[2])) <= threshold)
 			{
 				addResultPair(ctx, &points1[i1].iptr, &points2[j].iptr);
 			}
@@ -477,7 +477,7 @@ box3DLineSweep(CrossmatchContext *ctx, Box3DInfo *boxes1, int count1,
 		{
 			avg1 += (float8) boxes1[i1].v[coordIdx];
 			avg1 += (float8) boxes1[i1].v[coordIdx + 3];
-			avgsize += sqr((float8) (boxes1[i1].v[coordIdx + 3]
+			avgsize += Sqr((float8) (boxes1[i1].v[coordIdx + 3]
 									 - boxes1[i1].v[coordIdx] + 1));
 		}
 		avg1 /= 2 * count1;
@@ -486,7 +486,7 @@ box3DLineSweep(CrossmatchContext *ctx, Box3DInfo *boxes1, int count1,
 		{
 			avg2 += (float8) boxes2[i2].v[coordIdx];
 			avg2 += (float8) boxes2[i2].v[coordIdx + 3];
-			avgsize += sqr((float8) (boxes2[i2].v[coordIdx + 3]
+			avgsize += Sqr((float8) (boxes2[i2].v[coordIdx + 3]
 									 - boxes2[i2].v[coordIdx] + 1));
 		}
 		avg2 /= 2 * count2;

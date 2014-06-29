@@ -95,7 +95,7 @@ init_buffer(char *buffer)
 	bufeulertype.theta = EULER_AXIS_X;
 
 	bufpoints.m = 2;
-	bufpoints.p = (bpoint *) MALLOC(bufpoints.m * sizeof(bpoint));
+	bufpoints.p = (bpoint *) palloc(bufpoints.m * sizeof(bpoint));
 
 }
 
@@ -104,7 +104,7 @@ void
 reset_buffer(void)
 {
 	sphere_flush_scanner_buffer();
-	FREE(bufpoints.p);
+	pfree(bufpoints.p);
 	bufpoints.p = NULL;
 	bufpoints.m = 0;
 	init_buffer(NULL);
@@ -145,10 +145,10 @@ set_point(int lngpos, int latpos)
 		bpoint	   *p = bufpoints.p;
 		int			i = (bufpoints.m * 2);
 
-		bufpoints.p = (bpoint *) MALLOC(i * sizeof(bpoint));
+		bufpoints.p = (bpoint *) palloc(i * sizeof(bpoint));
 		memcpy((void *) bufpoints.p, (void *) p, bufpoints.m * sizeof(bpoint));
 		bufpoints.m = i;
-		FREE(p);
+		pfree(p);
 	}
 	bufpoints.p[bufspos].lng = bufangle[lngpos];
 	bufpoints.p[bufspos].lat = bufangle[latpos];

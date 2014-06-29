@@ -41,5 +41,5 @@ vector3d_scalar(Vector3D *v1, Vector3D *v2)
 float8
 vector3d_length(const Vector3D *v)
 {
-	return sqrt(sqr(v->x) + sqr(v->y) + sqr(v->z));
+	return sqrt(Sqr(v->x) + Sqr(v->y) + Sqr(v->z));
 }

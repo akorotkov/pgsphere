@@ -8,6 +8,8 @@
   \brief GIST index declarations
 */
 
+/* An alias for unsigned char */
+typedef unsigned char uchar;
 
  /* ! \defgroup PGS_KEY_REL Key relationships */
 

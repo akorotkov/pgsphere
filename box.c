@@ -1,8 +1,5 @@
 #include "box.h"
 
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-
 PG_FUNCTION_INFO_V1(spherebox_in);
 PG_FUNCTION_INFO_V1(spherebox_in_from_points);
 PG_FUNCTION_INFO_V1(spherebox_sw);
@@ -76,13 +73,9 @@ PG_FUNCTION_INFO_V1(spherebox_cont_box_com_neg);
 PG_FUNCTION_INFO_V1(spherebox_overlap_box);
 PG_FUNCTION_INFO_V1(spherebox_overlap_box_neg);
 
-#endif
-
-
  /*
-  * ! If latitude of south-west corner is larger than north-east corner, swap
-  * both positions. \brief Checks the box (input) \param box pointer to
-  * spherical box
+  * Checks the box: if latitude of south-west corner is larger than north-east
+  * corner, swap both positions.
   */
 static void
 sbox_check(SBOX *box)
@@ -103,11 +96,8 @@ sbox_check(SBOX *box)
 	}
 }
 
-
-
  /*
-  * ! \brief Returns the "center" of box \param c  pointer to center \param b
-  * pointer to box \return pointer to center
+  * Puts "center" of box "b" into point "c" and returns it.
   */
 static SPoint *
 sbox_center(SPoint *c, const SBOX *b)
@@ -123,9 +113,7 @@ sbox_center(SPoint *c, const SBOX *b)
 
 
  /*
-  * ! \brief Relationship between circle and box \param sc pointer to a circle
-  * \param sb pointer to a box \return relationship as a \link
-  * PGS_BOX_CIRCLE_REL int8 value \endlink (\ref  PGS_BOX_CIRCLE_REL )
+  * Relationship between circle and box as PGS_BOX_CIRCLE_REL int8 value.
   */
 static int8
 sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
@@ -144,9 +132,11 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 		static const SPoint tmpn = {0.0, PIH};
 		static const SPoint tmps = {0.0, -PIH};
 
-		if (spoint_eq(&sb->ne, &tmpn) && FPge(sc->center.lat - sc->radius, sb->sw.lat))
+		if (spoint_eq(&sb->ne, &tmpn)
+				&& FPge(sc->center.lat - sc->radius, sb->sw.lat))
 		{
-			if (spoint_eq(&sc->center, &tmpn) && FPeq(sc->radius, (PIH - sb->sw.lat)))
+			if (spoint_eq(&sc->center, &tmpn)
+					&& FPeq(sc->radius, (PIH - sb->sw.lat)))
 			{
 				return PGS_BOX_CIRCLE_EQUAL;
 			}
@@ -155,9 +145,11 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 				return PGS_BOX_CONT_CIRCLE;
 			}
 		}
-		else if (spoint_eq(&sb->sw, &tmps) && FPle(sc->center.lat + sc->radius, sb->ne.lat))
+		else if (spoint_eq(&sb->sw, &tmps)
+				&& FPle(sc->center.lat + sc->radius, sb->ne.lat))
 		{
-			if (spoint_eq(&sc->center, &tmps) && FPeq(sc->radius, (PIH + sb->ne.lat)))
+			if (spoint_eq(&sc->center, &tmps)
+					&& FPeq(sc->radius, (PIH + sb->ne.lat)))
 			{
 				return PGS_BOX_CIRCLE_EQUAL;
 			}
@@ -166,8 +158,7 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 				return PGS_BOX_CONT_CIRCLE;
 			}
 		}
-		else if (
-				 FPle((sc->center.lat + sc->radius), sb->ne.lat) &&
+		else if (FPle((sc->center.lat + sc->radius), sb->ne.lat) &&
 				 FPge((sc->center.lat - sc->radius), sb->sw.lat)
 			)
 		{
@@ -181,8 +172,8 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 	else
 	{
 		bool		lat_b_cont_c =
-		((sc->center.lat + sc->radius) <= sb->ne.lat) &&
-		((sc->center.lat - sc->radius) >= sb->sw.lat);
+				((sc->center.lat + sc->radius) <= sb->ne.lat) &&
+				((sc->center.lat - sc->radius) >= sb->sw.lat);
 		bool		bcc = sbox_cont_point(sb, &sc->center);
 		bool		ccb = FALSE;
 		static int8 pw,
@@ -261,30 +252,17 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 	return PGS_BOX_CIRCLE_AVOID;
 }
 
-
-
-
- /*
-  * ! \brief Relationship between line and box \param sl pointer to a line
-  * \param sb pointer to a box \return relationship as a \link
-  * PGS_BOX_LINE_REL int8 value \endlink (\ref	PGS_BOX_LINE_REL )
-  */
+/*
+ * Relationship between line and box AS PGS_BOX_LINE_REL int8 value.
+ */
 static int8
 sbox_line_pos(const SLine *sl, const SBOX *sb)
 {
-	static SPoint p1,
-				p2,
-				pbg,
-				ped;
-	static SPoint lc[4];
-	static int8 pw,
-				pe,
-				lcn,
-				lcs;
-	static SLine bw,
-				be;
-	static float8 minlat,
-				maxlat;
+	static SPoint	p1, p2, pbg, ped;
+	static SPoint	lc[4];
+	static int8		pw,	pe,	lcn,lcs;
+	static SLine	bw, be;
+	static float8	minlat,	maxlat;
 
 	sline_begin(&pbg, sl);
 	sline_end(&ped, sl);
@@ -321,23 +299,19 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 
 	p1.lat = sb->sw.lat;
 	p2.lat = sb->ne.lat;
+
 	/* west */
 	p1.lng = p2.lng = sb->sw.lng;
 	sline_from_points(&bw, &p1, &p2);
+
 	/* east */
 	p1.lng = p2.lng = sb->ne.lng;
 	sline_from_points(&be, &p1, &p2);
 
 
 	/* special case: east/west boundaries are connected */
-	if (
-		(
-		 FPeq(sb->ne.lat, PIH) ||
-		 FPeq(sb->sw.lat, -PIH)
-		 )
-		&&
-		FPeq(fabs(sb->sw.lng - sb->ne.lng), PI)
-		)
+	if ((FPeq(sb->ne.lat, PIH) || FPeq(sb->sw.lat, -PIH))
+			&& FPeq(fabs(sb->sw.lng - sb->ne.lng), PI))
 	{
 		if (FPeq(sb->ne.lat, PIH))
 		{
@@ -357,9 +331,7 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 			sline_from_points(&be, &p1, &p2);
 			be.length *= 2;
 		}
-
 	}
-
 
 	pw = sline_sline_pos(&bw, sl);
 	pe = sline_sline_pos(&be, sl);
@@ -395,7 +367,6 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 	}
 
 	/* check latitude */
-
 	lcn = sphereline_latitude_points(sl, sb->ne.lat, &lc[0], &lc[1]);
 	if (lcn < 0)
 		lcn = 0;
@@ -414,10 +385,8 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 
 		for (i = 0; i < lcn; i++)
 		{
-			if (
-				sbox_cont_point(sb, &lc[i]) &&
-				(!spoint_eq(&pbg, &lc[i]) && !spoint_eq(&ped, &lc[i]))
-				)
+			if (sbox_cont_point(sb, &lc[i]) &&
+					(!spoint_eq(&pbg, &lc[i]) && !spoint_eq(&ped, &lc[i])))
 			{
 				return PGS_BOX_LINE_OVER;
 			}
@@ -451,13 +420,9 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 	return PGS_BOX_LINE_OVER;
 }
 
-
-
-
  /*
-  * ! \brief Returns the relationship between box and path \param path pointer
-  * to path \param box	pointer to box \return relationship as a \link
-  * PGS_BOX_PATH_REL int8 value \endlink (\ref PGS_BOX_PATH_REL )
+  * Returns the relationship between box and path as PGS_BOX_PATH_REL int8
+  * value.
   */
 static int8
 sbox_path_pos(const SPATH *path, const SBOX *box)
@@ -512,13 +477,10 @@ sbox_path_pos(const SPATH *path, const SBOX *box)
 	return PGS_BOX_PATH_OVER;
 }
 
-
-
- /*
-  * ! \brief Returns the relationship between polygon and box \param poly
-  * pointer to polygon \param box  pointer to box \return relationship as a
-  * \link PGS_BOX_POLY_REL int8 value \endlink (\ref PGS_BOX_POLY_REL )
-  */
+/*
+ * Returns the relationship between polygon and box as PGS_BOX_POLY_REL int8
+ * value.
+ */
 static int8
 sbox_poly_pos(const SPOLY *poly, const SBOX *box)
 {
@@ -552,15 +514,14 @@ sbox_poly_pos(const SPOLY *poly, const SBOX *box)
 		pos |= (1 << sbox_line_pos(&sl, box));
 		if (((pos & sb_in) && (pos & sb_os)) || (pos & sb_ov))
 		{
-			return PGS_BOX_POLY_OVER;
 			/* overlaps */
+			return PGS_BOX_POLY_OVER;
 		}
 	}
 
 	if ((pos & sb_in) == pos)
 	{
-		/* all lines inside box */
-		/* box contains polygon */
+		/* all lines inside box; box contains polygon */
 		return PGS_BOX_CONT_POLY;
 	}
 	else if ((pos & sb_os) == pos)
@@ -582,11 +543,9 @@ sbox_poly_pos(const SPOLY *poly, const SBOX *box)
 }
 
 
- /*
-  * ! \brief Relationship between ellipse and box \param ell pointer to an
-  * ellipse \param box pointer to a box \return relationship as a \link
-  * PGS_BOX_ELLIPSE_REL int8 value \endlink (\ref  PGS_BOX_ELLIPSE_REL )
-  */
+/*
+ * Relationship between ellipse and box as PGS_BOX_ELLIPSE_REL int8 value.
+ */
 static int8
 sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 {
@@ -635,6 +594,7 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 	else
 	{
 		sco.center.lat = -PIH;
+
 		/* south */
 		sci.center.lat = PIH;
 		/* north */
@@ -664,7 +624,9 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 		if (FPzero(box->sw.lng) && FPeq(box->ne.lng, PID))
 		{
 			/* full latitude range */
-			if ((po == PGS_CIRCLE_CONT_ELLIPSE || po == PGS_ELLIPSE_CIRCLE_EQUAL) && pi == PGS_ELLIPSE_CIRCLE_AVOID)
+			if ((po == PGS_CIRCLE_CONT_ELLIPSE
+						|| po == PGS_ELLIPSE_CIRCLE_EQUAL)
+					&& pi == PGS_ELLIPSE_CIRCLE_AVOID)
 			{
 				return PGS_BOX_CONT_ELLIPSE;
 			}
@@ -684,7 +646,8 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 		if (FPzero(box->sw.lng) && FPeq(box->ne.lng, PID))
 		{
 			/* full latitude range */
-			if (po == PGS_ELLIPSE_CIRCLE_AVOID && pi == PGS_ELLIPSE_CIRCLE_AVOID)
+			if (po == PGS_ELLIPSE_CIRCLE_AVOID
+					&& pi == PGS_ELLIPSE_CIRCLE_AVOID)
 			{
 				return PGS_BOX_CONT_ELLIPSE;
 			}
@@ -716,23 +679,16 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 		)
 	{
 		/* center is between west and east meridians */
-		if
-			(
-			 (
-			  FPgt(box->sw.lng, box->ne.lng) &&
-			  (FPle(ec.lng, box->ne.lng) || FPgt(ec.lng, box->sw.lng))
-			  ) || (
-					FPle(box->sw.lng, box->ne.lng) &&
-					(FPge(ec.lng, box->sw.lng) && FPle(ec.lng, box->ne.lng))
-					)
-			)
+		if ((FPgt(box->sw.lng, box->ne.lng)
+				&& (FPle(ec.lng, box->ne.lng) || FPgt(ec.lng, box->sw.lng)))
+				|| (FPle(box->sw.lng, box->ne.lng) &&
+					(FPge(ec.lng, box->sw.lng) && FPle(ec.lng, box->ne.lng))))
 		{
 			if (FPeq(sco.center.lat, sci.center.lat))
 			{
-				if (
-					(po == PGS_CIRCLE_CONT_ELLIPSE || po == PGS_ELLIPSE_CIRCLE_EQUAL) &&
-					pi == PGS_ELLIPSE_CIRCLE_AVOID
-					)
+				if ((po == PGS_CIRCLE_CONT_ELLIPSE
+							|| po == PGS_ELLIPSE_CIRCLE_EQUAL) &&
+						pi == PGS_ELLIPSE_CIRCLE_AVOID)
 				{
 					return PGS_BOX_CONT_ELLIPSE;
 				}
@@ -744,10 +700,8 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 			else
 			{
 				/* equator modus */
-				if (
-					po == PGS_ELLIPSE_CIRCLE_AVOID &&
-					pi == PGS_ELLIPSE_CIRCLE_AVOID
-					)
+				if (po == PGS_ELLIPSE_CIRCLE_AVOID
+						&& pi == PGS_ELLIPSE_CIRCLE_AVOID)
 				{
 					return PGS_BOX_CONT_ELLIPSE;
 				}
@@ -762,8 +716,7 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 	}
 	else
 	{
-		static SPoint p1,
-					p2;
+		static SPoint p1, p2;
 
 		/* create east/west boundaries */
 		p1.lat = box->sw.lat;
@@ -779,11 +732,8 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 		sbox_center(&ec, box);
 
 		/* ellipse contains box */
-		if (
-			pw == PGS_ELLIPSE_CONT_LINE &&
-			pe == PGS_ELLIPSE_CONT_LINE &&
-			sellipse_cont_point(ell, &ec)
-			)
+		if (pw == PGS_ELLIPSE_CONT_LINE && pe == PGS_ELLIPSE_CONT_LINE
+				&& sellipse_cont_point(ell, &ec))
 		{
 			return PGS_ELLIPSE_CONT_BOX;
 		}
@@ -794,22 +744,15 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 }
 
  /*
-  * ! \brief Relationship between box and box \param b1 pointer to first box
-  * \param b2 pointer to second box \param recheck if true, swap b1 and b2
-  * \return relationship as a \link PGS_BOX_REL int8 value \endlink (\ref
-  * PGS_BOX_REL )
+  * Relationship between box and box as PGS_BOX_REL int8 value.
   */
 static int8
 sbox_box_pos(const SBOX *b1, const SBOX *b2, bool recheck)
 {
-	static SPoint p1,
-				p2,
-				bc;
-	static int8 pw,
-				pe;
-	static SLine bw,
-				be;
-	static bool scp;
+	static SPoint	p1, p2, bc;
+	static int8		pw, pe;
+	static SLine	bw, be;
+	static bool		scp;
 
 	if (spoint_eq(&b2->sw, &b2->ne))
 	{
@@ -883,7 +826,8 @@ sbox_eq(SBOX *b1, SBOX *b2)
 bool
 sbox_cont_point(const SBOX *b, const SPoint *p)
 {
-	if ((FPeq(p->lat, b->ne.lat) && FPeq(p->lat, PIH)) || (FPeq(p->lat, b->sw.lat) && FPeq(p->lat, -PIH)))
+	if ((FPeq(p->lat, b->ne.lat) && FPeq(p->lat, PIH))
+			|| (FPeq(p->lat, b->sw.lat) && FPeq(p->lat, -PIH)))
 	{
 		return true;
 	}
@@ -909,7 +853,7 @@ sbox_cont_point(const SBOX *b, const SPoint *p)
 Datum
 spherebox_in(PG_FUNCTION_ARGS)
 {
-	SBOX	   *box = (SBOX *) MALLOC(sizeof(SBOX));
+	SBOX	   *box = (SBOX *) palloc(sizeof(SBOX));
 	char	   *c = PG_GETARG_CSTRING(0);
 
 	void		sphere_yyparse(void);
@@ -919,9 +863,8 @@ spherebox_in(PG_FUNCTION_ARGS)
 
 	if (!get_box(&box->sw.lng, &box->sw.lat, &box->ne.lng, &box->ne.lat))
 	{
-
 		reset_buffer();
-		FREE(box);
+		pfree(box);
 		elog(ERROR, "spherebox_in: wrong data type");
 		PG_RETURN_NULL();
 
@@ -938,7 +881,7 @@ spherebox_in(PG_FUNCTION_ARGS)
 Datum
 spherebox_in_from_points(PG_FUNCTION_ARGS)
 {
-	SBOX	   *box = (SBOX *) MALLOC(sizeof(SBOX));
+	SBOX	   *box = (SBOX *) palloc(sizeof(SBOX));
 	SPoint	   *p1 = (SPoint *) PG_GETARG_POINTER(0);
 	SPoint	   *p2 = (SPoint *) PG_GETARG_POINTER(1);
 
@@ -951,7 +894,7 @@ spherebox_in_from_points(PG_FUNCTION_ARGS)
 Datum
 spherebox_sw(PG_FUNCTION_ARGS)
 {
-	SPoint	   *p = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 	SBOX	   *box = (SBOX *) PG_GETARG_POINTER(0);
 
 	memcpy((void *) p, (void *) &box->sw, sizeof(SPoint));
@@ -961,7 +904,7 @@ spherebox_sw(PG_FUNCTION_ARGS)
 Datum
 spherebox_ne(PG_FUNCTION_ARGS)
 {
-	SPoint	   *p = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 	SBOX	   *box = (SBOX *) PG_GETARG_POINTER(0);
 
 	memcpy((void *) p, (void *) &box->ne, sizeof(SPoint));
@@ -971,7 +914,7 @@ spherebox_ne(PG_FUNCTION_ARGS)
 Datum
 spherebox_se(PG_FUNCTION_ARGS)
 {
-	SPoint	   *p = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 	SBOX	   *box = (SBOX *) PG_GETARG_POINTER(0);
 
 	p->lng = box->ne.lng;
@@ -982,7 +925,7 @@ spherebox_se(PG_FUNCTION_ARGS)
 Datum
 spherebox_nw(PG_FUNCTION_ARGS)
 {
-	SPoint	   *p = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 	SBOX	   *box = (SBOX *) PG_GETARG_POINTER(0);
 
 	p->lng = box->sw.lng;

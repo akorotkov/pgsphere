@@ -85,12 +85,12 @@ spherepoly_center(Vector3D *v, const SPOLY *poly)
 	for (i = 0; i < poly->npts; i++)
 	{
 		spoint_vector3d(v, &poly->p[i]);
-		v1.x = min(v->x, v1.x);
-		v1.y = min(v->y, v1.y);
-		v1.z = min(v->z, v1.z);
-		v2.x = max(v->x, v2.x);
-		v2.y = max(v->y, v2.y);
-		v2.z = max(v->z, v2.z);
+		v1.x = Min(v->x, v1.x);
+		v1.y = Min(v->y, v1.y);
+		v1.z = Min(v->z, v1.z);
+		v2.x = Max(v->x, v2.x);
+		v2.y = Max(v->y, v2.y);
+		v2.z = Max(v->z, v2.z);
 	}
 
 	v->x = (v1.x + v2.x) / 2.0;
@@ -216,12 +216,8 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 		}
 
 		size = offsetof(SPOLY, p[0]) +sizeof(SPoint) * nelem;
-		poly = (SPOLY *) MALLOC(size);
-#if PG_VERSION_NUM < 80300
-		poly->size = size;
-#else
+		poly = (SPOLY *) palloc(size);
 		SET_VARSIZE(poly, size);
-#endif
 		poly->npts = nelem;
 		for (i = 0; i < nelem; i++)
 		{
@@ -246,7 +242,7 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 	if (!spherepoly_check(poly))
 	{
 		elog(ERROR, "spherepoly_from_array: a line segment overlaps or polygon too large");
-		FREE(poly);
+		pfree(poly);
 		return NULL;
 	}
 
@@ -611,7 +607,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 					a2,
 					eqa;
 		int32		cntr = 0;
-		SPOLY	   *tmp = (SPOLY *) MALLOC(VARSIZE(pg));
+		SPOLY	   *tmp = (SPOLY *) palloc(VARSIZE(pg));
 
 		/*
 		 * Make a transformation, so point is (0,0)
@@ -653,7 +649,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 			}
 			if (eqa)
 			{
-				SPOLY	   *ttt = (SPOLY *) MALLOC(VARSIZE(pg));
+				SPOLY	   *ttt = (SPOLY *) palloc(VARSIZE(pg));
 
 				srand(cntr);
 				se.phi_a = se.theta_a = se.psi_a = EULER_AXIS_X;
@@ -662,7 +658,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 				se.psi = 0.0;
 				euler_spoly_trans(ttt, tmp, &se);
 				memcpy((void *) tmp, (void *) ttt, VARSIZE(pg));
-				FREE(ttt);
+				pfree(ttt);
 			}
 			if (cntr > 10000)
 			{
@@ -710,7 +706,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 			}
 		}
 
-		FREE(tmp);
+		pfree(tmp);
 		if (cntr % 2)
 		{
 			res = TRUE;
@@ -1322,7 +1318,7 @@ spheretrans_poly(PG_FUNCTION_ARGS)
 {
 	SPOLY	   *sp = PG_GETARG_SPOLY(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SPOLY	   *out = (SPOLY *) MALLOC(VARSIZE(sp));
+	SPOLY	   *out = (SPOLY *) palloc(VARSIZE(sp));
 
 	PG_RETURN_POINTER(euler_spoly_trans(out, sp, se));
 }
@@ -1357,13 +1353,9 @@ spherepoly_add_point(PG_FUNCTION_ARGS)
 	if (poly == NULL)
 	{
 		size = offsetof(SPOLY, p[0]) +sizeof(SPoint);
-		poly = (SPOLY *) MALLOC(size);
+		poly = (SPOLY *) palloc(size);
 		memcpy((void *) &poly->p[0], (void *) p, sizeof(SPoint));
-#if PG_VERSION_NUM < 80300
-		poly->size = size;
-#else
 		SET_VARSIZE(poly, size);
-#endif
 		poly->npts = 1;
 		PG_RETURN_POINTER(poly);
 	}
@@ -1386,12 +1378,7 @@ spherepoly_add_point(PG_FUNCTION_ARGS)
 	poly_new = palloc(size);
 	memcpy((void *) poly_new, (void *) poly, VARSIZE(poly));
 	poly_new->npts++;
-
-#if PG_VERSION_NUM < 80300
-	poly_new->size = size;
-#else
 	SET_VARSIZE(poly_new, size);
-#endif
 
 	memcpy((void *) &poly_new->p[poly->npts], (void *) p, sizeof(SPoint));
 	PG_RETURN_POINTER(poly_new);
@@ -1413,21 +1400,21 @@ spherepoly_add_points_finalize(PG_FUNCTION_ARGS)
 	if (poly->npts < 3)
 	{
 		elog(NOTICE, "spoly(spoint): At least 3 points required");
-		FREE(poly);
+		pfree(poly);
 		PG_RETURN_NULL();
 	}
 	/* Skip if distance is equal 180deg */
 	if (FPeq(spoint_dist(&poly->p[0], &poly->p[poly->npts - 1]), PI))
 	{
 		elog(NOTICE, "spoly(spoint): Cannot close polygon. Distance between first and last point is 180deg");
-		FREE(poly);
+		pfree(poly);
 		PG_RETURN_NULL();
 	}
 
 	if (!spherepoly_check(poly))
 	{
 		elog(NOTICE, "spoly(spoint): a line segment overlaps or polygon too large");
-		FREE(poly);
+		pfree(poly);
 		PG_RETURN_NULL();
 	}
 	PG_RETURN_POINTER(poly);

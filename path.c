@@ -1,12 +1,8 @@
 #include "path.h"
 
-/*!
-  \file
-  \brief Path functions
-*/
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+/*
+ *  Path functions
+ */
 
 PG_FUNCTION_INFO_V1(spherepath_in);
 PG_FUNCTION_INFO_V1(spherepath_get_point);
@@ -54,9 +50,6 @@ PG_FUNCTION_INFO_V1(spheretrans_path);
 PG_FUNCTION_INFO_V1(spheretrans_path_inverse);
 PG_FUNCTION_INFO_V1(spherepath_add_point);
 PG_FUNCTION_INFO_V1(spherepath_add_points_finalize);
-
-
-#endif
 
 
  /*
@@ -110,12 +103,8 @@ spherepath_from_array(SPoint *arr, int32 nelem)
 		}
 
 		size = offsetof(SPATH, p[0]) +sizeof(path->p[0]) * nelem;
-		path = (SPATH *) MALLOC(size);
-#if PG_VERSION_NUM < 80300
-		path->size = size;
-#else
+		path = (SPATH *) palloc(size);
 		SET_VARSIZE(path, size);
-#endif
 		path->npts = nelem;
 		for (i = 0; i < nelem; i++)
 		{
@@ -556,14 +545,14 @@ spherepath_get_point(PG_FUNCTION_ARGS)
 {
 	static int32 i;
 	SPATH	   *path = PG_GETARG_SPATH(0);
-	SPoint	   *sp = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *sp = (SPoint *) palloc(sizeof(SPoint));
 
 	i = PG_GETARG_INT32(1);
 	if (spath_get_point(sp, path, i - 1))
 	{
 		PG_RETURN_POINTER(sp);
 	}
-	FREE(sp);
+	pfree(sp);
 	PG_RETURN_NULL();
 }
 
@@ -572,7 +561,7 @@ spherepath_point(PG_FUNCTION_ARGS)
 {
 	static float8 i;
 	SPATH	   *path = PG_GETARG_SPATH(0);
-	SPoint	   *sp = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *sp = (SPoint *) palloc(sizeof(SPoint));
 
 	i = PG_GETARG_FLOAT8(1);
 
@@ -580,7 +569,7 @@ spherepath_point(PG_FUNCTION_ARGS)
 	{
 		PG_RETURN_POINTER(sp);
 	}
-	FREE(sp);
+	pfree(sp);
 	PG_RETURN_NULL();
 }
 
@@ -635,7 +624,7 @@ spherepath_swap(PG_FUNCTION_ARGS)
 	SPATH	   *path = PG_GETARG_SPATH(0);
 	static int32 i;
 	static int32 n;
-	SPATH	   *ret = (SPATH *) MALLOC(VARSIZE(path));
+	SPATH	   *ret = (SPATH *) palloc(VARSIZE(path));
 
 	n = path->npts - 1;
 
@@ -960,7 +949,7 @@ spheretrans_path(PG_FUNCTION_ARGS)
 {
 	SPATH	   *sp = PG_GETARG_SPATH(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SPATH	   *out = (SPATH *) MALLOC(VARSIZE(sp));
+	SPATH	   *out = (SPATH *) palloc(VARSIZE(sp));
 
 	PG_RETURN_POINTER(euler_spath_trans(out, sp, se));
 }
@@ -995,13 +984,9 @@ spherepath_add_point(PG_FUNCTION_ARGS)
 	if (path == NULL)
 	{
 		size = offsetof(SPATH, p[0]) +sizeof(SPoint);
-		path = (SPATH *) MALLOC(size);
+		path = (SPATH *) palloc(size);
 		memcpy((void *) &path->p[0], (void *) p, sizeof(SPoint));
-#if PG_VERSION_NUM < 80300
-		path->size = size;
-#else
 		SET_VARSIZE(path, size);
-#endif
 		path->npts = 1;
 		PG_RETURN_POINTER(path);
 	}
@@ -1025,11 +1010,7 @@ spherepath_add_point(PG_FUNCTION_ARGS)
 	memcpy((void *) path_new, (void *) path, VARSIZE(path));
 	path_new->npts++;
 
-#if PG_VERSION_NUM < 80300
-	path_new->size = size;
-#else
 	SET_VARSIZE(path_new, size);
-#endif
 
 	memcpy((void *) &path_new->p[path->npts], (void *) p, sizeof(SPoint));
 	PG_RETURN_POINTER(path_new);
@@ -1050,7 +1031,7 @@ spherepath_add_points_finalize(PG_FUNCTION_ARGS)
 	if (path->npts < 2)
 	{
 		elog(NOTICE, "spath(spoint): At least 2 points required");
-		FREE(path);
+		pfree(path);
 		PG_RETURN_NULL();
 	}
 	PG_RETURN_POINTER(path);

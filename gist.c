@@ -1,11 +1,8 @@
 #include "gist.h"
 
-/*!
-  \file
-  \brief Functions needed to build a GIST index
-*/
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+/*
+ * Functions needed to build a GIST index
+ */
 
 PG_FUNCTION_INFO_V1(pointkey_in);
 PG_FUNCTION_INFO_V1(pointkey_out);
@@ -41,13 +38,8 @@ PG_FUNCTION_INFO_V1(g_spoint2_penalty);
 PG_FUNCTION_INFO_V1(g_spoint2_picksplit);
 PG_FUNCTION_INFO_V1(g_spoint2_distance);
 
-#endif
-
-
  /*
-  * ! \brief Returns the \link	PGS_KEY_REL Relationship \endlink of two keys
-  * \param k1 pointer to first key \param k2 pointer to second key \return
-  * \link  PGS_KEY_REL Relationship \endlink
+  * Returns the relationship of two keys as PGS_KEY_REL.
   */
 uchar
 spherekey_interleave(const int32 *k1, const int32 *k2)
@@ -106,28 +98,15 @@ spherekey_out(PG_FUNCTION_ARGS)
 {
 	static const float8 ks = (float8) MAXCVALUE;
 	int32	   *k = (int32 *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) MALLOC(1024);
+	char	   *buffer = (char *) palloc(1024);
 
-	sprintf(
-			buffer,
-			"(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
-			k[0] / ks,
-			k[1] / ks,
-			k[2] / ks,
-			k[3] / ks,
-			k[4] / ks,
-			k[5] / ks
-		);
+	sprintf(buffer, "(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
+			k[0] / ks, k[1] / ks, k[2] / ks,
+			k[3] / ks, k[4] / ks, k[5] / ks);
 
 	PG_RETURN_CSTRING(buffer);
 
 }
-
- /*
-  * static void checkKey(GiSTSPointKey *k) { if (!IS_LEAF(k)) { int i; for (i
-  * = 0; i < 6; i++) { if (k->k[i] < -MAXCVALUE || k->k[i] > MAXCVALUE) {
-  * elog(ERROR, "Invalid key!"); } } } }
-  */
 
 static bool
 get_sizes(GiSTSPointKey *k, float8 sizes[3])
@@ -193,29 +172,17 @@ pointkey_out(PG_FUNCTION_ARGS)
 {
 	static const float8 ks = (float8) MAXCVALUE;
 	GiSTSPointKey *k = (GiSTSPointKey *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) MALLOC(1024);
+	char	   *buffer = (char *) palloc(1024);
 
 	if (IS_LEAF(k))
 	{
-		sprintf(
-				buffer,
-				"(%.9f,%.9f)",
-				k->lng,
-				k->lat
-			);
+		sprintf(buffer, "(%.9f,%.9f)", k->lng, k->lat);
 	}
 	else
 	{
-		sprintf(
-				buffer,
-				"(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
-				k->k[0] / ks,
-				k->k[1] / ks,
-				k->k[2] / ks,
-				k->k[3] / ks,
-				k->k[4] / ks,
-				k->k[5] / ks
-			);
+		sprintf(buffer,	"(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
+				k->k[0] / ks, k->k[1] / ks, k->k[2] / ks,
+				k->k[3] / ks, k->k[4] / ks,	k->k[5] / ks);
 	}
 
 	PG_RETURN_CSTRING(buffer);
@@ -234,44 +201,14 @@ g_spherekey_decompress(PG_FUNCTION_ARGS)
   \param genkey function to generate the key value
   \see key.c
 */
-#if PG_VERSION_NUM < 80200
 #define PGS_COMPRESS( type, genkey, detoast )  do { \
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
 	GISTENTRY  *retval; \
 	if (entry->leafkey) \
 	{ \
-	  retval  =  MALLOC ( sizeof ( GISTENTRY ) ); \
+	  retval  =  palloc ( sizeof ( GISTENTRY ) ); \
 	  if ( DatumGetPointer(entry->key) != NULL ){ \
-		int32 * k = ( int32 * ) MALLOC ( KEYSIZE ) ; \
-		if( detoast ) \
-		{ \
-		  genkey ( k , ( type * )  DatumGetPointer( PG_DETOAST_DATUM( entry->key ) ) ) ; \
-		} else { \
-		  genkey ( k , ( type * )  DatumGetPointer( entry->key ) ) ; \
-		} \
-		gistentryinit(*retval, PointerGetDatum(k) , \
-		  entry->rel, entry->page, \
-		  entry->offset, KEYSIZE , FALSE ); \
-	  } else { \
-		gistentryinit(*retval, (Datum) 0, \
-		  entry->rel, entry->page, \
-		  entry->offset, 0, FALSE ); \
-	  } \
-	} else { \
-	  retval = entry; \
-	} \
-	PG_RETURN_POINTER(retval); \
-  } while (0) ;
-#else
-
-#define PGS_COMPRESS( type, genkey, detoast )  do { \
-	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
-	GISTENTRY  *retval; \
-	if (entry->leafkey) \
-	{ \
-	  retval  =  MALLOC ( sizeof ( GISTENTRY ) ); \
-	  if ( DatumGetPointer(entry->key) != NULL ){ \
-		int32 * k = ( int32 * ) MALLOC ( KEYSIZE ) ; \
+		int32 * k = ( int32 * ) palloc ( KEYSIZE ) ; \
 		if( detoast ) \
 		{ \
 		  genkey ( k , ( type * )  DatumGetPointer( PG_DETOAST_DATUM( entry->key ) ) ) ; \
@@ -291,7 +228,6 @@ g_spherekey_decompress(PG_FUNCTION_ARGS)
 	} \
 	PG_RETURN_POINTER(retval); \
   } while (0) ;
-#endif
 
 Datum
 g_scircle_compress(PG_FUNCTION_ARGS)
@@ -381,7 +317,7 @@ g_spherekey_union(PG_FUNCTION_ARGS)
 	int		   *sizep = (int *) PG_GETARG_POINTER(1);
 	int			numranges,
 				i;
-	int32	   *ret = (int32 *) MALLOC(KEYSIZE);
+	int32	   *ret = (int32 *) palloc(KEYSIZE);
 
 #ifdef GEVHDRSZ
 	numranges = entryvec->n;
@@ -541,14 +477,11 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = true;
-#endif
 
 		switch (strategy)
 		{
@@ -627,14 +560,11 @@ g_spoint2_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		GiSTSPointKey *key = (GiSTSPointKey *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = false;
-#endif
 
 		if (!IS_LEAF(key))
 		{
@@ -745,23 +675,23 @@ g_spoint2_distance(PG_FUNCTION_ARGS)
 		x_min = (float8) key->k[0] / (float8) MAXCVALUE;
 		x_max = (float8) (key->k[3] + 1) / (float8) MAXCVALUE;
 		if (v.x < x_min)
-			sum += sqr(v.x - x_min);
+			sum += Sqr(v.x - x_min);
 		else if (v.x > x_max)
-			sum += sqr(v.x - x_max);
+			sum += Sqr(v.x - x_max);
 
 		y_min = (float8) key->k[1] / (float8) MAXCVALUE;
 		y_max = (float8) (key->k[4] + 1) / (float8) MAXCVALUE;
 		if (v.y < y_min)
-			sum += sqr(v.y - y_min);
+			sum += Sqr(v.y - y_min);
 		else if (v.y > y_max)
-			sum += sqr(v.y - y_max);
+			sum += Sqr(v.y - y_max);
 
 		z_min = (float8) key->k[2] / (float8) MAXCVALUE;
 		z_max = (float8) (key->k[5] + 1) / (float8) MAXCVALUE;
 		if (v.z < z_min)
-			sum += sqr(v.z - z_min);
+			sum += Sqr(v.z - z_min);
 		else if (v.z > z_max)
-			sum += sqr(v.z - z_max);
+			sum += Sqr(v.z - z_max);
 
 		PG_RETURN_FLOAT8(sqrt(sum));
 	}
@@ -782,14 +712,11 @@ g_scircle_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = true;
-#endif
 
 		switch (strategy)
 		{
@@ -900,14 +827,11 @@ g_sline_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = true;
-#endif
 
 		switch (strategy)
 		{
@@ -1001,14 +925,11 @@ g_spath_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = true;
-#endif
 
 		switch (strategy)
 		{
@@ -1100,14 +1021,11 @@ g_spoly_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = true;
-#endif
 
 		switch (strategy)
 		{
@@ -1216,14 +1134,11 @@ g_sellipse_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = true;
-#endif
 
 		switch (strategy)
 		{
@@ -1332,14 +1247,11 @@ g_sbox_consistent(PG_FUNCTION_ARGS)
 	else
 	{
 
-#if PG_VERSION_NUM >= 80400
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-#endif
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
-#if PG_VERSION_NUM >= 80400
+
 		*recheck = true;
-#endif
 
 		switch (strategy)
 		{

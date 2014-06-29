@@ -35,30 +35,26 @@
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
-#define YYTOKENTYPE
-
- /*
-  * Put the tokens into the symbol table, so that GDB and other debuggers know
-  * about them.
-  */
-enum yytokentype
-{
-	HOUR = 258,
-	DEG = 259,
-	MIN = 260,
-	SEC = 261,
-	COMMA = 262,
-	OPENCIRC = 263,
-	CLOSECIRC = 264,
-	OPENPOINT = 265,
-	CLOSEPOINT = 266,
-	OPENARR = 267,
-	CLOSEARR = 268,
-	SIGN = 269,
-	INT = 270,
-	FLOAT = 271,
-	EULERAXIS = 272
-};
+# define YYTOKENTYPE
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     HOUR = 258,
+     DEG = 259,
+     MIN = 260,
+     SEC = 261,
+     COMMA = 262,
+     OPENCIRC = 263,
+     CLOSECIRC = 264,
+     OPENPOINT = 265,
+     CLOSEPOINT = 266,
+     OPENARR = 267,
+     CLOSEARR = 268,
+     SIGN = 269,
+     INT = 270,
+     FLOAT = 271,
+     EULERAXIS = 272
+   };
 #endif
 /* Tokens.  */
 #define HOUR 258
@@ -82,18 +78,19 @@ enum yytokentype
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 36 "sparse.y"
-{
-	int			i;
-	double		d;
-	char		c[3];
+#line 39 "sparse.y"
+{ 
+ int    i;
+ double d;
+ char   c[3];
 }
 /* Line 1529 of yacc.c.  */
 #line 89 "sparse.h"
-YYSTYPE;
-#define yystype YYSTYPE			/* obsolescent; will be withdrawn */
-#define YYSTYPE_IS_DECLARED 1
-#define YYSTYPE_IS_TRIVIAL 1
+	YYSTYPE;
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE sphere_yylval;
+

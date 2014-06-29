@@ -25,12 +25,12 @@ key_add_point(int32 *key, const SPoint *p)
 int32 *
 spherekey_union_two(int32 *kunion, const int32 *key)
 {
-	kunion[0] = min(kunion[0], key[0]);
-	kunion[1] = min(kunion[1], key[1]);
-	kunion[2] = min(kunion[2], key[2]);
-	kunion[3] = max(kunion[3], key[3]);
-	kunion[4] = max(kunion[4], key[4]);
-	kunion[5] = max(kunion[5], key[5]);
+	kunion[0] = Min(kunion[0], key[0]);
+	kunion[1] = Min(kunion[1], key[1]);
+	kunion[2] = Min(kunion[2], key[2]);
+	kunion[3] = Max(kunion[3], key[3]);
+	kunion[4] = Max(kunion[4], key[4]);
+	kunion[5] = Max(kunion[5], key[5]);
 	return kunion;
 }
 
@@ -43,12 +43,12 @@ spherekey_inter_two(int32 *kinter, const int32 *key)
 		return NULL;
 	if (kinter[5] < key[2] || key[5] < kinter[2])
 		return NULL;
-	kinter[0] = max(kinter[0], key[0]);
-	kinter[1] = max(kinter[1], key[1]);
-	kinter[2] = max(kinter[2], key[2]);
-	kinter[3] = min(kinter[3], key[3]);
-	kinter[4] = min(kinter[4], key[4]);
-	kinter[5] = min(kinter[5], key[5]);
+	kinter[0] = Max(kinter[0], key[0]);
+	kinter[1] = Max(kinter[1], key[1]);
+	kinter[2] = Max(kinter[2], key[2]);
+	kinter[3] = Min(kinter[3], key[3]);
+	kinter[4] = Min(kinter[4], key[4]);
+	kinter[5] = Min(kinter[5], key[5]);
 	return kinter;
 }
 
@@ -140,8 +140,8 @@ spherecircle_gen_key(int32 *k, const SCIRCLE *c)
 		euler_vector_trans(&tv, &v[i], &se);
 		if (tv.x >= -1.0 && tv.x <= 1.0)
 		{
-			mm[0].x = min(mm[0].x, tv.x);
-			mm[1].x = max(mm[1].x, tv.x);
+			mm[0].x = Min(mm[0].x, tv.x);
+			mm[1].x = Max(mm[1].x, tv.x);
 		}
 		else if (tv.x < -1.0)
 		{
@@ -154,8 +154,8 @@ spherecircle_gen_key(int32 *k, const SCIRCLE *c)
 
 		if (tv.y >= -1.0 && tv.y <= 1.0)
 		{
-			mm[0].y = min(mm[0].y, tv.y);
-			mm[1].y = max(mm[1].y, tv.y);
+			mm[0].y = Min(mm[0].y, tv.y);
+			mm[1].y = Max(mm[1].y, tv.y);
 		}
 		else if (tv.y < -1.0)
 		{
@@ -168,8 +168,8 @@ spherecircle_gen_key(int32 *k, const SCIRCLE *c)
 
 		if (tv.z >= -1.0 && tv.z <= 1.0)
 		{
-			mm[0].z = min(mm[0].z, tv.z);
-			mm[1].z = max(mm[1].z, tv.z);
+			mm[0].z = Min(mm[0].z, tv.z);
+			mm[1].z = Max(mm[1].z, tv.z);
 		}
 		else if (tv.z < -1.0)
 		{
@@ -246,8 +246,8 @@ sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 		euler_vector_trans(&tv, &v[i], &se);
 		if (tv.x >= -1.0 && tv.x <= 1.0)
 		{
-			mm[0].x = min(mm[0].x, tv.x);
-			mm[1].x = max(mm[1].x, tv.x);
+			mm[0].x = Min(mm[0].x, tv.x);
+			mm[1].x = Max(mm[1].x, tv.x);
 		}
 		else if (tv.x < -1.0)
 		{
@@ -260,8 +260,8 @@ sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 
 		if (tv.y >= -1.0 && tv.y <= 1.0)
 		{
-			mm[0].y = min(mm[0].y, tv.y);
-			mm[1].y = max(mm[1].y, tv.y);
+			mm[0].y = Min(mm[0].y, tv.y);
+			mm[1].y = Max(mm[1].y, tv.y);
 		}
 		else if (tv.y < -1.0)
 		{
@@ -274,8 +274,8 @@ sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 
 		if (tv.z >= -1.0 && tv.z <= 1.0)
 		{
-			mm[0].z = min(mm[0].z, tv.z);
-			mm[1].z = max(mm[1].z, tv.z);
+			mm[0].z = Min(mm[0].z, tv.z);
+			mm[1].z = Max(mm[1].z, tv.z);
 		}
 		else if (tv.z < -1.0)
 		{
@@ -317,12 +317,12 @@ sphereline_gen_key(int32 *k, const SLine *sl)
 		spoint_vector3d(&vbeg, &p[0]);
 		spoint_vector3d(&vend, &p[1]);
 
-		k[0] = min(vbeg.x, vend.x) * ks;
-		k[1] = min(vbeg.y, vend.y) * ks;
-		k[2] = min(vbeg.z, vend.z) * ks;
-		k[3] = max(vbeg.x, vend.x) * ks;
-		k[4] = max(vbeg.y, vend.y) * ks;
-		k[5] = max(vbeg.z, vend.z) * ks;
+		k[0] = Min(vbeg.x, vend.x) * ks;
+		k[1] = Min(vbeg.y, vend.y) * ks;
+		k[2] = Min(vbeg.z, vend.z) * ks;
+		k[3] = Max(vbeg.x, vend.x) * ks;
+		k[4] = Max(vbeg.y, vend.y) * ks;
+		k[5] = Max(vbeg.z, vend.z) * ks;
 
 	}
 	else
@@ -361,18 +361,18 @@ sphereline_gen_key(int32 *k, const SLine *sl)
 			euler_vector_trans(&vt, &v[i], &se);
 			if (vt.x >= -1.0 && vt.x <= 1.0)
 			{
-				vr[0].x = min(vr[0].x, vt.x);
-				vr[1].x = max(vr[1].x, vt.x);
+				vr[0].x = Min(vr[0].x, vt.x);
+				vr[1].x = Max(vr[1].x, vt.x);
 			}
 			if (vt.y >= -1.0 && vt.y <= 1.0)
 			{
-				vr[0].y = min(vr[0].y, vt.y);
-				vr[1].y = max(vr[1].y, vt.y);
+				vr[0].y = Min(vr[0].y, vt.y);
+				vr[1].y = Max(vr[1].y, vt.y);
 			}
 			if (vt.z >= -1.0 && vt.z <= 1.0)
 			{
-				vr[0].z = min(vr[0].z, vt.z);
-				vr[1].z = max(vr[1].z, vt.z);
+				vr[0].z = Min(vr[0].z, vt.z);
+				vr[1].z = Max(vr[1].z, vt.z);
 			}
 		}
 
@@ -412,12 +412,12 @@ spherepoly_gen_key(int32 *key, const SPOLY *sp)
 		}
 		else
 		{
-			key[0] = min(key[0], tk[0]);
-			key[1] = min(key[1], tk[1]);
-			key[2] = min(key[2], tk[2]);
-			key[3] = max(key[3], tk[3]);
-			key[4] = max(key[4], tk[4]);
-			key[5] = max(key[5], tk[5]);
+			key[0] = Min(key[0], tk[0]);
+			key[1] = Min(key[1], tk[1]);
+			key[2] = Min(key[2], tk[2]);
+			key[3] = Max(key[3], tk[3]);
+			key[4] = Max(key[4], tk[4]);
+			key[5] = Max(key[5], tk[5]);
 		}
 	}
 
@@ -449,12 +449,12 @@ spherepath_gen_key(int32 *key, const SPATH *sp)
 			}
 			else
 			{
-				key[0] = min(key[0], tk[0]);
-				key[1] = min(key[1], tk[1]);
-				key[2] = min(key[2], tk[2]);
-				key[3] = max(key[3], tk[3]);
-				key[4] = max(key[4], tk[4]);
-				key[5] = max(key[5], tk[5]);
+				key[0] = Min(key[0], tk[0]);
+				key[1] = Min(key[1], tk[1]);
+				key[2] = Min(key[2], tk[2]);
+				key[3] = Max(key[3], tk[3]);
+				key[4] = Max(key[4], tk[4]);
+				key[5] = Max(key[5], tk[5]);
 			}
 		}
 	}

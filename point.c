@@ -135,7 +135,7 @@ spoint_vector3d(Vector3D *v, const SPoint *p)
 Datum
 spherepoint_in(PG_FUNCTION_ARGS)
 {
-	SPoint	   *sp = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *sp = (SPoint *) palloc(sizeof(SPoint));
 	char	   *c = PG_GETARG_CSTRING(0);
 	double		lng,
 				lat;
@@ -153,7 +153,7 @@ spherepoint_in(PG_FUNCTION_ARGS)
 	else
 	{
 		reset_buffer();
-		FREE(sp);
+		pfree(sp);
 		sp = NULL;
 		elog(ERROR, "spherepoint_in: parse error");
 	}
@@ -165,7 +165,7 @@ spherepoint_in(PG_FUNCTION_ARGS)
 Datum
 spherepoint_from_long_lat(PG_FUNCTION_ARGS)
 {
-	SPoint	   *p = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 
 	p->lng = PG_GETARG_FLOAT8(0);
 	p->lat = PG_GETARG_FLOAT8(1);

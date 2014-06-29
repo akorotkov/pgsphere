@@ -50,10 +50,7 @@
 #define PID 6.283185307179586232			//!< 2*pi
 #define RADIANS 57.29577951308232311024		//!< 180/pi
 
-#define sqr(a)	 ( ( a ) * ( a ) )			//!< the square functionas macro
-#define max(a,b) ( (a>b)?(a):(b) )			//!< maximum of two values
-#define min(a,b) ( (a<b)?(a):(b) )			//!< minimum of two values
-#define pgs_abs(a) ((a<0)?(-a):(a))			//!< absolute value
+#define Sqr(a)	 ( ( a ) * ( a ) )			/* square function as macro */
 
 #include "postgres.h"
 #include "fmgr.h"
@@ -66,22 +63,11 @@
 #include "access/gist.h"
 #include "access/itup.h"
 
-/* PGSQL up to 8.1 use access/rtree.h for defining StrategyNumbers */
-#ifndef RTLeftStrategyNumber
-#include "access/rtree.h"
-#endif
-
 #ifdef EPSILON
 #undef EPSILON
 #endif
 #define EPSILON  1.0E-09				   //!< Precision of floating point values
 
-#define FREE	 pfree					   //!< An alias for pfree
-#define MALLOC	 palloc					   //!< An alias for palloc
-
-typedef unsigned char uchar;
-
-/* !<An alias for unsigned char */
-
+void		sphere_yyparse(void);
 
 #endif

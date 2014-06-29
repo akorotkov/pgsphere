@@ -120,6 +120,9 @@
 #include "utils/elog.h"
 #include "sbuffer.h"
 
+#define YYMALLOC palloc
+#define YYFREE   pfree
+
 void sphere_yyerror(const char *str)
 {
   reset_buffer();
@@ -164,14 +167,14 @@ static double human2dec ( double d , double m, double s ){
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 36 "sparse.y"
+#line 39 "sparse.y"
 { 
  int    i;
  double d;
  char   c[3];
 }
 /* Line 193 of yacc.c.  */
-#line 175 "sparse.c"
+#line 178 "sparse.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -184,7 +187,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 188 "sparse.c"
+#line 191 "sparse.c"
 
 #ifdef short
 # undef short
@@ -489,11 +492,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    59,    59,    60,    64,    66,    68,    70,    72,    74,
-      76,    82,    84,    90,    91,    92,    93,    94,    95,    96,
-      97,   103,   104,   105,   106,   107,   108,   109,   110,   111,
-     112,   113,   119,   121,   127,   129,   136,   146,   156,   159,
-     166,   175,   176,   180,   186,   193,   196
+       0,    62,    62,    63,    67,    69,    71,    73,    75,    77,
+      79,    85,    87,    93,    94,    95,    96,    97,    98,    99,
+     100,   106,   107,   108,   109,   110,   111,   112,   113,   114,
+     115,   116,   122,   124,   130,   132,   139,   149,   159,   162,
+     169,   178,   179,   183,   189,   196,   199
 };
 #endif
 
@@ -1459,219 +1462,219 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 64 "sparse.y"
+#line 67 "sparse.y"
     { set_spheretype ( STYPE_POINT   ); }
     break;
 
   case 5:
-#line 66 "sparse.y"
+#line 69 "sparse.y"
     { set_spheretype ( STYPE_CIRCLE  ); }
     break;
 
   case 6:
-#line 68 "sparse.y"
+#line 71 "sparse.y"
     { set_spheretype ( STYPE_LINE    ); }
     break;
 
   case 7:
-#line 70 "sparse.y"
+#line 73 "sparse.y"
     { set_spheretype ( STYPE_EULER   ); }
     break;
 
   case 8:
-#line 72 "sparse.y"
+#line 75 "sparse.y"
     { set_spheretype ( STYPE_PATH    ); }
     break;
 
   case 9:
-#line 74 "sparse.y"
+#line 77 "sparse.y"
     { set_spheretype ( STYPE_ELLIPSE ); }
     break;
 
   case 10:
-#line 76 "sparse.y"
+#line 79 "sparse.y"
     { set_spheretype ( STYPE_BOX     ); }
     break;
 
   case 11:
-#line 82 "sparse.y"
+#line 85 "sparse.y"
     { (yyval.d) = (yyvsp[(1) - (1)].d); }
     break;
 
   case 12:
-#line 84 "sparse.y"
+#line 87 "sparse.y"
     { (yyval.d) = (yyvsp[(1) - (1)].i); }
     break;
 
   case 13:
-#line 90 "sparse.y"
+#line 93 "sparse.y"
     { (yyval.i) = set_angle( 0, (yyvsp[(1) - (1)].d) ) ;                  }
     break;
 
   case 14:
-#line 91 "sparse.y"
+#line 94 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (2)].d),0 ,0) )  ; }
     break;
 
   case 15:
-#line 92 "sparse.y"
+#line 95 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (2)].i),0 ,0) )  ; }
     break;
 
   case 16:
-#line 93 "sparse.y"
+#line 96 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (3)].i),(yyvsp[(3) - (3)].d),0) )  ; }
     break;
 
   case 17:
-#line 94 "sparse.y"
+#line 97 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (4)].i),(yyvsp[(3) - (4)].d),0) )  ; }
     break;
 
   case 18:
-#line 95 "sparse.y"
+#line 98 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (4)].i),(yyvsp[(3) - (4)].i),0) )  ; }
     break;
 
   case 19:
-#line 96 "sparse.y"
+#line 99 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (5)].i),(yyvsp[(3) - (5)].i),(yyvsp[(5) - (5)].d)) ) ; }
     break;
 
   case 20:
-#line 97 "sparse.y"
+#line 100 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (6)].i),(yyvsp[(3) - (6)].i),(yyvsp[(5) - (6)].d)) ) ; }
     break;
 
   case 21:
-#line 103 "sparse.y"
+#line 106 "sparse.y"
     { (yyval.i) = set_angle( 0, (yyvsp[(1) - (1)].d) ) ;                  }
     break;
 
   case 22:
-#line 104 "sparse.y"
+#line 107 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (2)].d),0 ,0) )  ; }
     break;
 
   case 23:
-#line 105 "sparse.y"
+#line 108 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (2)].i),0 ,0) )  ; }
     break;
 
   case 24:
-#line 106 "sparse.y"
+#line 109 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (3)].i),(yyvsp[(3) - (3)].d),0) )  ; }
     break;
 
   case 25:
-#line 107 "sparse.y"
+#line 110 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (4)].i),(yyvsp[(3) - (4)].d),0) )  ; }
     break;
 
   case 26:
-#line 108 "sparse.y"
+#line 111 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (4)].i),(yyvsp[(3) - (4)].i),0) )  ; }
     break;
 
   case 27:
-#line 109 "sparse.y"
+#line 112 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (5)].i),(yyvsp[(3) - (5)].i),(yyvsp[(5) - (5)].d)) ) ; }
     break;
 
   case 28:
-#line 110 "sparse.y"
+#line 113 "sparse.y"
     { (yyval.i) = set_angle( 1, human2dec((yyvsp[(1) - (6)].i),(yyvsp[(3) - (6)].i),(yyvsp[(5) - (6)].d)) ) ; }
     break;
 
   case 29:
-#line 111 "sparse.y"
+#line 114 "sparse.y"
     { (yyval.i) = set_angle( 1,15*human2dec((yyvsp[(1) - (3)].i),(yyvsp[(3) - (3)].d),0)) ; }
     break;
 
   case 30:
-#line 112 "sparse.y"
+#line 115 "sparse.y"
     { (yyval.i) = set_angle( 1,15*human2dec((yyvsp[(1) - (5)].i),(yyvsp[(3) - (5)].i),(yyvsp[(5) - (5)].d))); }
     break;
 
   case 31:
-#line 113 "sparse.y"
+#line 116 "sparse.y"
     { (yyval.i) = set_angle( 1,15*human2dec((yyvsp[(1) - (6)].i),(yyvsp[(3) - (6)].i),(yyvsp[(5) - (6)].d))); }
     break;
 
   case 32:
-#line 119 "sparse.y"
+#line 122 "sparse.y"
     { (yyval.i) = set_angle_sign( (yyvsp[(1) - (1)].i),  1 ) ; }
     break;
 
   case 33:
-#line 121 "sparse.y"
+#line 124 "sparse.y"
     { (yyval.i) = set_angle_sign( (yyvsp[(2) - (2)].i), (yyvsp[(1) - (2)].i) ) ; }
     break;
 
   case 34:
-#line 127 "sparse.y"
+#line 130 "sparse.y"
     { (yyval.i) = set_angle_sign( (yyvsp[(1) - (1)].i),  1 ) ; }
     break;
 
   case 35:
-#line 129 "sparse.y"
+#line 132 "sparse.y"
     { (yyval.i) = set_angle_sign( (yyvsp[(2) - (2)].i), (yyvsp[(1) - (2)].i) ) ; }
     break;
 
   case 36:
-#line 137 "sparse.y"
+#line 140 "sparse.y"
     {
      (yyval.i) = set_point( (yyvsp[(2) - (5)].i) , (yyvsp[(4) - (5)].i) );
     }
     break;
 
   case 37:
-#line 147 "sparse.y"
+#line 150 "sparse.y"
     {
      set_circle( (yyvsp[(2) - (5)].i), (yyvsp[(4) - (5)].i) );
    }
     break;
 
   case 38:
-#line 157 "sparse.y"
+#line 160 "sparse.y"
     { set_euler ( (yyvsp[(1) - (5)].i) , (yyvsp[(3) - (5)].i) , (yyvsp[(5) - (5)].i) , "ZXZ" ) ; }
     break;
 
   case 39:
-#line 160 "sparse.y"
+#line 163 "sparse.y"
     { set_euler ( (yyvsp[(1) - (7)].i) , (yyvsp[(3) - (7)].i) , (yyvsp[(5) - (7)].i) , (yyvsp[(7) - (7)].c) ) ; }
     break;
 
   case 40:
-#line 167 "sparse.y"
+#line 170 "sparse.y"
     {
     set_line ( (yyvsp[(5) - (5)].i) ) ;
   }
     break;
 
   case 43:
-#line 180 "sparse.y"
+#line 183 "sparse.y"
     { }
     break;
 
   case 44:
-#line 187 "sparse.y"
+#line 190 "sparse.y"
     { set_ellipse ( (yyvsp[(3) - (11)].i) , (yyvsp[(5) - (11)].i) , (yyvsp[(8) - (11)].i) , (yyvsp[(10) - (11)].i) ) ; }
     break;
 
   case 45:
-#line 194 "sparse.y"
+#line 197 "sparse.y"
     {  }
     break;
 
   case 46:
-#line 197 "sparse.y"
+#line 200 "sparse.y"
     {  }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1675 "sparse.c"
+#line 1678 "sparse.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

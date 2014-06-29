@@ -230,8 +230,8 @@ sline_min_max_lat(const SLine *sl, float8 *minlat, float8 *maxlat)
 		*minlat = *maxlat = tp.lat;
 
 		sline_end(&tp, &nl);
-		*minlat = min(tp.lat, *minlat);
-		*maxlat = max(tp.lat, *maxlat);
+		*minlat = Min(tp.lat, *minlat);
+		*maxlat = Max(tp.lat, *maxlat);
 
 		for (lng = PIH; lng < PID; lng += PI)
 		{
@@ -239,8 +239,8 @@ sline_min_max_lat(const SLine *sl, float8 *minlat, float8 *maxlat)
 			tp.lat = (lng < PI) ? (inc) : (-inc);
 			if (spoint_at_sline(&tp, &nl))
 			{
-				*minlat = min(tp.lat, *minlat);
-				*maxlat = max(tp.lat, *maxlat);
+				*minlat = Min(tp.lat, *minlat);
+				*maxlat = Max(tp.lat, *maxlat);
 			}
 		}
 	}
@@ -707,7 +707,7 @@ sline_center(SPoint *c, const SLine *sl)
 Datum
 sphereline_in(PG_FUNCTION_ARGS)
 {
-	SLine	   *sl = (SLine *) MALLOC(sizeof(SLine));
+	SLine	   *sl = (SLine *) palloc(sizeof(SLine));
 	char	   *c = PG_GETARG_CSTRING(0);
 	unsigned char etype[3];
 	float8		eang[3],
@@ -761,7 +761,7 @@ sphereline_in(PG_FUNCTION_ARGS)
 	else
 	{
 		reset_buffer();
-		FREE(sl);
+		pfree(sl);
 		sl = NULL;
 		elog(ERROR, "sphereline_in: parse error");
 	}
@@ -792,7 +792,7 @@ sphereline_equal_neg(PG_FUNCTION_ARGS)
 Datum
 sphereline_from_point(PG_FUNCTION_ARGS)
 {
-	SLine	   *sl = (SLine *) MALLOC(sizeof(SLine));
+	SLine	   *sl = (SLine *) palloc(sizeof(SLine));
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
 
 	sline_from_points(sl, p, p);
@@ -802,13 +802,13 @@ sphereline_from_point(PG_FUNCTION_ARGS)
 Datum
 sphereline_from_points(PG_FUNCTION_ARGS)
 {
-	SLine	   *sl = (SLine *) MALLOC(sizeof(SLine));
+	SLine	   *sl = (SLine *) palloc(sizeof(SLine));
 	SPoint	   *beg = (SPoint *) PG_GETARG_POINTER(0);
 	SPoint	   *end = (SPoint *) PG_GETARG_POINTER(1);
 
 	if (!sline_from_points(sl, beg, end))
 	{
-		FREE(sl);
+		pfree(sl);
 		sl = NULL;
 		elog(ERROR, "sphereline_from_points: length of line must be not equal 180 degrees");
 	}
@@ -819,13 +819,13 @@ sphereline_from_points(PG_FUNCTION_ARGS)
 Datum
 sphereline_from_trans(PG_FUNCTION_ARGS)
 {
-	SLine	   *sl = (SLine *) MALLOC(sizeof(SLine));
+	SLine	   *sl = (SLine *) palloc(sizeof(SLine));
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(0);
 	float8		l = PG_GETARG_FLOAT8(1);
 
 	if (FPlt(l, 0.0))
 	{
-		FREE(sl);
+		pfree(sl);
 		elog(ERROR, "sphereline_from_trans: length of line must be >= 0");
 		PG_RETURN_NULL();
 	}
@@ -851,7 +851,7 @@ sphereline_from_trans(PG_FUNCTION_ARGS)
 Datum
 sphereline_meridian(PG_FUNCTION_ARGS)
 {
-	SLine	   *out = (SLine *) MALLOC(sizeof(SLine));
+	SLine	   *out = (SLine *) palloc(sizeof(SLine));
 	float8		lng = PG_GETARG_FLOAT8(0);
 
 	sline_meridian(out, lng);
@@ -862,7 +862,7 @@ Datum
 sphereline_swap_beg_end(PG_FUNCTION_ARGS)
 {
 	SLine	   *in = (SLine *) PG_GETARG_POINTER(0);
-	SLine	   *out = (SLine *) MALLOC(sizeof(SLine));
+	SLine	   *out = (SLine *) palloc(sizeof(SLine));
 
 	sline_swap_beg_end(out, in);
 	PG_RETURN_POINTER(out);
@@ -882,7 +882,7 @@ sphereline_turn(PG_FUNCTION_ARGS)
 	else
 	{
 
-		SLine	   *out = (SLine *) MALLOC(sizeof(SLine));
+		SLine	   *out = (SLine *) palloc(sizeof(SLine));
 		SEuler		se;
 		SLine		tmp;
 
@@ -906,7 +906,7 @@ Datum
 sphereline_begin(PG_FUNCTION_ARGS)
 {
 	SLine	   *sl = (SLine *) PG_GETARG_POINTER(0);
-	SPoint	   *sp = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *sp = (SPoint *) palloc(sizeof(SPoint));
 
 	sline_begin(sp, sl);
 	PG_RETURN_POINTER(sp);
@@ -916,7 +916,7 @@ Datum
 sphereline_end(PG_FUNCTION_ARGS)
 {
 	SLine	   *sl = (SLine *) PG_GETARG_POINTER(0);
-	SPoint	   *sp = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *sp = (SPoint *) palloc(sizeof(SPoint));
 
 	sline_end(sp, sl);
 	PG_RETURN_POINTER(sp);
@@ -1090,7 +1090,7 @@ spheretrans_line(PG_FUNCTION_ARGS)
 {
 	SLine	   *sl = (SLine *) PG_GETARG_POINTER(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SLine	   *ret = (SLine *) MALLOC(sizeof(SLine));
+	SLine	   *ret = (SLine *) palloc(sizeof(SLine));
 
 	PG_RETURN_POINTER(euler_sline_trans(ret, sl, se));
 }
@@ -1115,7 +1115,7 @@ Datum
 spheretrans_from_line(PG_FUNCTION_ARGS)
 {
 	SLine	   *l = (SLine *) PG_GETARG_POINTER(0);
-	SEuler	   *e = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *e = (SEuler *) palloc(sizeof(SEuler));
 
 	sphereline_to_euler(e, l);
 	PG_RETURN_POINTER(e);

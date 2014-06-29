@@ -1,12 +1,8 @@
 #include "circle.h"
 
-/*!
-  \file
-  \brief Circle functions
-*/
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+/*
+ * Circle functions
+ */
 
 PG_FUNCTION_INFO_V1(spherecircle_in);
 PG_FUNCTION_INFO_V1(spherecircle_equal);
@@ -33,16 +29,12 @@ PG_FUNCTION_INFO_V1(spherecircle_circ);
 PG_FUNCTION_INFO_V1(spheretrans_circle);
 PG_FUNCTION_INFO_V1(spheretrans_circle_inverse);
 
-#endif
-
 
 bool
 scircle_eq(const SCIRCLE *c1, const SCIRCLE *c2)
 {
-	return (
-			spoint_eq(&c1->center, &c2->center) &&
-			FPeq(c1->radius, c2->radius)
-		);
+	return (spoint_eq(&c1->center, &c2->center)
+			&& FPeq(c1->radius, c2->radius));
 }
 
 bool
@@ -68,13 +60,11 @@ euler_scircle_trans(SCIRCLE *out, const SCIRCLE *in, const SEuler *se)
 Datum
 spherecircle_in(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c = (SCIRCLE *) MALLOC(sizeof(SCIRCLE));
+	SCIRCLE    *c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 	char	   *s = PG_GETARG_CSTRING(0);
 	double		lng,
 				lat,
 				radius;
-
-	void		sphere_yyparse(void);
 
 	init_buffer(s);
 	sphere_yyparse();
@@ -86,11 +76,11 @@ spherecircle_in(PG_FUNCTION_ARGS)
 		reset_buffer();
 
 		/*
-		 * It's important to allow circles with radius 90deg!!
+		 * It's important to allow circles with radius 90 degrees!
 		 */
 		if (FPgt(c->radius, PIH))
 		{
-			FREE(c);
+			pfree(c);
 			c = NULL;
 			elog(ERROR, "spherecircle_in: radius must be not greater than 90 degrees");
 		}
@@ -104,7 +94,7 @@ spherecircle_in(PG_FUNCTION_ARGS)
 	else
 	{
 		reset_buffer();
-		FREE(c);
+		pfree(c);
 		c = NULL;
 		elog(ERROR, "spherecircle_in: parse error");
 	}
@@ -340,7 +330,7 @@ Datum
 spherecircle_center(PG_FUNCTION_ARGS)
 {
 	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SPoint	   *p = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 
 	memcpy((void *) p, (void *) &c->center, sizeof(SPoint));
 	PG_RETURN_POINTER(p);
@@ -358,7 +348,7 @@ Datum
 spherepoint_to_circle(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c = (SCIRCLE *) MALLOC(sizeof(SCIRCLE));
+	SCIRCLE    *c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 
 	memcpy((void *) &c->center, (void *) p, sizeof(SPoint));
 	c->radius = 0;
@@ -377,7 +367,7 @@ spherecircle_by_center(PG_FUNCTION_ARGS)
 		elog(ERROR, "radius must be not greater than 90 degrees or less than 0");
 		PG_RETURN_NULL();
 	}
-	c = (SCIRCLE *) MALLOC(sizeof(SCIRCLE));
+	c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 	memcpy((void *) &c->center, (void *) p, sizeof(SPoint));
 	c->radius = rad;
 	PG_RETURN_POINTER(c);
@@ -404,7 +394,7 @@ spheretrans_circle(PG_FUNCTION_ARGS)
 {
 	SCIRCLE    *sc = (SCIRCLE *) PG_GETARG_POINTER(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SCIRCLE    *out = (SCIRCLE *) MALLOC(sizeof(SCIRCLE));
+	SCIRCLE    *out = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 
 	PG_RETURN_POINTER(euler_scircle_trans(out, sc, se));
 }
@@ -418,8 +408,7 @@ spheretrans_circle_inverse(PG_FUNCTION_ARGS)
 	Datum		ret;
 
 	spheretrans_inverse(&tmp, se);
-	ret = DirectFunctionCall2(
-							  spheretrans_circle,
+	ret = DirectFunctionCall2(spheretrans_circle,
 							  sc, PointerGetDatum(&tmp));
 	PG_RETURN_DATUM(ret);
 }

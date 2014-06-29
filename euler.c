@@ -1,13 +1,9 @@
 #include "euler.h"
 
-/*!
-  \file
-  \brief Euler transformation functions
-*/
+/*
+ * Euler transformation functions
+ */
 
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
 PG_FUNCTION_INFO_V1(spheretrans_in);
 PG_FUNCTION_INFO_V1(spheretrans_from_float8);
 PG_FUNCTION_INFO_V1(spheretrans_from_float8_and_type);
@@ -24,8 +20,6 @@ PG_FUNCTION_INFO_V1(spheretrans_trans);
 PG_FUNCTION_INFO_V1(spheretrans_trans_inv);
 PG_FUNCTION_INFO_V1(spheretrans_point);
 PG_FUNCTION_INFO_V1(spheretrans_point_inverse);
-#endif
-
 
  /**
   * \brief Checks and modifies the Euler transformation
@@ -55,7 +49,7 @@ spheretrans_check(SEuler *e)
 Datum
 spheretrans_in(PG_FUNCTION_ARGS)
 {
-	SEuler	   *se = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *se = (SEuler *) palloc(sizeof(SEuler));
 	char	   *c = PG_GETARG_CSTRING(0);
 	unsigned char etype[3];
 	int			i;
@@ -88,7 +82,7 @@ spheretrans_in(PG_FUNCTION_ARGS)
 	else
 	{
 		reset_buffer();
-		FREE(se);
+		pfree(se);
 		se = NULL;
 		elog(ERROR, "spheretrans_in: parse error");
 	}
@@ -100,7 +94,7 @@ spheretrans_in(PG_FUNCTION_ARGS)
 Datum
 spheretrans_from_float8(PG_FUNCTION_ARGS)
 {
-	SEuler	   *se = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *se = (SEuler *) palloc(sizeof(SEuler));
 
 	se->phi = PG_GETARG_FLOAT8(0);
 	se->theta = PG_GETARG_FLOAT8(1);
@@ -147,7 +141,7 @@ spheretrans_from_float8_and_type(PG_FUNCTION_ARGS)
 
 		if (t == 0)
 		{
-			FREE(se);
+			pfree(se);
 			elog(ERROR, "invalid axis format");
 		}
 		switch (i)
@@ -247,7 +241,7 @@ Datum
 spheretrans_type(PG_FUNCTION_ARGS)
 {
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(0);
-	BpChar	   *result = (BpChar *) MALLOC(3 + VARHDRSZ);
+	BpChar	   *result = (BpChar *) palloc(3 + VARHDRSZ);
 	char		ret[4];
 	int			i;
 	unsigned char t = 0;
@@ -280,11 +274,7 @@ spheretrans_type(PG_FUNCTION_ARGS)
 		}
 	}
 	ret[3] = '\0';
-#if PG_VERSION_NUM < 80300
-	VARATT_SIZEP(result) = 3 + VARHDRSZ;
-#else
 	SET_VARSIZE(result, 3 + VARHDRSZ);
-#endif
 	memcpy((void *) VARDATA(result), (void *) &ret[0], 3);
 
 	PG_RETURN_BPCHAR_P(result);
@@ -347,7 +337,7 @@ Datum
 spheretrans_zxz(PG_FUNCTION_ARGS)
 {
 	SEuler	   *si = (SEuler *) PG_GETARG_POINTER(0);
-	SEuler	   *ret = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *ret = (SEuler *) palloc(sizeof(SEuler));
 
 	strans_zxz(ret, si);
 	PG_RETURN_POINTER(ret);
@@ -367,7 +357,7 @@ Datum
 spheretrans_invert(PG_FUNCTION_ARGS)
 {
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(0);
-	SEuler	   *ret = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *ret = (SEuler *) palloc(sizeof(SEuler));
 
 	spheretrans_inverse(ret, se);
 	PG_RETURN_POINTER(ret);
@@ -397,7 +387,7 @@ spheretrans_trans(PG_FUNCTION_ARGS)
 {
 	SEuler	   *se1 = (SEuler *) PG_GETARG_POINTER(0);
 	SEuler	   *se2 = (SEuler *) PG_GETARG_POINTER(1);
-	SEuler	   *out = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *out = (SEuler *) palloc(sizeof(SEuler));
 
 	seuler_trans_zxz(out, se1, se2);
 	PG_RETURN_POINTER(out);
@@ -409,7 +399,7 @@ spheretrans_trans_inv(PG_FUNCTION_ARGS)
 {
 	SEuler	   *se1 = (SEuler *) PG_GETARG_POINTER(0);
 	SEuler	   *se2 = (SEuler *) PG_GETARG_POINTER(1);
-	SEuler	   *out = (SEuler *) MALLOC(sizeof(SEuler));
+	SEuler	   *out = (SEuler *) palloc(sizeof(SEuler));
 	SEuler		tmp;
 
 	spheretrans_inverse(&tmp, se2);
@@ -435,7 +425,7 @@ spheretrans_point(PG_FUNCTION_ARGS)
 {
 	SPoint	   *sp = (SPoint *) PG_GETARG_POINTER(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SPoint	   *out = (SPoint *) MALLOC(sizeof(SPoint));
+	SPoint	   *out = (SPoint *) palloc(sizeof(SPoint));
 
 	PG_RETURN_POINTER(euler_spoint_trans(out, sp, se));
 }
