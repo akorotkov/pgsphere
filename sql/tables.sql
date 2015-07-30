@@ -29,3 +29,11 @@ CREATE TABLE spheretmp5 (id int PRIMARY KEY , p spoly );
 CREATE TABLE spheretmp6 (id int PRIMARY KEY , p spath );
 \copy spheretmp6 from 'data/test_spherepath.data'
 
+-- Aggregate data from tables
+
+CREATE TABLE spheretmp7 (p spoint);
+\copy spheretmp7 from 'data/test_spherepolygon_aggregate.data'
+SELECT spoly(p) FROM spheretmp7;
+CREATE TABLE spheretmp8 (p spoint);
+\copy spheretmp8 from 'data/test_spherepoint.data'
+SELECT spath(p) FROM spheretmp8 WHERE p IS NOT NULL;

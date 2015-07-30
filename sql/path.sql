@@ -53,6 +53,8 @@ SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{10d,5d},(280d,-20d),90
 SELECT spath '{(280d, -8d),(280d, -9d)}'   @  sellipse '<{10d,5d},(280d, -8d),90d>';
 SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{10d,5d},(280d,-20d),90d>';
 SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{10d,5d},(280d, -8d),90d>';
+-- create path as aggregate
+SELECT spath(data.p) FROM ( SELECT spoint '(0,1)' as p UNION ALL SELECT spoint '(1,1)' UNION ALL SELECT '(1,0)' ) AS data ;
 
 --
 -- checking path other operators
