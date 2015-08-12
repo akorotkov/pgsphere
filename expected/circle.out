@@ -165,9 +165,9 @@ SELECT 180.0*dist('<( 23h 30m 00s , 0d 0m 0s), 1.0d>'::scircle,'<( 1h 0m 00s , 0
 (1 row)
 
 SELECT 180.0*dist('<( 0h 40m 00s , 0d 0m 0s), 1.0d>'::scircle,'<( 0h 50m 00s , 0d 0m 0s),1.0d>'::scircle)/pi();
-     ?column?      
--------------------
- 0.499999999999953
+ ?column? 
+----------
+      0.5
 (1 row)
 
 SELECT 180.0*dist('<( 0h 40m 00s , 0d 0m 0s), 1.5d>'::scircle,'<( 0h 50m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();
@@ -407,9 +407,9 @@ SELECT 180.0*('<( 23h 30m 00s , 0d 0m 0s), 1.0d>'::scircle<->'<( 1h 0m 00s , 0d 
 (1 row)
 
 SELECT 180.0*('<( 0h 40m 00s , 0d 0m 0s), 1.0d>'::scircle<->'<( 0h 50m 00s , 0d 0m 0s),1.0d>'::scircle)/pi();
-     ?column?      
--------------------
- 0.499999999999953
+ ?column? 
+----------
+      0.5
 (1 row)
 
 SELECT 180.0*('<( 0h 40m 00s , 0d 0m 0s), 1.5d>'::scircle<->'<( 0h 50m 00s , 0d 0m 0s),1.5d>'::scircle)/pi();

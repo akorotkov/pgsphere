@@ -261,7 +261,7 @@ SELECT spoint(0.0 , 2.141592653589793116);
 SELECT dist('( 0h 2m 30s , 0d 0m 0s)'::spoint,'( 0h 0m 30s , 0d 0m 0s)'::spoint);
         dist         
 ---------------------
- 0.00872664625996925
+ 0.00872664625997165
 (1 row)
 
 SELECT dist('( 0h 2m 30s , 0d 0m 0s)'::spoint,'( 0h 2m 30s , 10d 0m 0s)'::spoint);
@@ -609,7 +609,7 @@ SELECT '( 0h 2m 30s , 0d 0m 0s)'::spoint<>'( 12h 2m 30s , 45d 0m 0s)'::spoint;
 SELECT '( 0h 2m 30s , 0d 0m 0s)'::spoint<->'( 0h 0m 30s , 0d 0m 0s)'::spoint;
       ?column?       
 ---------------------
- 0.00872664625996925
+ 0.00872664625997165
 (1 row)
 
 SELECT '( 0h 2m 30s , 0d 0m 0s)'::spoint<->'( 0h 2m 30s , 10d 0m 0s)'::spoint;

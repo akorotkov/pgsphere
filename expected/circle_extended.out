@@ -305,6 +305,6 @@ select count(sc) from scircle_data where '<(0d,0d),2.1d>'::scircle ~ sc;
 select count(spoint_data.sp) from spoint_data,scircle_data where spoint_data.sp @ scircle_data.sc;
  count 
 -------
- 76682
+ 78842
 (1 row)
 
