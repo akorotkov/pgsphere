@@ -343,20 +343,6 @@ COMMENT ON FUNCTION sline_contains_point ( sline , spoint ) IS
   'returns true if spherical line contains spherical point'; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sline,
-   RIGHTARG   = spoint,
-   PROCEDURE  = sline_contains_point,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sline, spoint ) IS
-  'true if spherical line contains spherical point'; 
-
-
 --
 -- point is contained by line
 --
@@ -372,20 +358,6 @@ COMMENT ON FUNCTION sline_contains_point_com ( spoint , sline ) IS
   'returns true if spherical line contains spherical point'; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = spoint,
-   RIGHTARG   = sline,
-   PROCEDURE  = sline_contains_point_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoint, sline ) IS
-  'true if spherical line contains spherical point'; 
-
-
 --
 -- line does not contain point
 --
@@ -398,20 +370,6 @@ CREATE FUNCTION sline_contains_point_neg ( sline , spoint )
 
 COMMENT ON FUNCTION sline_contains_point_neg ( sline , spoint ) IS
   'returns true if spherical line does not contain spherical point'; 
-
-CREATE OPERATOR !~ (
-   LEFTARG    = sline,
-   RIGHTARG   = spoint,
-   PROCEDURE  = sline_contains_point,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sline, spoint ) IS
-  'true if spherical line does not contain spherical point'; 
-
 
 --
 -- point is not contained by line
@@ -426,20 +384,6 @@ CREATE FUNCTION sline_contains_point_com_neg ( spoint , sline )
 
 COMMENT ON FUNCTION sline_contains_point_com_neg ( spoint , sline ) IS
   'returns true if spherical line does not contain spherical point'; 
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spoint,
-   RIGHTARG   = sline,
-   PROCEDURE  = sline_contains_point_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoint, sline ) IS
-  'true if spherical line does not contain spherical point'; 
-
 
 --
 --  Transformation of line
@@ -607,20 +551,6 @@ COMMENT ON FUNCTION scircle_contains_line( scircle , sline ) IS
   'returns true if spherical circle contains spherical line'; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sline,
-   PROCEDURE  = scircle_contains_line,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( scircle, sline ) IS
-  'true if spherical circle contains spherical line'; 
-
-
 --
 -- line is contained by circle
 --
@@ -634,20 +564,6 @@ CREATE FUNCTION scircle_contains_line_com( sline , scircle )
 
 COMMENT ON FUNCTION scircle_contains_line_com( sline , scircle ) IS
   'returns true if spherical circle contains spherical line'; 
-
-CREATE OPERATOR @ (
-   LEFTARG    = sline,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_line_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sline, scircle ) IS
-  'true if spherical circle contains spherical line'; 
-
 
 --
 -- circle does not contain line
@@ -663,20 +579,6 @@ COMMENT ON FUNCTION scircle_contains_line_neg( scircle , sline ) IS
   'returns true if spherical circle does not contain spherical line'; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sline,
-   PROCEDURE  = scircle_contains_line_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( scircle, sline ) IS
-  'true if spherical circle does not contain spherical line'; 
-
-
 --
 -- line is not contained by circle
 --
@@ -690,17 +592,4 @@ CREATE FUNCTION scircle_contains_line_com_neg( sline , scircle )
 COMMENT ON FUNCTION scircle_contains_line_com_neg( sline , scircle ) IS
   'returns true if spherical circle does not contain spherical line'; 
 
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sline,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_line_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sline, scircle ) IS
-  'true if spherical circle does not contain spherical line'; 
 

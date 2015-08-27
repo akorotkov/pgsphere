@@ -7,7 +7,9 @@ OBJS       = sscan.o sparse.o sbuffer.o vector3d.o point.o \
 EXTENSION   = pg_sphere
 DATA_built  = pg_sphere--1.0.sql
 DOCS        = README.pg_sphere COPYRIGHT.pg_sphere
-REGRESS     = init tables points euler circle line ellipse poly path box index
+REGRESS     = init tables points euler circle line ellipse poly path box index \
+              contains_ops contains_ops_compat
+
 EXTRA_CLEAN = pg_sphere--1.0.sql $(PGS_SQL) 
 
 CRUSH_TESTS  = init_extended circle_extended 
@@ -15,7 +17,8 @@ CRUSH_TESTS  = init_extended circle_extended
 # order of sql files is important
 PGS_SQL    =  pgs_types.sql pgs_point.sql pgs_euler.sql pgs_circle.sql \
    pgs_line.sql pgs_ellipse.sql pgs_polygon.sql pgs_path.sql \
-   pgs_box.sql pgs_gist.sql pgs_crossmatch.sql
+   pgs_box.sql pgs_contains_ops.sql pgs_contains_ops_compat.sql \
+   pgs_gist.sql pgs_crossmatch.sql \
 
 ifdef USE_PGXS
   ifndef PG_CONFIG
@@ -56,4 +59,3 @@ endif
 dist : clean sparse.c sscan.c
 	find . -name '*~' -type f -exec rm {} \;
 	cd .. && tar  --exclude CVS -czf pg_sphere.tar.gz pg_sphere && cd -
- 	

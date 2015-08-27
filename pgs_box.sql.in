@@ -150,20 +150,6 @@ COMMENT ON FUNCTION sbox_contains_box(sbox,sbox) IS
   'true if spherical box contains spherical box '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_box,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sbox, sbox ) IS
-  'true if spherical box contains spherical box'; 
-
-
 --
 -- box is contained by box
 --
@@ -177,19 +163,6 @@ CREATE FUNCTION sbox_contains_box_com(sbox, sbox)
 COMMENT ON FUNCTION sbox_contains_box_com(sbox, sbox) IS
   'true if spherical box contains spherical box '; 
 
-
-CREATE OPERATOR @ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_box_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sbox, sbox ) IS
-  'true if spherical box contains spherical box'; 
 
 --
 -- box does not contain box
@@ -205,20 +178,6 @@ COMMENT ON FUNCTION sbox_contains_box_neg(sbox,sbox) IS
   'true if spherical box does not contain spherical box '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_box_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sbox, sbox ) IS
-  'true if spherical box does not contain spherical box'; 
-
-
 --
 -- box is not contained by box
 --
@@ -232,19 +191,6 @@ CREATE FUNCTION sbox_contains_box_com_neg(sbox, sbox)
 COMMENT ON FUNCTION sbox_contains_box_com_neg(sbox, sbox) IS
   'true if spherical box does not contain spherical box '; 
 
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_box_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sbox, sbox ) IS
-  'true if spherical box does not contain spherical box'; 
 
 --
 -- box overlaps box
@@ -314,20 +260,6 @@ COMMENT ON FUNCTION sbox_cont_point_com(spoint,sbox) IS
   'true if spherical point is contained by spherical box'; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = spoint,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_cont_point_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoint, sbox ) IS
-  'true if spherical point is contained by spherical box'; 
-
-
 --
 -- point is not contained by box
 --
@@ -340,20 +272,6 @@ CREATE FUNCTION sbox_cont_point_com_neg(spoint,sbox)
 
 COMMENT ON FUNCTION sbox_cont_point_com_neg (spoint,sbox) IS
   'true if spherical point is not contained by spherical box '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spoint,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_cont_point_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoint, sbox ) IS
-  'true if spherical point is not contained by spherical box'; 
 
 
 --
@@ -370,20 +288,6 @@ COMMENT ON FUNCTION sbox_cont_point (sbox,spoint) IS
   'true if spherical box contains spherical point '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spoint,
-   PROCEDURE  = sbox_cont_point,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sbox, spoint ) IS
-  'true if spherical box contains spherical point'; 
-
-
 --
 -- box does not contain point
 --
@@ -398,19 +302,6 @@ COMMENT ON FUNCTION sbox_cont_point_neg (sbox,spoint) IS
   'true if spherical box does not contain spherical point '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spoint,
-   PROCEDURE  = sbox_cont_point_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sbox, spoint ) IS
-  'true if spherical box does not contain spherical point'; 
-
 --
 -- box contains circle
 --
@@ -423,20 +314,6 @@ CREATE FUNCTION sbox_contains_circle(sbox,scircle)
 
 COMMENT ON FUNCTION sbox_contains_circle(sbox,scircle) IS
   'true if spherical box contains spherical circle '; 
-
-
-CREATE OPERATOR ~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = scircle,
-   PROCEDURE  = sbox_contains_circle,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sbox, scircle ) IS
-  'true if spherical box contains spherical circle'; 
 
 
 --
@@ -453,19 +330,6 @@ COMMENT ON FUNCTION sbox_contains_circle_com(scircle, sbox) IS
   'true if spherical box contains spherical circle '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_circle_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( scircle, sbox ) IS
-  'true if spherical box contains spherical circle'; 
-
 --
 -- box does not contain circle
 --
@@ -478,20 +342,6 @@ CREATE FUNCTION sbox_contains_circle_neg(sbox,scircle)
 
 COMMENT ON FUNCTION sbox_contains_circle_neg(sbox,scircle) IS
   'true if spherical box does not contain spherical circle '; 
-
-
-CREATE OPERATOR !~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = scircle,
-   PROCEDURE  = sbox_contains_circle_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sbox, scircle ) IS
-  'true if spherical box does not contain spherical circle'; 
 
 
 --
@@ -508,20 +358,6 @@ COMMENT ON FUNCTION sbox_contains_circle_com_neg(scircle, sbox) IS
   'true if spherical box does not contain spherical circle '; 
 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_circle_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( scircle, sbox ) IS
-  'true if spherical box does not contain spherical circle'; 
-
-
 --
 -- circle contains box
 --
@@ -534,20 +370,6 @@ CREATE FUNCTION scircle_contains_box(scircle,sbox)
 
 COMMENT ON FUNCTION scircle_contains_box(scircle,sbox) IS
   'true if spherical circle contains spherical box '; 
-
-
-CREATE OPERATOR ~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sbox,
-   PROCEDURE  = scircle_contains_box,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( scircle, sbox ) IS
-  'true if spherical circle contains spherical box'; 
 
 
 --
@@ -564,19 +386,6 @@ COMMENT ON FUNCTION scircle_contains_box_com(sbox, scircle) IS
   'true if spherical circle contains spherical box '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = sbox,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_box_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sbox, scircle ) IS
-  'true if spherical circle contains spherical box'; 
-
 --
 -- circle does not contain box
 --
@@ -591,20 +400,6 @@ COMMENT ON FUNCTION scircle_contains_box_neg(scircle,sbox) IS
   'true if spherical circle does not contain spherical box '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sbox,
-   PROCEDURE  = scircle_contains_box_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( scircle, sbox ) IS
-  'true if spherical circle does not contain spherical box'; 
-
-
 --
 -- box is not contained by circle
 --
@@ -617,20 +412,6 @@ CREATE FUNCTION scircle_contains_box_com_neg(sbox, scircle)
 
 COMMENT ON FUNCTION scircle_contains_box_com_neg(sbox, scircle) IS
   'true if spherical circle does not contain spherical box '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sbox,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_box_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sbox, scircle ) IS
-  'true if spherical circle does not contain spherical box'; 
 
 
 --
@@ -757,20 +538,6 @@ COMMENT ON FUNCTION sbox_contains_line(sbox,sline) IS
   'true if spherical box contains spherical line '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sline,
-   PROCEDURE  = sbox_contains_line,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sbox, sline ) IS
-  'true if spherical box contains spherical line'; 
-
-
 --
 -- line is contained by box
 --
@@ -784,19 +551,6 @@ CREATE FUNCTION sbox_contains_line_com(sline, sbox)
 COMMENT ON FUNCTION sbox_contains_line_com(sline, sbox) IS
   'true if spherical box contains spherical line '; 
 
-
-CREATE OPERATOR @ (
-   LEFTARG    = sline,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_line_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sline, sbox ) IS
-  'true if spherical box contains spherical line'; 
 
 --
 -- box does not contain line
@@ -812,20 +566,6 @@ COMMENT ON FUNCTION sbox_contains_line_neg(sbox,sline) IS
   'true if spherical box does not contain spherical line '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sline,
-   PROCEDURE  = sbox_contains_line_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sbox, sline ) IS
-  'true if spherical box does not contain spherical line'; 
-
-
 --
 -- line is not contained by box
 --
@@ -838,20 +578,6 @@ CREATE FUNCTION sbox_contains_line_com_neg(sline, sbox)
 
 COMMENT ON FUNCTION sbox_contains_line_com_neg(sline, sbox) IS
   'true if spherical box does not contain spherical line '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sline,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_line_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sline, sbox ) IS
-  'true if spherical box does not contain spherical line'; 
 
 
 --
@@ -978,20 +704,6 @@ COMMENT ON FUNCTION sbox_contains_ellipse(sbox,sellipse) IS
   'true if spherical box contains spherical ellipse '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sbox_contains_ellipse,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sbox, sellipse ) IS
-  'true if spherical box contains spherical ellipse'; 
-
-
 --
 -- ellipse is contained by box
 --
@@ -1006,19 +718,6 @@ COMMENT ON FUNCTION sbox_contains_ellipse_com(sellipse, sbox) IS
   'true if spherical box contains spherical ellipse '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_ellipse_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sellipse, sbox ) IS
-  'true if spherical box contains spherical ellipse'; 
-
 --
 -- box does not contain ellipse
 --
@@ -1031,20 +730,6 @@ CREATE FUNCTION sbox_contains_ellipse_neg(sbox,sellipse)
 
 COMMENT ON FUNCTION sbox_contains_ellipse_neg(sbox,sellipse) IS
   'true if spherical box does not contain spherical ellipse '; 
-
-
-CREATE OPERATOR !~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sbox_contains_ellipse_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sbox, sellipse ) IS
-  'true if spherical box does not contain spherical ellipse'; 
 
 
 --
@@ -1061,20 +746,6 @@ COMMENT ON FUNCTION sbox_contains_ellipse_com_neg(sellipse, sbox) IS
   'true if spherical box does not contain spherical ellipse '; 
 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_ellipse_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sellipse, sbox ) IS
-  'true if spherical box does not contain spherical ellipse'; 
-
-
 --
 -- ellipse contains box
 --
@@ -1087,20 +758,6 @@ CREATE FUNCTION sellipse_contains_box(sellipse,sbox)
 
 COMMENT ON FUNCTION sellipse_contains_box(sellipse,sbox) IS
   'true if spherical ellipse contains spherical box '; 
-
-
-CREATE OPERATOR ~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sellipse_contains_box,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sellipse, sbox ) IS
-  'true if spherical ellipse contains spherical box'; 
 
 
 --
@@ -1117,19 +774,6 @@ COMMENT ON FUNCTION sellipse_contains_box_com(sbox, sellipse) IS
   'true if spherical ellipse contains spherical box '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_box_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sbox, sellipse ) IS
-  'true if spherical ellipse contains spherical box'; 
-
 --
 -- ellipse does not contain box
 --
@@ -1144,20 +788,6 @@ COMMENT ON FUNCTION sellipse_contains_box_neg(sellipse,sbox) IS
   'true if spherical ellipse does not contain spherical box '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sellipse_contains_box_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sellipse, sbox ) IS
-  'true if spherical ellipse does not contain spherical box'; 
-
-
 --
 -- box is not contained by ellipse
 --
@@ -1170,20 +800,6 @@ CREATE FUNCTION sellipse_contains_box_com_neg(sbox, sellipse)
 
 COMMENT ON FUNCTION sellipse_contains_box_com_neg(sbox, sellipse) IS
   'true if spherical ellipse does not contain spherical box '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sbox,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_box_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sbox, sellipse ) IS
-  'true if spherical ellipse does not contain spherical box'; 
 
 
 --
@@ -1311,20 +927,6 @@ COMMENT ON FUNCTION sbox_contains_poly(sbox,spoly) IS
   'true if spherical box contains spherical polygon '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spoly,
-   PROCEDURE  = sbox_contains_poly,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sbox, spoly ) IS
-  'true if spherical box contains spherical polygon'; 
-
-
 --
 -- polygon is contained by box
 --
@@ -1339,19 +941,6 @@ COMMENT ON FUNCTION sbox_contains_poly_com(spoly, sbox) IS
   'true if spherical box contains spherical polygon '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_poly_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoly, sbox ) IS
-  'true if spherical box contains spherical polygon'; 
-
 --
 -- box does not contain polygon
 --
@@ -1364,20 +953,6 @@ CREATE FUNCTION sbox_contains_poly_neg(sbox,spoly)
 
 COMMENT ON FUNCTION sbox_contains_poly_neg(sbox,spoly) IS
   'true if spherical box does not contain spherical polygon '; 
-
-
-CREATE OPERATOR !~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spoly,
-   PROCEDURE  = sbox_contains_poly_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sbox, spoly ) IS
-  'true if spherical box does not contain spherical polygon'; 
 
 
 --
@@ -1394,20 +969,6 @@ COMMENT ON FUNCTION sbox_contains_poly_com_neg(spoly, sbox) IS
   'true if spherical box does not contain spherical polygon '; 
 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_poly_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoly, sbox ) IS
-  'true if spherical box does not contain spherical polygon'; 
-
-
 --
 -- polygon contains box
 --
@@ -1420,20 +981,6 @@ CREATE FUNCTION spoly_contains_box(spoly,sbox)
 
 COMMENT ON FUNCTION spoly_contains_box(spoly,sbox) IS
   'true if spherical polygon contains spherical box '; 
-
-
-CREATE OPERATOR ~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sbox,
-   PROCEDURE  = spoly_contains_box,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( spoly, sbox ) IS
-  'true if spherical polygon contains spherical box'; 
 
 
 --
@@ -1450,19 +997,6 @@ COMMENT ON FUNCTION spoly_contains_box_com(sbox, spoly) IS
   'true if spherical polygon contains spherical box '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_box_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sbox, spoly ) IS
-  'true if spherical polygon contains spherical box'; 
-
 --
 -- polygon does not contain box
 --
@@ -1477,20 +1011,6 @@ COMMENT ON FUNCTION spoly_contains_box_neg(spoly,sbox) IS
   'true if spherical polygon does not contain spherical box '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sbox,
-   PROCEDURE  = spoly_contains_box_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( spoly, sbox ) IS
-  'true if spherical polygon does not contain spherical box'; 
-
-
 --
 -- box is not contained by polygon
 --
@@ -1503,20 +1023,6 @@ CREATE FUNCTION spoly_contains_box_com_neg(sbox, spoly)
 
 COMMENT ON FUNCTION spoly_contains_box_com_neg(sbox, spoly) IS
   'true if spherical polygon does not contain spherical box '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_box_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sbox, spoly ) IS
-  'true if spherical polygon does not contain spherical box'; 
 
 
 --
@@ -1644,20 +1150,6 @@ COMMENT ON FUNCTION sbox_contains_path(sbox,spath) IS
   'true if spherical box contains spherical path '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spath,
-   PROCEDURE  = sbox_contains_path,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sbox, spath ) IS
-  'true if spherical box contains spherical path'; 
-
-
 --
 -- path is contained by box
 --
@@ -1671,19 +1163,6 @@ CREATE FUNCTION sbox_contains_path_com(spath, sbox)
 COMMENT ON FUNCTION sbox_contains_path_com(spath, sbox) IS
   'true if spherical box contains spherical path '; 
 
-
-CREATE OPERATOR @ (
-   LEFTARG    = spath,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_path_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spath, sbox ) IS
-  'true if spherical box contains spherical path'; 
 
 --
 -- box does not contain path
@@ -1699,20 +1178,6 @@ COMMENT ON FUNCTION sbox_contains_path_neg(sbox,spath) IS
   'true if spherical box does not contain spherical path '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sbox,
-   RIGHTARG   = spath,
-   PROCEDURE  = sbox_contains_path_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sbox, spath ) IS
-  'true if spherical box does not contain spherical path'; 
-
-
 --
 -- path is not contained by box
 --
@@ -1725,20 +1190,6 @@ CREATE FUNCTION sbox_contains_path_com_neg(spath, sbox)
 
 COMMENT ON FUNCTION sbox_contains_path_com_neg(spath, sbox) IS
   'true if spherical box does not contain spherical path '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spath,
-   RIGHTARG   = sbox,
-   PROCEDURE  = sbox_contains_path_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spath, sbox ) IS
-  'true if spherical box does not contain spherical path'; 
 
 
 --

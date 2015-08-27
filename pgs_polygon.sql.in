@@ -118,20 +118,6 @@ COMMENT ON FUNCTION spoly_contains_polygon(spoly,spoly) IS
   'true if spherical polygon contains spherical polygon '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_polygon,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( spoly, spoly ) IS
-  'true if spherical polygon contains spherical polygon'; 
-
-
 --
 -- polygon is contained by polygon
 --
@@ -145,19 +131,6 @@ CREATE FUNCTION spoly_contains_polygon_com(spoly, spoly)
 COMMENT ON FUNCTION spoly_contains_polygon_com(spoly, spoly) IS
   'true if spherical polygon is contained by spherical polygon '; 
 
-
-CREATE OPERATOR @ (
-   LEFTARG    = spoly,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_polygon_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoly, spoly ) IS
-  'true if spherical polygon is contained by spherical polygon'; 
 
 --
 -- polygon does not contain polygon
@@ -173,20 +146,6 @@ COMMENT ON FUNCTION spoly_contains_polygon_neg(spoly,spoly) IS
   'true if spherical polygon does not contain spherical polygon '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_polygon_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( spoly, spoly ) IS
-  'true if spherical polygon does not contain spherical polygon'; 
-
-
 --
 -- polygon is not contained by polygon
 --
@@ -199,20 +158,6 @@ CREATE FUNCTION spoly_contains_polygon_com_neg(spoly, spoly)
 
 COMMENT ON FUNCTION spoly_contains_polygon_com_neg(spoly, spoly) IS
   'true if spherical polygon is not contained by spherical polygon '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spoly,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_polygon_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoly, spoly ) IS
-  'true if spherical polygon is not contained by spherical polygon'; 
 
 
 --
@@ -283,20 +228,6 @@ CREATE FUNCTION spoly_contains_point(spoly,spoint)
 COMMENT ON FUNCTION spoly_contains_point(spoly,spoint) IS
   'true if spherical polygon contains spherical point '; 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = spoint,
-   PROCEDURE  = spoly_contains_point,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( spoly, spoint ) IS
-  'true if spherical polygon contains spherical point'; 
-
-
 --
 -- point is contained by polygon
 --
@@ -309,20 +240,6 @@ CREATE FUNCTION spoly_contains_point_com(spoint,spoly)
 
 COMMENT ON FUNCTION spoly_contains_point_com(spoint,spoly) IS
   'true if spherical polygon contains spherical point '; 
-
-CREATE OPERATOR @ (
-   LEFTARG    = spoint,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_point_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoint, spoly ) IS
-  'true if spherical polygon contains spherical point'; 
-
 
 --
 -- polygon does not contain point
@@ -337,20 +254,6 @@ CREATE FUNCTION spoly_contains_point_neg(spoly,spoint)
 COMMENT ON FUNCTION spoly_contains_point_neg(spoly,spoint) IS
   'true if spherical polygon does not contain spherical point '; 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = spoint,
-   PROCEDURE  = spoly_contains_point,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( spoly, spoint ) IS
-  'true if spherical polygon does not contain spherical point'; 
-
-
 --
 -- point is not contained by polygon
 --
@@ -363,19 +266,6 @@ CREATE FUNCTION spoly_contains_point_com_neg(spoint,spoly)
 
 COMMENT ON FUNCTION spoly_contains_point_com_neg(spoint,spoly) IS
   'true if spherical polygon does not contain spherical point '; 
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spoint,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_point_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoint, spoly ) IS
-  'true if spherical polygon does not contain spherical point'; 
 
 --
 -- Transformation of polygon
@@ -432,20 +322,6 @@ COMMENT ON FUNCTION spoly_contains_circle(spoly,scircle) IS
   'true if spherical polygon contains spherical circle '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = scircle,
-   PROCEDURE  = spoly_contains_circle,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( spoly, scircle ) IS
-  'true if spherical polygon contains spherical circle'; 
-
-
 --
 -- circle is contained by polygon
 --
@@ -460,19 +336,6 @@ COMMENT ON FUNCTION spoly_contains_circle_com(scircle, spoly) IS
   'true if spherical polygon contains spherical circle '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = scircle,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_circle_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( scircle, spoly ) IS
-  'true if spherical polygon contains spherical circle'; 
-
 --
 -- polygon does not contain circle
 --
@@ -485,20 +348,6 @@ CREATE FUNCTION spoly_contains_circle_neg(spoly,scircle)
 
 COMMENT ON FUNCTION spoly_contains_circle_neg(spoly,scircle) IS
   'true if spherical polygon does not contain spherical circle '; 
-
-
-CREATE OPERATOR !~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = scircle,
-   PROCEDURE  = spoly_contains_circle_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( spoly, scircle ) IS
-  'true if spherical polygon does not contain spherical circle'; 
 
 
 --
@@ -515,20 +364,6 @@ COMMENT ON FUNCTION spoly_contains_circle_com_neg(scircle, spoly) IS
   'true if spherical polygon does not contain spherical circle '; 
 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = scircle,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_circle_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( scircle, spoly ) IS
-  'true if spherical polygon does not contain spherical circle'; 
-
-
 --
 -- circle contains polygon
 --
@@ -541,20 +376,6 @@ CREATE FUNCTION scircle_contains_polygon(scircle,spoly)
 
 COMMENT ON FUNCTION scircle_contains_polygon(scircle,spoly) IS
   'true if spherical circle contains spherical polygon '; 
-
-
-CREATE OPERATOR ~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = spoly,
-   PROCEDURE  = scircle_contains_polygon,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( scircle, spoly ) IS
-  'true if spherical circle contains spherical polygon'; 
 
 
 --
@@ -571,19 +392,6 @@ COMMENT ON FUNCTION scircle_contains_polygon_com(spoly, scircle) IS
   'true if spherical circle contains spherical polygon '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = spoly,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_polygon_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoly, scircle ) IS
-  'true if spherical circle contains spherical polygon'; 
-
 --
 -- circle does not contain polygon
 --
@@ -598,20 +406,6 @@ COMMENT ON FUNCTION scircle_contains_polygon_neg(scircle,spoly) IS
   'true if spherical circle does not contain spherical polygon '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = spoly,
-   PROCEDURE  = scircle_contains_polygon_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( scircle, spoly ) IS
-  'true if spherical circle does not contain spherical polygon'; 
-
-
 --
 -- polygon is not contained by circle
 --
@@ -624,20 +418,6 @@ CREATE FUNCTION scircle_contains_polygon_com_neg(spoly, scircle)
 
 COMMENT ON FUNCTION scircle_contains_polygon_com_neg(spoly, scircle) IS
   'true if spherical circle does not contain spherical polygon '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spoly,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_polygon_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoly, scircle ) IS
-  'true if spherical circle does not contain spherical polygon'; 
 
 
 --
@@ -763,19 +543,6 @@ CREATE FUNCTION spoly_contains_line(spoly,sline)
 COMMENT ON FUNCTION spoly_contains_line(spoly,sline) IS
   'true if spherical polygon contains spherical line '; 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sline,
-   PROCEDURE  = spoly_contains_line,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( spoly, sline ) IS
-  'true if spherical polygon contains spherical line'; 
-
 --
 -- line is contained by polygon
 --
@@ -788,21 +555,6 @@ CREATE FUNCTION spoly_contains_line_com(sline,spoly)
 
 COMMENT ON FUNCTION spoly_contains_line_com(sline,spoly) IS
   'true if spherical polygon contains spherical line '; 
-
-CREATE OPERATOR @ (
-   LEFTARG    = sline,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_line_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sline, spoly ) IS
-  'true if spherical polygon contains spherical line'; 
-
-
 
 --
 -- polygon does not contain line
@@ -817,19 +569,6 @@ CREATE FUNCTION spoly_contains_line_neg(spoly,sline)
 COMMENT ON FUNCTION spoly_contains_line_neg(spoly,sline) IS
   'true if spherical polygon does not contain spherical line '; 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sline,
-   PROCEDURE  = spoly_contains_line,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( spoly, sline ) IS
-  'true if spherical polygon does not contain spherical line'; 
-
 --
 -- line is not contained by polygon
 --
@@ -842,19 +581,6 @@ CREATE FUNCTION spoly_contains_line_com_neg(sline,spoly)
 
 COMMENT ON FUNCTION spoly_contains_line_com_neg(sline,spoly) IS
   'true if spherical polygon does not contain spherical line '; 
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sline,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_line_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sline, spoly ) IS
-  'true if spherical polygon does not contain spherical line'; 
 
 --
 -- line overlaps polygon
@@ -981,20 +707,6 @@ COMMENT ON FUNCTION spoly_contains_ellipse(spoly,sellipse) IS
   'true if spherical polygon contains spherical ellipse '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = spoly_contains_ellipse,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( spoly, sellipse ) IS
-  'true if spherical polygon contains spherical ellipse'; 
-
-
 --
 -- ellipse is contained by polygon
 --
@@ -1009,19 +721,6 @@ COMMENT ON FUNCTION spoly_contains_ellipse_com(sellipse, spoly) IS
   'true if spherical polygon contains spherical ellipse '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_ellipse_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sellipse, spoly ) IS
-  'true if spherical polygon contains spherical ellipse'; 
-
 --
 -- polygon does not contain ellipse
 --
@@ -1034,20 +733,6 @@ CREATE FUNCTION spoly_contains_ellipse_neg(spoly,sellipse)
 
 COMMENT ON FUNCTION spoly_contains_ellipse_neg(spoly,sellipse) IS
   'true if spherical polygon does not contain spherical ellipse '; 
-
-
-CREATE OPERATOR !~ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = spoly_contains_ellipse_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( spoly, sellipse ) IS
-  'true if spherical polygon does not contain spherical ellipse'; 
 
 
 --
@@ -1064,20 +749,6 @@ COMMENT ON FUNCTION spoly_contains_ellipse_com_neg(sellipse, spoly) IS
   'true if spherical polygon does not contain spherical ellipse '; 
 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = spoly,
-   PROCEDURE  = spoly_contains_ellipse_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sellipse, spoly ) IS
-  'true if spherical polygon does not contain spherical ellipse'; 
-
-
 --
 -- ellipse contains polygon
 --
@@ -1090,20 +761,6 @@ CREATE FUNCTION sellipse_contains_polygon(sellipse,spoly)
 
 COMMENT ON FUNCTION sellipse_contains_polygon(sellipse,spoly) IS
   'true if spherical ellipse contains spherical polygon '; 
-
-
-CREATE OPERATOR ~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = spoly,
-   PROCEDURE  = sellipse_contains_polygon,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sellipse, spoly ) IS
-  'true if spherical ellipse contains spherical polygon'; 
 
 
 --
@@ -1120,19 +777,6 @@ COMMENT ON FUNCTION sellipse_contains_polygon_com(spoly, sellipse) IS
   'true if spherical ellipse contains spherical polygon '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_polygon_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoly, sellipse ) IS
-  'true if spherical ellipse contains spherical polygon'; 
-
 --
 -- ellipse does not contain polygon
 --
@@ -1147,20 +791,6 @@ COMMENT ON FUNCTION sellipse_contains_polygon_neg(sellipse,spoly) IS
   'true if spherical ellipse does not contain spherical polygon '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = spoly,
-   PROCEDURE  = sellipse_contains_polygon_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sellipse, spoly ) IS
-  'true if spherical ellipse does not contain spherical polygon'; 
-
-
 --
 -- polygon is not contained by ellipse
 --
@@ -1173,20 +803,6 @@ CREATE FUNCTION sellipse_contains_polygon_com_neg(spoly, sellipse)
 
 COMMENT ON FUNCTION sellipse_contains_polygon_com_neg(spoly, sellipse) IS
   'true if spherical ellipse does not contain spherical polygon '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spoly,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_polygon_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoly, sellipse ) IS
-  'true if spherical ellipse does not contain spherical polygon'; 
 
 
 --
