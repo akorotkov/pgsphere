@@ -3,18 +3,16 @@
 
 #include "types.h"
 
-/*!
-  \file
-  \brief Declarations of key build functions
-*/
+/*
+ * Declarations of key build functions
+ */
 
+#define KEYSIZE 24				/* the key size for one entry */
+#define BPCKSIZE (KEYSIZE/6)	/* the key size for one entry per coordinate */
 
-#define KEYSIZE 24						   //!< the key size for one entry
-#define BPCKSIZE (KEYSIZE/6)			   //!< the key size for one entry per coordinate
-
-/*!
-  The coordinate value has to be between -MAXCVALUE .. MAXCVALUE
-*/
+/*
+ * The coordinate value has to be between -MAXCVALUE .. MAXCVALUE
+ */
 #define MAXCVALUE ( ( 1 << ( 8*BPCKSIZE - 2 ) ) - 1 )
 
 typedef struct
@@ -46,155 +44,131 @@ typedef struct
 	SET_VARSIZE(key, INTERNAL_KEY_SIZE); \
 } while (0) ;
 
- /*
-  * ! \brief Union the both keys and returns it. \param kunion pointer to
-  * first key ( = united key ) \param key second ( unmodified ) key \return
-  * pointer to result key
-  */
+/*
+ * Union the both keys and returns it. Result is placed into kunion.
+ */
 int32	   *spherekey_union_two(int32 *kunion, const int32 *key);
 
-
- /*
-  * ! \brief Intersect the both keys and returns it. \param kinter pointer to
-  * first key ( = intersected key ) \param key second ( unmodified ) key
-  * \return pointer to result key or NULL if there is not intersection
-  */
+/*
+ * Intersect the both keys and returns it. Returns NULL if there is
+ * no intersection. Result is placed into kinter.
+ */
 int32	   *spherekey_inter_two(int32 *kinter, const int32 *key);
 
-
- /*
-  * ! \brief generate key value of spherical point \param k  pointer to key
-  * \param sp spherical point \return pointer to key
-  */
+/*
+ * Generate key value of spherical point and returns it. Result is placed
+ * into k.
+ */
 int32	   *spherepoint_gen_key(int32 *k, const SPoint *sp);
 
- /*
-  * ! \brief generates circle's key \param k  pointer to key \param c  pointer
-  * to circle \return pointer to key
-  */
+/*
+ * Generates circle's key and returns it. Result is placed into k.
+ */
 int32	   *spherecircle_gen_key(int32 *k, const SCIRCLE *c);
 
- /*
-  * ! \brief Returns the key of a spherical ellipse \param k   the pointer to
-  * the key \param e  the pointer to a ellipse \return pointer to key
-  */
+/*
+ * Returns the key of a spherical ellipse and returns it. Result is placed
+ * into k.
+ */
 int32	   *sphereellipse_gen_key(int32 *k, const SELLIPSE *e);
 
- /*
-  * ! \brief Returns the key of a spherical line \param k	the pointer to the
-  * key \param sl  the pointer to a line \return pointer to key
-  */
+/*
+ * Returns the key of a spherical line and returns it. Result is placed
+ * into k.
+ */
 int32	   *sphereline_gen_key(int32 *k, const SLine *sl);
 
- /*
-  * ! \brief Creates the key of polygon \param sp pointer to polygon \param
-  * key pointer to key \return pointer to key
-  */
+/*
+ * Creates the key of polygon and returns it. Result is placed into "key".
+ */
 int32	   *spherepoly_gen_key(int32 *key, const SPOLY *sp);
 
- /*
-  * ! \brief Creates the key of path \param sp pointer to path \param k
-  * pointer to key \return pointer to key
-  */
+/*
+ * Creates the key of path and returns it. Result is placed into k.
+ */
 int32	   *spherepath_gen_key(int32 *k, const SPATH *sp);
 
- /*
-  * ! \brief Creates the key of path \param box pointer to path \param key
-  * pointer to key \return pointer to key
-  */
+/*
+ * Creates the key of box and returns it. Result is placed into k.
+ */
 int32	   *spherebox_gen_key(int32 *key, const SBOX *box);
 
-
- /*
-  * ! \brief Returns true, if first key is less than second key \return bool
-  * datum \note PostgreSQL function
-  */
+/*
+ * Returns true, if first key is less than second key.
+ */
 Datum		spherekey_lt(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief Returns true, if first key is less or equal than second key
-  * \return bool datum \note PostgreSQL function
-  */
+/*
+ * Returns true, if first key is less or equal than second key.
+ */
 Datum		spherekey_le(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief Returns true, if first keys are equal \return bool datum \note
-  * PostgreSQL function
-  */
+/*
+ * Returns true, if first keys are equal.
+ */
 Datum		spherekey_eq(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief Returns true, if first keys are not equal \return bool datum
-  * \note PostgreSQL function
-  */
+/*
+ * Returns true, if first keys are not equal.
+ */
 Datum		spherekey_eq_neg(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief Returns true, if first key is greater or equal than second key
-  * \return bool datum \note PostgreSQL function
-  */
+/*
+ * Returns true, if first key is greater or equal than second key.
+ */
 Datum		spherekey_ge(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief Returns true, if first key is greater than second key \return
-  * bool datum \note PostgreSQL function
-  */
+/*
+ * Returns true, if first key is greater than second key.
+ */
 Datum		spherekey_gt(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two keys
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of two keys.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two keys.
+ */
 Datum		spherekey_cmp(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two points
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of keys of two spherical points.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two points.
+ */
 Datum		spherepoint_cmp(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two circles
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of keys of two spherical circles.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two circles.
+ */
 Datum		spherecircle_cmp(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two ellipses
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of keys of two spherical ellipses.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two ellipses.
+ */
 Datum		sphereellipse_cmp(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two lines
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of keys of two spherical lines.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two lines.
+ */
 Datum		sphereline_cmp(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two pathes
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of keys of two spherical pathes.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two pathes.
+ */
 Datum		spherepath_cmp(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two polygons
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of keys of two spherical polygons.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two polygons.
+ */
 Datum		spherepoly_cmp(PG_FUNCTION_ARGS);
 
- /*
-  * ! \brief calls skey_cmp( const int32 *, const int32 * ) for two boxes
-  * \return relationship \note PostgreSQL function \see skey_cmp( const int32
-  * *, const int32 * )
-  */
+/*
+ * Returns relationship of keys of two spherical boxes.
+ * ‘alls skey_cmp(const int32 *, const int32 *) for two boxes.
+ */
 Datum		spherebox_cmp(PG_FUNCTION_ARGS);
 
 #endif

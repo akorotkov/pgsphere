@@ -1,19 +1,15 @@
 #include "vector3d.h"
 
-/*!
-  \file
-  \brief Vector functions
-*/
-
+/*
+ * Vector functions
+ */
 
 bool
 vector3d_eq(const Vector3D *v1, const Vector3D *v2)
 {
-	return (
-			FPeq(v1->x, v2->x) &&
+	return (FPeq(v1->x, v2->x) &&
 			FPeq(v1->y, v2->y) &&
-			FPeq(v1->z, v2->z)
-		);
+			FPeq(v1->z, v2->z));
 }
 
 

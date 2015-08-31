@@ -1,14 +1,8 @@
 #include "point.h"
 
-/*!
-  \file
-  This file contains definitions for spherical
-  point functions
-  \brief definitions of spherical point functions
-*/
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+/*
+ * This file contains definitions for spherical point functions.
+ */
 
 PG_FUNCTION_INFO_V1(spherepoint_in);
 PG_FUNCTION_INFO_V1(spherepoint_from_long_lat);
@@ -20,8 +14,6 @@ PG_FUNCTION_INFO_V1(spherepoint_y);
 PG_FUNCTION_INFO_V1(spherepoint_z);
 PG_FUNCTION_INFO_V1(spherepoint_xyz);
 PG_FUNCTION_INFO_V1(spherepoint_equal);
-
-#endif
 
 bool
 spoint_eq(const SPoint *p1, const SPoint *p2)
@@ -35,7 +27,7 @@ spoint_eq(const SPoint *p1, const SPoint *p2)
 }
 
 
-SPoint *
+void
 spoint_check(SPoint *spoint)
 {
 	static bool lat_is_neg;
@@ -64,9 +56,7 @@ spoint_check(SPoint *spoint)
 		spoint->lat = (-PI - spoint->lat);
 		spoint->lng += ((spoint->lng < PI) ? (PI) : (-PI));
 	}
-	if (
-		FPeq(spoint->lat, PIH) && lat_is_neg
-		)
+	if (FPeq(spoint->lat, PIH) && lat_is_neg)
 		spoint->lat = -PIH;
 
 	if (FPeq(spoint->lng, PID))
@@ -81,12 +71,9 @@ spoint_check(SPoint *spoint)
 	{
 		spoint->lat = 0.0;
 	}
-
-	return spoint;
 }
 
-
-SPoint *
+void
 vector3d_spoint(SPoint *p, const Vector3D *v)
 {
 	double		rho = sqrt((v->x) * (v->x) + (v->y) * (v->y));
@@ -120,7 +107,6 @@ vector3d_spoint(SPoint *p, const Vector3D *v)
 	{
 		p->lng += PID;
 	}
-	return (p);
 }
 
 Vector3D *
@@ -177,14 +163,13 @@ float8
 spoint_dist(const SPoint *p1, const SPoint *p2)
 {
 	float8		dl = p1->lng - p2->lng;
-	float8		f = ((sin(p1->lat) * sin(p2->lat) + cos(p1->lat) * cos(p2->lat) * cos(dl)));
+	float8		f = ((sin(p1->lat) * sin(p2->lat) +
+					  cos(p1->lat) * cos(p2->lat) * cos(dl)));
 
 	if (FPeq(f, 1.0))
 	{
 		/* for small distances */
-		Vector3D	v1,
-					v2,
-					v3;
+		Vector3D	v1,	v2,	v3;
 
 		spoint_vector3d(&v1, p1);
 		spoint_vector3d(&v2, p2);
@@ -273,7 +258,11 @@ spherepoint_xyz(PG_FUNCTION_ARGS)
 	dret[0] = Float8GetDatumFast(v.x);
 	dret[1] = Float8GetDatumFast(v.y);
 	dret[2] = Float8GetDatumFast(v.z);
-	result = construct_array(dret, 3, FLOAT8OID, sizeof(float8), false /* float8 byval */ , 'd');
+#ifdef USE_FLOAT8_BYVAL
+	result = construct_array(dret, 3, FLOAT8OID, sizeof(float8), true, 'd');
+#else
+	result = construct_array(dret, 3, FLOAT8OID, sizeof(float8), false, 'd');
+#endif
 	PG_RETURN_ARRAYTYPE_P(result);
 }
 

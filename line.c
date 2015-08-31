@@ -1,12 +1,8 @@
 #include "line.h"
 
-/*!
-  \file
-  \brief Line functions
-*/
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+/*
+ * Line functions
+ */
 
 PG_FUNCTION_INFO_V1(sphereline_in);
 PG_FUNCTION_INFO_V1(sphereline_from_point);
@@ -40,14 +36,11 @@ PG_FUNCTION_INFO_V1(spheretrans_from_line);
 PG_FUNCTION_INFO_V1(spheretrans_line);
 PG_FUNCTION_INFO_V1(spheretrans_line_inverse);
 
-#endif
-
  /*
-  * ! \brief Swaps begin and end of a line \param out the result pointer to a
-  * spherical line \param in  the input pointer to a spherical line \return a
-  * pointer to swapped spherical line
+  * Swaps begin and end of the line. "out" is pointer to the result spherical
+  * line. "in" is pointer to the input spherical line.
   */
-static SLine *
+static void
 sline_swap_beg_end(SLine *out, const SLine *in)
 {
 	static SLine l;
@@ -62,9 +55,7 @@ sline_swap_beg_end(SLine *out, const SLine *in)
 	se.theta = in->theta;
 	se.psi = in->psi;
 	euler_sline_trans(out, &l, &se);
-	return out;
 }
-
 
 bool
 sline_eq(const SLine *l1, const SLine *l2)
@@ -75,8 +66,7 @@ sline_eq(const SLine *l1, const SLine *l2)
 	}
 	else
 	{
-		static SEuler e1,
-					e2;
+		static SEuler e1, e2;
 
 		seuler_set_zxz(&e1);
 		seuler_set_zxz(&e2);
@@ -128,18 +118,16 @@ sline_from_points(SLine *sl, const SPoint *pbeg, const SPoint *pend)
 
 }
 
-SLine *
+void
 sline_meridian(SLine *sl, float8 lng)
 {
 	sl->phi = -PIH;
 	sl->theta = PIH;
 	sl->psi = (lng < 0.0) ? lng + PID : lng;
 	sl->length = PI;
-	return sl;
 }
 
-
-SPoint *
+void
 sline_begin(SPoint *p, const SLine *l)
 {
 	const static SPoint tmp = {0.0, 0.0};
@@ -147,10 +135,9 @@ sline_begin(SPoint *p, const SLine *l)
 
 	sphereline_to_euler(&se, l);
 	euler_spoint_trans(p, &tmp, &se);
-	return p;
 }
 
-SPoint *
+void
 sline_end(SPoint *p, const SLine *l)
 {
 	static SPoint tmp = {0.0, 0.0};
@@ -159,15 +146,12 @@ sline_end(SPoint *p, const SLine *l)
 	tmp.lng = l->length;
 	sphereline_to_euler(&se, l);
 	euler_spoint_trans(p, &tmp, &se);
-	return p;
 }
 
  /*
-  * ! \brief Returns the begin of a line as vector \param v  the pointer to
-  * the begin \param l	the input pointer to the line \return a pointer to
-  * begin
+  * Place begin of a line "l" as vector "v".
   */
-static Vector3D *
+static void
 sline_vector_begin(Vector3D *v, const SLine *l)
 {
 	const static Vector3D tmp = {1.0, 0.0, 0.0};
@@ -175,14 +159,12 @@ sline_vector_begin(Vector3D *v, const SLine *l)
 
 	sphereline_to_euler(&se, l);
 	euler_vector_trans(v, &tmp, &se);
-	return v;
 }
 
  /*
-  * ! \brief Returns the end of a line as vector \param v  the pointer to the
-  * end \param l  the input pointer to the line \return a pointer to begin
+  * Place end of a line "l" as vector "v".
   */
-static Vector3D *
+static void
 sline_vector_end(Vector3D *v, const SLine *l)
 {
 	static Vector3D tmp = {0.0, 0.0, 0.0};
@@ -192,10 +174,7 @@ sline_vector_end(Vector3D *v, const SLine *l)
 	tmp.y = sin(l->length);
 	sphereline_to_euler(&se, l);
 	euler_vector_trans(v, &tmp, &se);
-	return v;
 }
-
-
 
 void
 sline_min_max_lat(const SLine *sl, float8 *minlat, float8 *maxlat)
@@ -224,7 +203,7 @@ sline_min_max_lat(const SLine *sl, float8 *minlat, float8 *maxlat)
 		se.psi = 0.0;
 		euler_sline_trans(&nl, sl, &se);
 
-		/* Now ascending node at (0,0) , line ascending */
+		/* Now ascending node at (0,0), line ascending */
 
 		sline_begin(&tp, &nl);
 		*minlat = *maxlat = tp.lat;
@@ -266,18 +245,15 @@ sphereline_latitude_points(const SLine *sl, float8 lat, SPoint *p1, SPoint *p2)
 			return -1;
 		else
 			return 0;
-
 	}
 	else
 	{
-
 		SLine		nl;
 		float8		rot = (inc > PIH) ? (sl->psi - PIH) : (sl->psi + PIH);
 		bool		p1b,
 					p2b;
 
 		/* Transform maximum latitude of full line to longitude 0.0 */
-
 		memcpy((void *) &nl, (void *) sl, sizeof(SLine));
 		nl.psi = (inc > PIH) ? (PIH) : (-PIH);
 
@@ -289,11 +265,9 @@ sphereline_latitude_points(const SLine *sl, float8 lat, SPoint *p1, SPoint *p2)
 			p1->lng = PIH;
 			p2->lng = -PIH;
 			ret = 2;
-
 		}
 		else
 		{
-
 			float8		ainc;
 
 			ainc = fabs(inc - ((inc > PIH) ? (PI) : (0.0)));
@@ -313,12 +287,10 @@ sphereline_latitude_points(const SLine *sl, float8 lat, SPoint *p1, SPoint *p2)
 			}
 			else
 			{
-
 				p1->lng = acos(sin(lat) * cos(ainc) / (sin(ainc) * cos(lat)));
 				p2->lng = PID - p1->lng;
 				ret = 2;
 			}
-
 		}
 
 		if (ret == 1)
@@ -360,25 +332,20 @@ sphereline_latitude_points(const SLine *sl, float8 lat, SPoint *p1, SPoint *p2)
 			spoint_check(p1);
 			spoint_check(p2);
 		}
-
 	}
-
 	return ret;
 }
-
 
 int8
 sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 {
-	static float8 i,
-				mi;
-	static const float8 step = (PI - 0.01);
-	static SPoint p[2] = {{0.0, 0.0}, {0.0, 0.0}};
-	static SCIRCLE c;
-	static bool bbeg,
-				bend;
-	static SEuler se;
-	static int	contain;
+	static float8	i, mi;
+	static const	float8 step = (PI - 0.01);
+	static SPoint	p[2] = {{0.0, 0.0}, {0.0, 0.0}};
+	static SCIRCLE	c;
+	static bool		bbeg, bend;
+	static SEuler	se;
+	static int		contain;
 
 	if (FPzero(sl->length))
 	{
@@ -401,10 +368,8 @@ sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 	mi = sl->length / step;
 
 	/* split line in segments and check for each of it */
-
 	for (i = 0.0; i < mi; i += 1.0)
 	{
-
 		p[0].lng = i * step;
 		p[1].lng = (((i + 1.0) > mi) ? (sl->length) : ((i + 1.0) * step));
 
@@ -419,10 +384,9 @@ sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 		{
 			return PGS_CIRCLE_LINE_OVER;
 		}
-		else if (
-				 FPle(((c.center.lat < 0) ? (-c.center.lat) : (c.center.lat)), c.radius) &&
-				 FPge(c.center.lng, p[0].lng) && FPle(c.center.lng, p[1].lng)
-			)
+		else if (FPle(((c.center.lat < 0) ? (-c.center.lat) : (c.center.lat)),
+					  c.radius) &&
+				 FPge(c.center.lng, p[0].lng) && FPle(c.center.lng, p[1].lng))
 		{
 			return PGS_CIRCLE_LINE_OVER;
 		}
@@ -438,9 +402,7 @@ sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 	}
 
 	return PGS_CIRCLE_LINE_AVOID;
-
 }
-
 
 bool
 sline_circle_touch(const SLine *sl, const SCIRCLE *sc)
@@ -458,7 +420,6 @@ sline_circle_touch(const SLine *sl, const SCIRCLE *sc)
 			return TRUE;
 		}
 		return FALSE;
-
 	}
 	else
 	{
@@ -475,25 +436,20 @@ sline_circle_touch(const SLine *sl, const SCIRCLE *sc)
 			return true;
 		}
 		return false;
-
 	}
-
 }
 
 int8
 sline_sline_pos(const SLine *l1, const SLine *l2)
 {
-	const SLine *il1,
-			   *il2;
-	Vector3D	v[2][2],
-				vtmp;
-	SEuler		se;
-	SLine		sl1,
-				sl2,
-				lseg;
-	SPoint		p[4];
-	const float8 seg_length = (PI - 0.1);
-	float8		seg_begin;
+	const SLine	   *il1, *il2;
+	Vector3D		v[2][2],
+					vtmp;
+	SEuler			se;
+	SLine			sl1, sl2, lseg;
+	SPoint			p[4];
+	const float8	seg_length = (PI - 0.1);
+	float8			seg_begin;
 
 	if (sline_eq(l1, l2))
 	{
@@ -506,7 +462,6 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	}
 
 	/* transform the larger line into equator ( begin at (0,0) ) */
-
 	if (FPge(l1->length, l2->length))
 	{
 		il1 = l1;
@@ -524,15 +479,15 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 		return PGS_LINE_AVOID;
 	}
 
-	sl1.phi = sl1.theta = sl1.psi = 0.0;
-	p[0].lat = p[0].lng = p[1].lat = 0.0;
-	sl1.length = p[1].lng = il1->length;
-	v[0][0].x = 1.0;
-	v[0][0].y = 0.0;
-	v[0][0].z = 0.0;
-	v[0][1].x = cos(il1->length);
-	v[0][1].y = sin(il1->length);
-	v[0][1].z = 0.0;
+	sl1.phi    = sl1.theta = sl1.psi = 0.0;
+	p[0].lat   = p[0].lng  = p[1].lat = 0.0;
+	sl1.length = p[1].lng  = il1->length;
+	v[0][0].x  = 1.0;
+	v[0][0].y  = 0.0;
+	v[0][0].z  = 0.0;
+	v[0][1].x  = cos(il1->length);
+	v[0][1].y  = sin(il1->length);
+	v[0][1].z  = 0.0;
 
 	sphereline_to_euler_inv(&se, il1);
 	sline_vector_begin(&vtmp, il2);
@@ -543,10 +498,8 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	vector3d_spoint(&p[3], &v[1][1]);
 
 	/* Check, sl2 is at equator */
-
 	if (FPzero(p[2].lat) && FPzero(p[3].lat))
 	{
-
 		bool		a1 = spoint_at_sline(&p[2], &sl1);
 		bool		a2 = spoint_at_sline(&p[3], &sl1);
 
@@ -571,14 +524,10 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	/* Now sl2 is not at equator */
 
 	/* check connected lines */
-	if (
-		FPgt(il2->length, 0.0) && (
-								   vector3d_eq(&v[0][0], &v[1][0]) ||
+	if (FPgt(il2->length, 0.0) && (vector3d_eq(&v[0][0], &v[1][0]) ||
 								   vector3d_eq(&v[0][0], &v[1][1]) ||
 								   vector3d_eq(&v[0][1], &v[1][0]) ||
-								   vector3d_eq(&v[0][1], &v[1][1])
-								   )
-		)
+								   vector3d_eq(&v[0][1], &v[1][1])))
 	{
 		return PGS_LINE_CONNECT;
 	}
@@ -586,10 +535,8 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	if (FPle(il2->length, seg_length))
 	{
 		bool		a1 = (FPge(p[2].lat, 0.0) && FPle(p[3].lat, 0.0));
-
 		/* sl2 crosses equator desc. */
 		bool		a2 = (FPle(p[2].lat, 0.0) && FPge(p[3].lat, 0.0));
-
 		/* sl2 crosses equator asc. */
 
 		if (a1 || a2)
@@ -617,10 +564,11 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	for (seg_begin = 0.0; seg_begin < il2->length; seg_begin += seg_length)
 	{
 
-		lseg.length = ((seg_begin + seg_length) > il2->length) ? (il2->length - seg_begin) : seg_length;
-		lseg.phi = sl2.phi + seg_begin;
-		lseg.theta = sl2.theta;
-		lseg.psi = sl2.psi;
+		lseg.length = ((seg_begin + seg_length) > il2->length) ?
+					  (il2->length - seg_begin) : seg_length;
+		lseg.phi    = sl2.phi + seg_begin;
+		lseg.theta  = sl2.theta;
+		lseg.psi    = sl2.psi;
 
 		if (sline_sline_pos(&sl1, &lseg) != PGS_LINE_AVOID)
 		{
@@ -630,26 +578,23 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	return PGS_LINE_AVOID;
 }
 
-SEuler *
+void
 sphereline_to_euler_inv(SEuler *se, const SLine *sl)
 {
 	sphereline_to_euler(se, sl);
 	spheretrans_inv(se);
-	return se;
 }
 
-SEuler *
+void
 sphereline_to_euler(SEuler *se, const SLine *sl)
 {
 	seuler_set_zxz(se);
 	se->phi = sl->phi;
 	se->theta = sl->theta;
 	se->psi = sl->psi;
-	return se;
 }
 
-
-SLine *
+void
 euler_sline_trans(SLine *out, const SLine *in, const SEuler *se)
 {
 	static SEuler stmp[2];
@@ -660,7 +605,6 @@ euler_sline_trans(SLine *out, const SLine *in, const SEuler *se)
 	out->theta = stmp[1].theta;
 	out->psi = stmp[1].psi;
 	out->length = in->length;
-	return out;
 }
 
 bool
@@ -687,11 +631,9 @@ spoint_at_sline(const SPoint *p, const SLine *sl)
 	{
 		return false;
 	}
-
 }
 
-
-SPoint *
+void
 sline_center(SPoint *c, const SLine *sl)
 {
 	static SEuler se;
@@ -700,19 +642,18 @@ sline_center(SPoint *c, const SLine *sl)
 	p.lng = sl->length / 2.0;
 	p.lat = 0.0;
 	sphereline_to_euler(&se, sl);
-	return (euler_spoint_trans(c, &p, &se));
+	euler_spoint_trans(c, &p, &se);
 }
-
 
 Datum
 sphereline_in(PG_FUNCTION_ARGS)
 {
 	SLine	   *sl = (SLine *) palloc(sizeof(SLine));
 	char	   *c = PG_GETARG_CSTRING(0);
-	unsigned char etype[3];
-	float8		eang[3],
-				length;
-	SEuler		se,
+	unsigned char	etype[3];
+	float8			eang[3],
+					length;
+	SEuler			se,
 				stmp,
 				so;
 	int			i;
@@ -847,7 +788,6 @@ sphereline_from_trans(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(sl);
 }
 
-
 Datum
 sphereline_meridian(PG_FUNCTION_ARGS)
 {
@@ -875,13 +815,10 @@ sphereline_turn(PG_FUNCTION_ARGS)
 
 	if (FPzero(in->length))
 	{
-
 		PG_RETURN_NULL();
-
 	}
 	else
 	{
-
 		SLine	   *out = (SLine *) palloc(sizeof(SLine));
 		SEuler		se;
 		SLine		tmp;
@@ -895,11 +832,8 @@ sphereline_turn(PG_FUNCTION_ARGS)
 		euler_sline_trans(out, &tmp, &se);
 
 		PG_RETURN_POINTER(out);
-
 	}
-
 	PG_RETURN_NULL();
-
 }
 
 Datum
@@ -1092,7 +1026,8 @@ spheretrans_line(PG_FUNCTION_ARGS)
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
 	SLine	   *ret = (SLine *) palloc(sizeof(SLine));
 
-	PG_RETURN_POINTER(euler_sline_trans(ret, sl, se));
+	euler_sline_trans(ret, sl, se);
+	PG_RETURN_POINTER(ret);
 }
 
 Datum

@@ -98,11 +98,7 @@ CREATE FUNCTION g_spoint_compress(internal)
    LANGUAGE 'c';   
 
 
---ifversion < v080400
-CREATE FUNCTION g_spoint_consistent(internal, internal, int4)
---elseversion
 CREATE FUNCTION g_spoint_consistent(internal, internal, int4, oid, internal)
---endifversion
    RETURNS internal
    AS 'MODULE_PATHNAME' , 'g_spoint_consistent'
    LANGUAGE 'c';   
@@ -110,16 +106,6 @@ CREATE FUNCTION g_spoint_consistent(internal, internal, int4, oid, internal)
 
 CREATE OPERATOR CLASS spoint
    DEFAULT FOR TYPE spoint USING gist AS
---ifversion < v080400
-   OPERATOR   1 = (spoint, spoint) RECHECK,
-   OPERATOR  11 @ (spoint, scircle) RECHECK,
-   OPERATOR  12 @ (spoint, sline) RECHECK,
-   OPERATOR  13 @ (spoint, spath) RECHECK,
-   OPERATOR  14 @ (spoint, spoly) RECHECK,
-   OPERATOR  15 @ (spoint, sellipse) RECHECK,
-   OPERATOR  16 @ (spoint, sbox) RECHECK,
-   FUNCTION  1 g_spoint_consistent (internal, internal, int4),
---elseversion
    OPERATOR   1 = (spoint, spoint),
    OPERATOR  11 @ (spoint, scircle),
    OPERATOR  12 @ (spoint, sline),
@@ -128,7 +114,6 @@ CREATE OPERATOR CLASS spoint
    OPERATOR  15 @ (spoint, sellipse),
    OPERATOR  16 @ (spoint, sbox),
    FUNCTION  1 g_spoint_consistent (internal, internal, int4, oid, internal),
---endifversion
    FUNCTION  2 g_spherekey_union (bytea, internal),
    FUNCTION  3 g_spoint_compress (internal),
    FUNCTION  4 g_spherekey_decompress (internal),
@@ -202,38 +187,13 @@ CREATE FUNCTION g_scircle_compress(internal)
    LANGUAGE 'c';   
 
 
---ifversion < v080400
-CREATE FUNCTION g_scircle_consistent(internal, internal, int4)
---elseversion
 CREATE FUNCTION g_scircle_consistent(internal, internal, int4, oid, internal)
---endifversion
    RETURNS internal
    AS 'MODULE_PATHNAME' , 'g_scircle_consistent'
    LANGUAGE 'c';   
 
 CREATE OPERATOR CLASS scircle
    DEFAULT FOR TYPE scircle USING gist AS
---ifversion < v080400
-   OPERATOR   1 =  (scircle, scircle) RECHECK,
-   OPERATOR  11 @  (scircle, scircle) RECHECK,
-   OPERATOR  12 @  (scircle, spoly) RECHECK,
-   OPERATOR  13 @  (scircle, sellipse) RECHECK,
-   OPERATOR  14 @  (scircle, sbox) RECHECK,
-   OPERATOR  21 ~ (scircle, spoint) RECHECK,
-   OPERATOR  22 ~ (scircle, scircle) RECHECK,
-   OPERATOR  23 ~ (scircle, sline) RECHECK,
-   OPERATOR  24 ~ (scircle, spath) RECHECK,
-   OPERATOR  25 ~ (scircle, spoly) RECHECK,
-   OPERATOR  26 ~ (scircle, sellipse) RECHECK,
-   OPERATOR  27 ~ (scircle, sbox) RECHECK,
-   OPERATOR  31 && (scircle, scircle) RECHECK,
-   OPERATOR  32 && (scircle, sline) RECHECK,
-   OPERATOR  33 && (scircle, spath) RECHECK,
-   OPERATOR  34 && (scircle, spoly) RECHECK,
-   OPERATOR  35 && (scircle, sellipse) RECHECK,
-   OPERATOR  36 && (scircle, sbox) RECHECK,
-   FUNCTION  1 g_scircle_consistent (internal, internal, int4),
---elseversion
    OPERATOR   1 =  (scircle, scircle),
    OPERATOR  11 @  (scircle, scircle),
    OPERATOR  12 @  (scircle, spoly),
@@ -253,7 +213,6 @@ CREATE OPERATOR CLASS scircle
    OPERATOR  35 && (scircle, sellipse),
    OPERATOR  36 && (scircle, sbox),
    FUNCTION  1 g_scircle_consistent (internal, internal, int4, oid, internal),
---endifversion
    FUNCTION  2 g_spherekey_union (bytea, internal),
    FUNCTION  3 g_scircle_compress (internal),
    FUNCTION  4 g_spherekey_decompress  (internal),
@@ -271,11 +230,7 @@ CREATE FUNCTION g_sline_compress(internal)
    AS 'MODULE_PATHNAME' , 'g_sline_compress'
    LANGUAGE 'c';   
 
---ifversion < v080400
-CREATE FUNCTION g_sline_consistent(internal, internal, int4)
---elseversion
 CREATE FUNCTION g_sline_consistent(internal, internal, int4, oid, internal)
---endifversion
    RETURNS internal
    AS 'MODULE_PATHNAME' , 'g_sline_consistent'
    LANGUAGE 'c';
@@ -283,22 +238,6 @@ CREATE FUNCTION g_sline_consistent(internal, internal, int4, oid, internal)
 
 CREATE OPERATOR CLASS sline
    DEFAULT FOR TYPE sline USING gist AS
---ifversion < v080400
-   OPERATOR   1 =  (sline, sline) RECHECK,
-   OPERATOR   2 #  (sline, sline) RECHECK,
-   OPERATOR  11 @  (sline, scircle) RECHECK,
-   OPERATOR  12 @  (sline, spoly) RECHECK,
-   OPERATOR  13 @  (sline, sellipse) RECHECK,
-   OPERATOR  14 @  (sline, sbox) RECHECK,
-   OPERATOR  21 ~ (sline, spoint) RECHECK,
-   OPERATOR  31 && (sline, scircle) RECHECK,
-   OPERATOR  32 && (sline, sline) RECHECK,
-   OPERATOR  33 && (sline, spath) RECHECK,
-   OPERATOR  34 && (sline, spoly) RECHECK,
-   OPERATOR  35 && (sline, sellipse) RECHECK,
-   OPERATOR  36 && (sline, sbox) RECHECK,
-   FUNCTION  1 g_sline_consistent (internal, internal, int4),
---elseversion
    OPERATOR   1 =  (sline, sline),
    OPERATOR   2 #  (sline, sline),
    OPERATOR  11 @  (sline, scircle),
@@ -313,7 +252,6 @@ CREATE OPERATOR CLASS sline
    OPERATOR  35 && (sline, sellipse),
    OPERATOR  36 && (sline, sbox),
    FUNCTION  1 g_sline_consistent (internal, internal, int4, oid, internal),
---endifversion
    FUNCTION  2 g_spherekey_union (bytea, internal),
    FUNCTION  3 g_sline_compress (internal),
    FUNCTION  4 g_spherekey_decompress  (internal),
@@ -329,38 +267,13 @@ CREATE FUNCTION g_sellipse_compress(internal)
    AS 'MODULE_PATHNAME' , 'g_sellipse_compress'
    LANGUAGE 'c';   
  
---ifversion < v080400
- CREATE FUNCTION g_sellipse_consistent(internal, internal, int4)
---elseversion
  CREATE FUNCTION g_sellipse_consistent(internal, internal, int4, oid, internal)
---endifversion
    RETURNS internal
    AS 'MODULE_PATHNAME' , 'g_sellipse_consistent'
    LANGUAGE 'c';
  
 CREATE OPERATOR CLASS sellipse
    DEFAULT FOR TYPE sellipse USING gist AS
---ifversion < v080400
-   OPERATOR   1 =  (sellipse, sellipse) RECHECK,
-   OPERATOR  11 @  (sellipse, scircle) RECHECK,
-   OPERATOR  12 @  (sellipse, spoly) RECHECK,
-   OPERATOR  13 @  (sellipse, sellipse) RECHECK,
-   OPERATOR  14 @  (sellipse, sbox) RECHECK,
-   OPERATOR  21 ~ (sellipse, spoint) RECHECK,
-   OPERATOR  22 ~ (sellipse, scircle) RECHECK,
-   OPERATOR  23 ~ (sellipse, sline) RECHECK,
-   OPERATOR  24 ~ (sellipse, spath) RECHECK,
-   OPERATOR  25 ~ (sellipse, spoly) RECHECK,
-   OPERATOR  26 ~ (sellipse, sellipse) RECHECK,
-   OPERATOR  27 ~ (sellipse, sbox) RECHECK,
-   OPERATOR  31 && (sellipse, scircle) RECHECK,
-   OPERATOR  32 && (sellipse, sline) RECHECK,
-   OPERATOR  33 && (sellipse, spath) RECHECK,
-   OPERATOR  34 && (sellipse, spoly) RECHECK,
-   OPERATOR  35 && (sellipse, sellipse) RECHECK,
-   OPERATOR  36 && (sellipse, sbox) RECHECK,
-   FUNCTION  1 g_sellipse_consistent (internal, internal, int4),
---elseversion
    OPERATOR   1 =  (sellipse, sellipse),
    OPERATOR  11 @  (sellipse, scircle),
    OPERATOR  12 @  (sellipse, spoly),
@@ -380,7 +293,6 @@ CREATE OPERATOR CLASS sellipse
    OPERATOR  35 && (sellipse, sellipse),
    OPERATOR  36 && (sellipse, sbox),
    FUNCTION  1 g_sellipse_consistent (internal, internal, int4, oid, internal),
---endifversion
    FUNCTION  2 g_spherekey_union (bytea, internal),
    FUNCTION  3 g_sellipse_compress (internal),
    FUNCTION  4 g_spherekey_decompress  (internal),
@@ -396,11 +308,7 @@ CREATE FUNCTION g_spoly_compress(internal)
    AS 'MODULE_PATHNAME' , 'g_spoly_compress'
    LANGUAGE 'c';   
  
---ifversion < v080400
-CREATE FUNCTION g_spoly_consistent(internal, internal, int4)
---elseversion
 CREATE FUNCTION g_spoly_consistent(internal, internal, int4, oid, internal)
---endifversion
    RETURNS internal
    AS 'MODULE_PATHNAME' , 'g_spoly_consistent'
    LANGUAGE 'c';
@@ -408,27 +316,6 @@ CREATE FUNCTION g_spoly_consistent(internal, internal, int4, oid, internal)
  
 CREATE OPERATOR CLASS spoly
    DEFAULT FOR TYPE spoly USING gist AS
---ifversion < v080400
-   OPERATOR   1 =  (spoly, spoly) RECHECK,
-   OPERATOR  11 @  (spoly, scircle) RECHECK,
-   OPERATOR  12 @  (spoly, spoly) RECHECK,
-   OPERATOR  13 @  (spoly, sellipse) RECHECK,
-   OPERATOR  14 @  (spoly, sbox) RECHECK,
-   OPERATOR  21 ~ (spoly, spoint) RECHECK,
-   OPERATOR  22 ~ (spoly, scircle) RECHECK,
-   OPERATOR  23 ~ (spoly, sline) RECHECK,
-   OPERATOR  24 ~ (spoly, spath) RECHECK,
-   OPERATOR  25 ~ (spoly, spoly) RECHECK,
-   OPERATOR  26 ~ (spoly, sellipse) RECHECK,
-   OPERATOR  27 ~ (spoly, sbox) RECHECK,
-   OPERATOR  31 && (spoly, scircle) RECHECK,
-   OPERATOR  32 && (spoly, sline) RECHECK,
-   OPERATOR  33 && (spoly, spath) RECHECK,
-   OPERATOR  34 && (spoly, spoly) RECHECK,
-   OPERATOR  35 && (spoly, sellipse) RECHECK,
-   OPERATOR  36 && (spoly, sbox) RECHECK,
-   FUNCTION  1 g_spoly_consistent (internal, internal, int4),
---elseversion
    OPERATOR   1 =  (spoly, spoly),
    OPERATOR  11 @  (spoly, scircle),
    OPERATOR  12 @  (spoly, spoly),
@@ -448,7 +335,6 @@ CREATE OPERATOR CLASS spoly
    OPERATOR  35 && (spoly, sellipse),
    OPERATOR  36 && (spoly, sbox),
    FUNCTION  1 g_spoly_consistent (internal, internal, int4, oid, internal),
---endifversion
    FUNCTION  2 g_spherekey_union (bytea, internal),
    FUNCTION  3 g_spoly_compress (internal),
    FUNCTION  4 g_spherekey_decompress  (internal),
@@ -465,11 +351,7 @@ CREATE FUNCTION g_spath_compress(internal)
    AS 'MODULE_PATHNAME' , 'g_spath_compress'
    LANGUAGE 'c';   
  
---ifversion < v080400
-CREATE FUNCTION g_spath_consistent(internal, internal, int4)
---elseversion
 CREATE FUNCTION g_spath_consistent(internal, internal, int4, oid, internal)
---endifversion
    RETURNS internal
    AS 'MODULE_PATHNAME' , 'g_spath_consistent'
    LANGUAGE 'c';
@@ -477,21 +359,6 @@ CREATE FUNCTION g_spath_consistent(internal, internal, int4, oid, internal)
  
 CREATE OPERATOR CLASS spath
    DEFAULT FOR TYPE spath USING gist AS
---ifversion < v080400
-   OPERATOR   1 =  (spath, spath) RECHECK,
-   OPERATOR  11 @  (spath, scircle) RECHECK,
-   OPERATOR  12 @  (spath, spoly) RECHECK,
-   OPERATOR  13 @  (spath, sellipse) RECHECK,
-   OPERATOR  14 @  (spath, sbox) RECHECK,
-   OPERATOR  21 ~ (spath, spoint) RECHECK,
-   OPERATOR  31 && (spath, scircle) RECHECK,
-   OPERATOR  32 && (spath, sline) RECHECK,
-   OPERATOR  33 && (spath, spath) RECHECK,
-   OPERATOR  34 && (spath, spoly) RECHECK,
-   OPERATOR  35 && (spath, sellipse) RECHECK,
-   OPERATOR  36 && (spath, sbox) RECHECK,
-   FUNCTION  1 g_spath_consistent (internal, internal, int4),
---elseversion
    OPERATOR   1 =  (spath, spath),
    OPERATOR  11 @  (spath, scircle),
    OPERATOR  12 @  (spath, spoly),
@@ -505,7 +372,6 @@ CREATE OPERATOR CLASS spath
    OPERATOR  35 && (spath, sellipse),
    OPERATOR  36 && (spath, sbox),
    FUNCTION  1 g_spath_consistent (internal, internal, int4, oid, internal),
---endifversion
    FUNCTION  2 g_spherekey_union (bytea, internal),
    FUNCTION  3 g_spath_compress (internal),
    FUNCTION  4 g_spherekey_decompress  (internal),
@@ -522,38 +388,13 @@ CREATE FUNCTION g_sbox_compress(internal)
    AS 'MODULE_PATHNAME' , 'g_sbox_compress'
    LANGUAGE 'c';
  
---ifversion < v080400
-CREATE FUNCTION g_sbox_consistent(internal, internal, int4)
---elseversion
 CREATE FUNCTION g_sbox_consistent(internal, internal, int4, oid, internal)
---endifversion
    RETURNS internal
    AS 'MODULE_PATHNAME' , 'g_sbox_consistent'
    LANGUAGE 'c';
  
 CREATE OPERATOR CLASS sbox
    DEFAULT FOR TYPE sbox USING gist AS
---ifversion < v080400
-   OPERATOR   1 =  (sbox, sbox) RECHECK,
-   OPERATOR  11 @  (sbox, scircle) RECHECK,
-   OPERATOR  12 @  (sbox, spoly) RECHECK,
-   OPERATOR  13 @  (sbox, sellipse) RECHECK,
-   OPERATOR  14 @  (sbox, sbox) RECHECK,
-   OPERATOR  21 ~ (sbox, spoint) RECHECK,
-   OPERATOR  22 ~ (sbox, scircle) RECHECK,
-   OPERATOR  23 ~ (sbox, sline) RECHECK,
-   OPERATOR  24 ~ (sbox, spath) RECHECK,
-   OPERATOR  25 ~ (sbox, spoly) RECHECK,
-   OPERATOR  26 ~ (sbox, sellipse) RECHECK,
-   OPERATOR  27 ~ (sbox, sbox) RECHECK,
-   OPERATOR  31 && (sbox, scircle) RECHECK,
-   OPERATOR  32 && (sbox, sline) RECHECK,
-   OPERATOR  33 && (sbox, spath) RECHECK,
-   OPERATOR  34 && (sbox, spoly) RECHECK,
-   OPERATOR  35 && (sbox, sellipse) RECHECK,
-   OPERATOR  36 && (sbox, sbox) RECHECK,
-   FUNCTION  1 g_sbox_consistent (internal, internal, int4),
---elseversion
    OPERATOR   1 =  (sbox, sbox),
    OPERATOR  11 @  (sbox, scircle),
    OPERATOR  12 @  (sbox, spoly),
@@ -573,7 +414,6 @@ CREATE OPERATOR CLASS sbox
    OPERATOR  35 && (sbox, sellipse),
    OPERATOR  36 && (sbox, sbox),
    FUNCTION  1 g_sbox_consistent (internal, internal, int4, oid, internal),
---endifversion
    FUNCTION  2 g_spherekey_union (bytea, internal),
    FUNCTION  3 g_sbox_compress (internal),
    FUNCTION  4 g_spherekey_decompress  (internal),

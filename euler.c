@@ -21,10 +21,8 @@ PG_FUNCTION_INFO_V1(spheretrans_trans_inv);
 PG_FUNCTION_INFO_V1(spheretrans_point);
 PG_FUNCTION_INFO_V1(spheretrans_point_inverse);
 
- /**
-  * \brief Checks and modifies the Euler transformation
-  * \param e Euler transformation
-  * \return Euler transformation
+ /*
+  * Checks and modifies the Euler transformation
   */
 static SEuler *
 spheretrans_check(SEuler *e)
@@ -42,9 +40,7 @@ spheretrans_check(SEuler *e)
 	e->theta = sp[1].lng;
 	e->psi = sp[2].lng;
 	return e;
-
 }
-
 
 Datum
 spheretrans_in(PG_FUNCTION_ARGS)
@@ -90,7 +86,6 @@ spheretrans_in(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(se);
 }
 
-
 Datum
 spheretrans_from_float8(PG_FUNCTION_ARGS)
 {
@@ -102,7 +97,6 @@ spheretrans_from_float8(PG_FUNCTION_ARGS)
 	seuler_set_zxz(se);
 	PG_RETURN_POINTER(spheretrans_check(se));
 }
-
 
 Datum
 spheretrans_from_float8_and_type(PG_FUNCTION_ARGS)
@@ -169,12 +163,10 @@ seuler_set_zxz(SEuler *se)
 	se->psi_a = EULER_AXIS_Z;
 }
 
-
 bool
 strans_eq(const SEuler *e1, const SEuler *e2)
 {
-	static SPoint in[2],
-				p[4];
+	static SPoint in[2], p[4];
 
 	in[0].lng = 0.0;
 	in[0].lat = 0.0;
@@ -189,7 +181,6 @@ strans_eq(const SEuler *e1, const SEuler *e2)
 	return (spoint_eq(&p[0], &p[2]) && spoint_eq(&p[1], &p[3]));
 }
 
-
 Datum
 spheretrans_equal(PG_FUNCTION_ARGS)
 {
@@ -198,7 +189,6 @@ spheretrans_equal(PG_FUNCTION_ARGS)
 
 	PG_RETURN_BOOL(strans_eq(e1, e2));
 }
-
 
 Datum
 spheretrans_not_equal(PG_FUNCTION_ARGS)
@@ -209,7 +199,6 @@ spheretrans_not_equal(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(!strans_eq(e1, e2));
 }
 
-
 Datum
 spheretrans_phi(PG_FUNCTION_ARGS)
 {
@@ -217,7 +206,6 @@ spheretrans_phi(PG_FUNCTION_ARGS)
 
 	PG_RETURN_POINTER(&se->phi);
 }
-
 
 Datum
 spheretrans_theta(PG_FUNCTION_ARGS)
@@ -227,7 +215,6 @@ spheretrans_theta(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(&se->theta);
 }
 
-
 Datum
 spheretrans_psi(PG_FUNCTION_ARGS)
 {
@@ -235,7 +222,6 @@ spheretrans_psi(PG_FUNCTION_ARGS)
 
 	PG_RETURN_POINTER(&se->psi);
 }
-
 
 Datum
 spheretrans_type(PG_FUNCTION_ARGS)
@@ -278,7 +264,6 @@ spheretrans_type(PG_FUNCTION_ARGS)
 	memcpy((void *) VARDATA(result), (void *) &ret[0], 3);
 
 	PG_RETURN_BPCHAR_P(result);
-
 }
 
 SEuler *
@@ -307,15 +292,12 @@ spheretrans_inverse(SEuler *se_out, const SEuler *se_in)
 	return se_out;
 }
 
-
 SEuler *
 strans_zxz(SEuler *ret, const SEuler *se)
 {
-	if (
-		se->phi_a == EULER_AXIS_Z &&
+	if (se->phi_a == EULER_AXIS_Z &&
 		se->theta_a == EULER_AXIS_X &&
-		se->psi_a == EULER_AXIS_Z
-		)
+		se->psi_a == EULER_AXIS_Z)
 	{
 		memcpy((void *) ret, (void *) se, sizeof(SEuler));
 	}
@@ -332,7 +314,6 @@ strans_zxz(SEuler *ret, const SEuler *se)
 	return ret;
 }
 
-
 Datum
 spheretrans_zxz(PG_FUNCTION_ARGS)
 {
@@ -343,7 +324,6 @@ spheretrans_zxz(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(ret);
 }
 
-
 Datum
 spheretrans(PG_FUNCTION_ARGS)
 {
@@ -351,7 +331,6 @@ spheretrans(PG_FUNCTION_ARGS)
 
 	PG_RETURN_DATUM(d);
 }
-
 
 Datum
 spheretrans_invert(PG_FUNCTION_ARGS)
@@ -362,7 +341,6 @@ spheretrans_invert(PG_FUNCTION_ARGS)
 	spheretrans_inverse(ret, se);
 	PG_RETURN_POINTER(ret);
 }
-
 
 SEuler *
 seuler_trans_zxz(SEuler *out, const SEuler *in, const SEuler *se)
@@ -381,7 +359,6 @@ seuler_trans_zxz(SEuler *out, const SEuler *in, const SEuler *se)
 	return out;
 }
 
-
 Datum
 spheretrans_trans(PG_FUNCTION_ARGS)
 {
@@ -392,7 +369,6 @@ spheretrans_trans(PG_FUNCTION_ARGS)
 	seuler_trans_zxz(out, se1, se2);
 	PG_RETURN_POINTER(out);
 }
-
 
 Datum
 spheretrans_trans_inv(PG_FUNCTION_ARGS)
@@ -411,8 +387,7 @@ spheretrans_trans_inv(PG_FUNCTION_ARGS)
 SPoint *
 euler_spoint_trans(SPoint *out, const SPoint *in, const SEuler *se)
 {
-	Vector3D	v,
-				o;
+	Vector3D	v, o;
 
 	spoint_vector3d(&v, in);
 	euler_vector_trans(&o, &v, se);
@@ -430,7 +405,6 @@ spheretrans_point(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(euler_spoint_trans(out, sp, se));
 }
 
-
 Datum
 spheretrans_point_inverse(PG_FUNCTION_ARGS)
 {
@@ -447,29 +421,21 @@ spheretrans_point_inverse(PG_FUNCTION_ARGS)
 }
 
  /*
-  * ! \brief transforms a spherical vector to a inverse Euler transformation
-  * \param spb pointer to begin of spherical vector \param spe pointer to end
-  * of spherical vector \param se  pointer to Euler transformation \return
-  * true, if calculation was successfull \see spherevector_to_euler ( SEuler
-  * *, SPoint *, SPoint * )
+  * Transforms a spherical vector from spb to spe into a inverse Euler
+  * transformation. Returns whether transformation was successful.
   */
 static bool
 spherevector_to_euler_inv(SEuler *se, const SPoint *spb, const SPoint *spe)
 {
 	if (spoint_eq(spb, spe))
 	{
-
 		return false;
-
 	}
 	else
 	{
-
-		static Vector3D vbeg,
-					vend,
-					vtmp;
-		static SPoint spt[2];
-		static SEuler set;
+		static Vector3D	vbeg, vend, vtmp;
+		static SPoint	spt[2];
+		static SEuler	set;
 
 		spoint_vector3d(&vbeg, spb);
 		spoint_vector3d(&vend, spe);
@@ -487,7 +453,6 @@ spherevector_to_euler_inv(SEuler *se, const SPoint *spb, const SPoint *spe)
 	return true;
 }
 
-
 bool
 spherevector_to_euler(SEuler *se, const SPoint *spb, const SPoint *spe)
 {
@@ -501,18 +466,13 @@ spherevector_to_euler(SEuler *se, const SPoint *spb, const SPoint *spe)
 	return ret;
 }
 
-
-
 Vector3D *
 euler_vector_trans(Vector3D *out, const Vector3D *in, const SEuler *se)
 {
-	static int	i;
-	static unsigned char t;
-	static const double *a;
-	static double u[3],
-				vr[3],
-				sa,
-				ca;
+	static int				i;
+	static unsigned char	t;
+	static const double	   *a;
+	static double 			u[3], vr[3], sa, ca;
 
 	t = 0;
 	a = NULL;
@@ -575,5 +535,4 @@ euler_vector_trans(Vector3D *out, const Vector3D *in, const SEuler *se)
 	out->z = u[2];
 
 	return (out);
-
 }

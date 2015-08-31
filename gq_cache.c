@@ -1,65 +1,44 @@
 #include "gist.h"
 
-/*!
-  \file
-  \brief GIST's query cache
-*/
+/*
+ * GIST's query cache
+ */
 
-
-/*!
-  \brief keytype holds the parent type of cached key
-  \see \link PGS_DATA_TYPES data types \endlink
-*/
+/* Holds the parent type of PGS_DATA_TYPES for cached key. */
 static unsigned keytype = 0;
 
-/*!
-  \brief the cached key
-*/
+/* the cached key */
 static int32 kcache[6];
 
-
-/*!
-  \brief pointer to cached query
-*/
+/* pointer to cached query */
 static void *cquery = NULL;
 
-/*!
-  Holds the count of points, if cached query is a path or polygon
-  \brief count of elements of cached query
-*/
+/* Holds the count of points, if cached query is a path or polygon. */
 static int32 npts = 0;
 
-/* for polygons
-	and pathes */
+/* If query type and value are equal, this value is true */
+static bool res = false;
 
-/*!
-  \brief If query type and value are equal, this value is true
-*/
-static bool res = FALSE;
-
-
-/*!
-  If query cache and current query are equal, set ref to true
-  \brief depending on type, compare current query and cached query
-  \param type \link PGS_DATA_TYPES type \endlink of query
+/*
+ * Depending on type of PGS_DATA_TYPES, compare current query and cached query.
+ * If query cache and current query are equal, set ref to true.
 */
 #define GQ_MEMCMP( type ) do { \
   if ( keytype == PGS_TYPE_##type ){ \
-	if ( memcmp ( (void*)cquery , (void*)query , sizeof( type ) ) == 0	) res = TRUE; \
+	if ( memcmp ( (void*)cquery , (void*)query , sizeof( type ) ) == 0	) res = true; \
   } \
 } while(0);
-
 
 bool
 gq_cache_get_value(unsigned pgstype, const void *query, int32 **key)
 {
 	if (keytype == 0)
 	{
-		return FALSE;
+		return false;
 	}
 	else
 	{
-		res = FALSE;
+		res = false;
 
 		switch (pgstype)
 		{
@@ -81,19 +60,21 @@ gq_cache_get_value(unsigned pgstype, const void *query, int32 **key)
 			case PGS_TYPE_SPATH:
 				if (keytype == pgstype && ((SPATH *) query)->npts == npts)
 				{
-					if (memcmp((void *) cquery, (void *) &((SPATH *) query)->p, ((SPATH *) query)->size) == 0)
-						res = TRUE;
+					if (memcmp((void *) cquery, (void *) &((SPATH *) query)->p,
+												((SPATH *) query)->size) == 0)
+						res = true;
 				}
 				break;
 			case PGS_TYPE_SPOLY:
 				if (keytype == pgstype && ((SPOLY *) query)->npts == npts)
 				{
-					if (memcmp((void *) cquery, (void *) &((SPOLY *) query)->p, ((SPOLY *) query)->size) == 0)
-						res = TRUE;
+					if (memcmp((void *) cquery, (void *) &((SPOLY *) query)->p,
+												((SPOLY *) query)->size) == 0)
+						res = true;
 				}
 				break;
 			default:
-				res = FALSE;
+				res = false;
 				break;
 		}
 
@@ -106,10 +87,9 @@ gq_cache_get_value(unsigned pgstype, const void *query, int32 **key)
 	return false;
 }
 
-/*!
-  \brief depending on type, copy current query to cache
-  \param type \link PGS_DATA_TYPES type \endlink of query
-*/
+/*
+ * Depending on type of PGS_DATA_TYPES, copy current query to cache.
+ */
 #define GQ_MEMCPY( type ) do { \
 	cquery = ( void *) malloc ( sizeof( type ) ); \
 	memcpy( (void*)cquery , (void*)query , sizeof( type ) );   \
@@ -119,7 +99,6 @@ gq_cache_get_value(unsigned pgstype, const void *query, int32 **key)
 void
 gq_cache_set_value(unsigned pgstype, const void *query, const int32 *key)
 {
-
 	if (cquery)
 	{
 		free(cquery);
@@ -148,20 +127,20 @@ gq_cache_set_value(unsigned pgstype, const void *query, const int32 *key)
 		case PGS_TYPE_SPATH:
 			cquery = (void *) malloc(((SPATH *) query)->size);
 			npts = ((SPATH *) query)->npts;
-			memcpy((void *) cquery, (void *) &((SPATH *) query)->p, ((SPATH *) query)->size);
+			memcpy((void *) cquery, (void *) &((SPATH *) query)->p,
+													((SPATH *) query)->size);
 			break;
 		case PGS_TYPE_SPOLY:
 			cquery = (void *) malloc(((SPOLY *) query)->size);
 			npts = ((SPOLY *) query)->npts;
-			memcpy((void *) cquery, (void *) &((SPOLY *) query)->p, ((SPOLY *) query)->size);
+			memcpy((void *) cquery, (void *) &((SPOLY *) query)->p,
+													((SPOLY *) query)->size);
 			break;
 		default:
 			keytype = 0;
-
 	}
 	if (keytype > 0)
 	{
 		memcpy((void *) &kcache[0], (void *) key, KEYSIZE);
 	}
-
 }

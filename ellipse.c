@@ -50,11 +50,11 @@ PG_FUNCTION_INFO_V1(spheretrans_ellipse);
 PG_FUNCTION_INFO_V1(spheretrans_ellipse_inv);
 
 
- /*
-  * ! This function returns the arc cos of a value. If variable a is outside
-  * the range between -1.00 and 1.00, the function returns corresponding PI/2
-  * or 3*PI/2. \param a the arccos argument \return arccos of a value
-  */
+/*
+ * This function returns the arccos of a value. If variable a is outside
+ * the range between -1.00 and 1.00, the function returns corresponding PI/2
+ * or 3*PI/2.
+ */
 static float8
 my_acos(float8 a)
 {
@@ -65,10 +65,9 @@ my_acos(float8 a)
 	return acos(a);
 }
 
- /*
-  * ! \brief Checks the parameter of an ellipse \param e pointer to ellipse
-  * \return pointer of (modified) ellipse
-  */
+/*
+ *  Checks the parameter of an ellipse.
+ */
 static SELLIPSE *
 sellipse_check(SELLIPSE *e)
 {
@@ -95,11 +94,9 @@ sellipse_check(SELLIPSE *e)
 	return e;
 }
 
-
- /*
-  * ! \brief Returns the boundary circle of an ellipse \param e pointer to
-  * ellipse \param sc pointer to circle \return pointer to result circle
-  */
+/*
+ * Returns the boundary circle of an ellipse.
+ */
 static SCIRCLE *
 sellipse_circle(SCIRCLE *sc, const SELLIPSE *e)
 {
@@ -111,14 +108,10 @@ sellipse_circle(SCIRCLE *sc, const SELLIPSE *e)
 	return sc;
 }
 
-
- /*
-  * ! \brief Returns the an ellipse from axes, center and inclination \param
-  * r1 first  axis length in radians \param r2 second axis length in radians
-  * \param c  pointer to center of ellipse \param inc inclination of ellipse
-  * in radians \note The largest axis length is choosen for large axis \return
-  * pointer to ellipse
-  */
+/*
+ * Returns the an ellipse from axes, center and inclination. The largest axis
+ * length is chosen for large axis.
+ */
 static SELLIPSE *
 sellipse_in(float8 r1, float8 r2, const SPoint *c, float8 inc)
 {
@@ -142,11 +135,13 @@ sellipse_in(float8 r1, float8 r2, const SPoint *c, float8 inc)
 	return (e);
 }
 
- /*
-  * ! \brief Returns the radius of an ellipse depending on position angle
-  * \param rada major axis length \param radb minor axis length \param ang
-  * position angle in radians \return radius of ellipse in radians
-  */
+/*---
+ * Returns the radius of an ellipse depending on position angle.
+ *
+ *     rada - major axis length
+ *     radb - minor axis length
+ *     ang  - position angle in radians
+ */
 static float8
 sellipse_dist(float8 rada, float8 radb, float8 ang)
 {
@@ -156,22 +151,15 @@ sellipse_dist(float8 rada, float8 radb, float8 ang)
 	return (asin(sin(radb) / sqrt(1 - e * Sqr(cos(ang)))));
 }
 
-
-
-
- /*
-  * ! \brief Returns distance between ellipse and point \param se pointer to
-  * ellipse \param sp pointer to point \return distance in radians \note
-  * returns -1.0 if ellipse contains point
-  */
+/*
+ * Returns distance between ellipse and point.
+ */
 static float8
 sellipse_point_dist(const SELLIPSE *se, const SPoint *sp)
 {
 	static SEuler e;
 	static SPoint p;
-	static float8 dist,
-				rad,
-				ang;
+	static float8 dist, rad, ang;
 
 	sellipse_trans(&e, se);
 	spheretrans_inv(&e);
@@ -208,11 +196,9 @@ sellipse_point_dist(const SELLIPSE *se, const SPoint *sp)
 	return -1.0;
 }
 
- /*
-  * ! \brief Does an Euler transformation of ellipse \param out pointer to
-  * transformed ellipse \param in  pointer to input ellipse \param se  pointer
-  * to Euler transformation \return pointer to transformed ellipse
-  */
+/*
+ * Does an Euler transformation of ellipse.
+ */
 static SELLIPSE *
 euler_sellipse_trans(SELLIPSE *out, const SELLIPSE *in, const SEuler *se)
 {
@@ -245,12 +231,10 @@ euler_sellipse_trans(SELLIPSE *out, const SELLIPSE *in, const SEuler *se)
 }
 
 
- /*
-  * ! \brief Returns the relationship between two ellipses \param se1 pointer
-  * to first ellipse \param se2  pointer to second ellipse \return
-  * relationship as a \link PGS_ELLIPSE_ELLIPSE_REL int8 value \endlink (\ref
-  * PGS_ELLIPSE_ELLIPSE_REL )
-  */
+/*
+ * Returns the relationship between two ellipses as PGS_ELLIPSE_ELLIPSE_REL
+ * int8 value.
+ */
 static int8
 sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 {
@@ -288,7 +272,6 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 	}
 
 	/* se1 is circle or point */
-
 	if (FPeq(se1->rad[0], se1->rad[1]))
 	{
 
@@ -313,7 +296,6 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 	}
 
 	/* se2 is line */
-
 	if (FPzero(se2->rad[1]))
 	{
 		static SLine l;
@@ -335,7 +317,6 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 	}
 
 	/* se1 is line */
-
 	if (FPzero(se1->rad[1]))
 	{
 		static SLine l;
@@ -357,12 +338,10 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 	}
 
 	/* now we have two real ellipses */
-
 	do
 	{
 
-		static SPoint p1,
-					p2;
+		static SPoint p1, p2;
 		static float8 dist;
 
 		/* check inner and outer circles */
@@ -380,20 +359,18 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 		else if (FPle((dist + se2->rad[0]), se1->rad[1]))
 		{
 			return PGS_ELLIPSE_CONT;
-
 		}
 		else
 		{
 
-			static SEuler eul;
-			static SELLIPSE etmp,
-						e;
-			static SPoint sp[3];
-			static int	i;
-			static float8 diff[3];
-			static float8 elng;
-			static const int maxcntr = 100000;
-			static int	cntr;
+			static SEuler		eul;
+			static SELLIPSE		etmp, e;
+			static SPoint		sp[3];
+			static int			i;
+			static float8		diff[3];
+			static float8		elng;
+			static const int	maxcntr = 100000;
+			static int			cntr;
 
 			/* transform se1 to north pol */
 			sellipse_trans(&eul, se1);
@@ -416,7 +393,6 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 
 
 			/* search for minimum distance */
-
 			sp[0].lat = sp[2].lat = PIH - se1->rad[0];
 			sellipse_center(&sp[1], &e);
 
@@ -445,7 +421,6 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 			cntr = 0;
 			do
 			{
-
 				for (i = 0; i < 3; i++)
 				{
 					diff[i] = sellipse_point_dist(&e, &sp[i]);
@@ -521,7 +496,6 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 			{
 				return PGS_ELLIPSE_AVOID;
 			}
-
 		}
 	} while (0);
 
@@ -741,7 +715,6 @@ sellipse_line_pos(const SELLIPSE *se, const SLine *sl)
 	}
 
 	/* begin or end of line inside ellipse */
-
 	{
 		bool		bb,
 					be;

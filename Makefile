@@ -4,10 +4,11 @@ OBJS       = sscan.o sparse.o sbuffer.o vector3d.o point.o \
              path.o box.o output.o gq_cache.o gist.o key.o \
              crossmatch.o
 
-DATA_built  = pg_sphere.sql
+EXTENSION   = pg_sphere
+DATA_built  = pg_sphere--1.0.sql
 DOCS        = README.pg_sphere COPYRIGHT.pg_sphere
 REGRESS     = init tables points euler circle line ellipse poly path box index
-EXTRA_CLEAN = pg_sphere.sql pg_sphere.sql.in $(PGS_SQL) 
+EXTRA_CLEAN = pg_sphere--1.0.sql $(PGS_SQL) 
 
 CRUSH_TESTS  = init_extended circle_extended 
 
@@ -30,15 +31,11 @@ else
   include $(top_srcdir)/contrib/contrib-global.mk
 endif
 
-PGVERSION += $(shell $(PG_CONFIG) --version | sed 's,^PostgreSQL[[:space:]][[:space:]]*,,' | awk '{ split($$1,a,"."); printf( "v%02d%02d%02d" ,a[1], a[2], a[3]); }' )
-
 crushtest: REGRESS += $(CRUSH_TESTS)
 crushtest: installcheck
 
-pg_sphere.sql.in : $(addsuffix .in, $(PGS_SQL))
-	echo 'BEGIN;' > $@
-	for i in $+ ; do $(AWK) -v pg_version=$(PGVERSION) -f sql.awk < $$i >> $@ ; done
-	echo 'COMMIT;' >> $@
+pg_sphere--1.0.sql: $(addsuffix .in, $(PGS_SQL))
+	cat $^ > $@
 
 sscan.o : sparse.c
 

@@ -4,14 +4,13 @@
 PG_MODULE_MAGIC;
 #endif
 
-/*!
-  \file
-  \brief functions to create the key values
-*/
+/*
+ * Functions to create the key values
+ */
 
- /*
-  * ! \brief unions a key with the key value of a point
-  */
+/*
+ * Unions a key with the key value of a point.
+ */
 static int32 *
 key_add_point(int32 *key, const SPoint *p)
 {

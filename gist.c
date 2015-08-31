@@ -48,7 +48,6 @@ spherekey_interleave(const int32 *k1, const int32 *k2)
 	static char tb;
 
 	/* i represents x,y,z */
-
 	tb = 0;
 	for (i = 0; i < 3; i++)
 	{
@@ -145,7 +144,9 @@ pointkey_area(PG_FUNCTION_ARGS)
 	if (!get_sizes(k, sizes))
 		PG_RETURN_FLOAT8(0.0);
 
-	PG_RETURN_FLOAT8(sizes[0] * sizes[1] + sizes[0] * sizes[2] + sizes[1] * sizes[2]);
+	PG_RETURN_FLOAT8(sizes[0] * sizes[1] +
+					 sizes[0] * sizes[2] +
+					 sizes[1] * sizes[2]);
 }
 
 Datum
@@ -186,7 +187,6 @@ pointkey_out(PG_FUNCTION_ARGS)
 	}
 
 	PG_RETURN_CSTRING(buffer);
-
 }
 
 Datum
@@ -195,13 +195,11 @@ g_spherekey_decompress(PG_FUNCTION_ARGS)
 	PG_RETURN_DATUM(PG_GETARG_DATUM(0));
 }
 
-/*!
-  \brief general compress method for all data types
-  \param type \link PGS_DATA_TYPES data type \endlink
-  \param genkey function to generate the key value
-  \see key.c
-*/
-#define PGS_COMPRESS( type, genkey, detoast )  do { \
+/*
+ * General compress method for all data types. Uses genkey to generate key
+ * value (see key.c).
+ */
+#define PGS_COMPRESS(type, genkey, detoast)  do { \
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
 	GISTENTRY  *retval; \
 	if (entry->leafkey) \
@@ -288,13 +286,13 @@ g_spoint2_compress(PG_FUNCTION_ARGS)
 			ALLOC_LEAF_KEY(key);
 			key->lat = p->lat;
 			key->lng = p->lng;
-			gistentryinit(*retval, PointerGetDatum(key), entry->rel, entry->page,
-						  entry->offset, FALSE);
+			gistentryinit(*retval, PointerGetDatum(key), entry->rel,
+											entry->page, entry->offset, FALSE);
 		}
 		else
 		{
 			gistentryinit(*retval, (Datum) 0, entry->rel, entry->page,
-						  entry->offset, FALSE);
+											entry->offset, FALSE);
 		}
 	}
 	else
@@ -307,33 +305,17 @@ g_spoint2_compress(PG_FUNCTION_ARGS)
 Datum
 g_spherekey_union(PG_FUNCTION_ARGS)
 {
-#ifdef GEVHDRSZ
-	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
+	GistEntryVector	   *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
+	int				   *sizep = (int *) PG_GETARG_POINTER(1);
+	int					numranges, i;
+	int32			   *ret = (int32 *) palloc(KEYSIZE);
 
-#else
-	bytea	   *entryvec = (bytea *) PG_GETARG_POINTER(0);
-
-#endif
-	int		   *sizep = (int *) PG_GETARG_POINTER(1);
-	int			numranges,
-				i;
-	int32	   *ret = (int32 *) palloc(KEYSIZE);
-
-#ifdef GEVHDRSZ
 	numranges = entryvec->n;
 	memcpy((void *) ret, (void *) DatumGetPointer(entryvec->vector[0].key), KEYSIZE);
-#else
-	numranges = (VARSIZE(entryvec) - VARHDRSZ) / sizeof(GISTENTRY);
-	memcpy((void *) ret, (void *) DatumGetPointer(((GISTENTRY *) VARDATA(entryvec))[0].key), KEYSIZE);
-#endif
 
 	for (i = 1; i < numranges; i++)
 	{
-#ifdef GEVHDRSZ
 		spherekey_union_two(ret, (int32 *) DatumGetPointer(entryvec->vector[i].key));
-#else
-		spherekey_union_two(ret, (int32 *) DatumGetPointer(((GISTENTRY *) VARDATA(entryvec))[i].key));
-#endif
 	}
 	*sizep = KEYSIZE;
 	PG_RETURN_POINTER(ret);
@@ -342,11 +324,10 @@ g_spherekey_union(PG_FUNCTION_ARGS)
 Datum
 g_spoint2_union(PG_FUNCTION_ARGS)
 {
-	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
-	int		   *sizep = (int *) PG_GETARG_POINTER(1);
-	int			numranges,
-				i;
-	GiSTSPointKey *ret;
+	GistEntryVector	   *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
+	int				   *sizep = (int *) PG_GETARG_POINTER(1);
+	int					numranges, i;
+	GiSTSPointKey	   *ret;
 
 	ALLOC_INTERNAL_KEY(ret);
 	numranges = entryvec->n;
@@ -411,9 +392,9 @@ g_spherekey_same(PG_FUNCTION_ARGS)
 Datum
 g_spoint2_same(PG_FUNCTION_ARGS)
 {
-	GiSTSPointKey *key1 = (GiSTSPointKey *) PG_GETARG_POINTER(0);
-	GiSTSPointKey *key2 = (GiSTSPointKey *) PG_GETARG_POINTER(1);
-	bool	   *result = (bool *) PG_GETARG_POINTER(2);
+	GiSTSPointKey  *key1 = (GiSTSPointKey *) PG_GETARG_POINTER(0);
+	GiSTSPointKey  *key2 = (GiSTSPointKey *) PG_GETARG_POINTER(1);
+	bool		   *result = (bool *) PG_GETARG_POINTER(2);
 
 	*result = TRUE;
 	if (key1 && key2)
@@ -435,16 +416,11 @@ g_spoint2_same(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(result);
 }
 
-
-/*!
-  \brief general interleave method with query cache
-  \param type \link PGS_DATA_TYPES data type \endlink
-  \param genkey function to generate the key value
-  \param dir for spherekey_interleave what value is the first
-		  - 0 : the query key
-		  - not 0 : the key entry
-  \see key.c gq_cache.c
-*/
+/*
+ * General interleave method with query cache. genkey function is used to
+ * generate the key value. "dir" defines which value is the first for
+ * spherekey_interleave: 0 - query key, 1 - entry key.
+ */
 #define SCK_INTERLEAVE( type , genkey , dir ) do { \
   int32 * q = NULL ; \
   if ( ! gq_cache_get_value ( PGS_TYPE_##type , query, &q ) ){ \
@@ -476,7 +452,6 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
@@ -524,7 +499,6 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 		}
 		else
 		{
-
 			switch (strategy)
 			{
 				case 1:
@@ -538,9 +512,7 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 			}
 
 		}
-
 		PG_RETURN_BOOL(result);
-
 	}
 	PG_RETURN_BOOL(FALSE);
 }
@@ -663,12 +635,9 @@ g_spoint2_distance(PG_FUNCTION_ARGS)
 	{
 		Vector3D	v;
 		float8		sum = 0.0,
-					x_min,
-					x_max,
-					y_min,
-					y_max,
-					z_min,
-					z_max;
+					x_min, x_max,
+					y_min, y_max,
+					z_min, z_max;
 
 		spoint_vector3d(&v, query);
 
@@ -711,7 +680,6 @@ g_scircle_consistent(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
@@ -778,7 +746,6 @@ g_scircle_consistent(PG_FUNCTION_ARGS)
 
 		if (GIST_LEAF(entry))
 		{
-
 			switch (strategy)
 			{
 				case 1:
@@ -810,8 +777,6 @@ g_scircle_consistent(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(FALSE);
 }
 
-
-
 Datum
 g_sline_consistent(PG_FUNCTION_ARGS)
 {
@@ -826,7 +791,6 @@ g_sline_consistent(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
@@ -908,8 +872,6 @@ g_sline_consistent(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(FALSE);
 }
 
-
-
 Datum
 g_spath_consistent(PG_FUNCTION_ARGS)
 {
@@ -924,7 +886,6 @@ g_spath_consistent(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
@@ -969,7 +930,6 @@ g_spath_consistent(PG_FUNCTION_ARGS)
 			case 36:
 				SCK_INTERLEAVE(SBOX, spherebox_gen_key, 1);
 				break;
-
 		}
 
 		if (GIST_LEAF(entry))
@@ -1020,7 +980,6 @@ g_spoly_consistent(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
@@ -1117,7 +1076,6 @@ g_spoly_consistent(PG_FUNCTION_ARGS)
 	}
 	PG_RETURN_BOOL(FALSE);
 }
-
 
 Datum
 g_sellipse_consistent(PG_FUNCTION_ARGS)
@@ -1133,7 +1091,6 @@ g_sellipse_consistent(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
@@ -1230,7 +1187,6 @@ g_sellipse_consistent(PG_FUNCTION_ARGS)
 	}
 	PG_RETURN_BOOL(FALSE);
 }
-
 
 Datum
 g_sbox_consistent(PG_FUNCTION_ARGS)
@@ -1246,7 +1202,6 @@ g_sbox_consistent(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-
 		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
 		int32	   *ent = (int32 *) DatumGetPointer(entry->key);
 		int			i = SCKEY_DISJ;
@@ -1344,7 +1299,6 @@ g_sbox_consistent(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(FALSE);
 }
 
-
 typedef int32 coord_t;
 
 typedef struct
@@ -1352,14 +1306,14 @@ typedef struct
 	coord_t		coord[3];
 } Point3D;
 
-
 typedef struct
 {
 	Point3D		low;
 	Point3D		high;
 } Box3D;
 
-/*static void
+#ifdef NOT_USED
+static void
 checkBox3D(Box3D *box)
 {
 	  int i;
@@ -1374,7 +1328,8 @@ checkBox3D(Box3D *box)
 			  elog(ERROR, "Invalid key!");
 		  }
 	  }
-}*/
+}
+#endif
 
 static void
 adjustBox3D(Box3D *b, Box3D *addon)
@@ -1394,21 +1349,21 @@ static inline double
 sizeBox3D(Box3D *b)
 {
 	return (double) ((int64) b->high.coord[0] - (int64) b->low.coord[0]) / MAXCVALUE
-		* (double) ((int64) b->high.coord[1] - (int64) b->low.coord[1]) / MAXCVALUE
-		* (double) ((int64) b->high.coord[2] - (int64) b->low.coord[2]) / MAXCVALUE;
+		 * (double) ((int64) b->high.coord[1] - (int64) b->low.coord[1]) / MAXCVALUE
+		 * (double) ((int64) b->high.coord[2] - (int64) b->low.coord[2]) / MAXCVALUE;
 }
 
 static inline double
 unionSizeBox3D(Box3D *a, Box3D *b)
 {
 	return (double) ((int64) Max(a->high.coord[0], b->high.coord[0]) - (int64) Min(a->low.coord[0], b->low.coord[0])) / MAXCVALUE
-		* (double) ((int64) Max(a->high.coord[1], b->high.coord[1]) - (int64) Min(a->low.coord[1], b->low.coord[1])) / MAXCVALUE
-		* (double) ((int64) Max(a->high.coord[2], b->high.coord[2]) - (int64) Min(a->low.coord[2], b->low.coord[2])) / MAXCVALUE;
+		 * (double) ((int64) Max(a->high.coord[1], b->high.coord[1]) - (int64) Min(a->low.coord[1], b->low.coord[1])) / MAXCVALUE
+		 * (double) ((int64) Max(a->high.coord[2], b->high.coord[2]) - (int64) Min(a->low.coord[2], b->low.coord[2])) / MAXCVALUE;
 }
 
 /*
  * Trivial split: half of entries will be placed on one page
- * and another half - to another
+ * and another half - to another.
  */
 static void
 fallbackSplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
@@ -1608,7 +1563,8 @@ g_box_consider_split(ConsiderSplitContext *context, int dimNum,
 		 * overlaps. We switch dimension if find less overlap (non-negative)
 		 * or less range with same overlap.
 		 */
-		range = (float8) context->boundingBox.high.coord[dimNum] - (float8) context->boundingBox.low.coord[dimNum];
+		range = (float8) context->boundingBox.high.coord[dimNum] -
+				(float8) context->boundingBox.low.coord[dimNum];
 		overlap = ((float8) leftUpper - (float8) rightLower) / range;
 
 		/* If there is no previous selection, select this */
@@ -2160,10 +2116,8 @@ g_spoint2_penalty(PG_FUNCTION_ARGS)
 	float	   *result = (float *) PG_GETARG_POINTER(2);
 	GiSTSPointKey *origkey = (GiSTSPointKey *) DatumGetPointer(origentry->key);
 	GiSTSPointKey *newkey = (GiSTSPointKey *) DatumGetPointer(newentry->key);
-	Box3D	   *o,
-			   *n;
-	int32		k[6],
-				ok[6];
+	Box3D	   *o, *n;
+	int32		k[6], ok[6];
 
 	if (IS_LEAF(origkey))
 	{
@@ -2205,13 +2159,14 @@ g_spoint2_penalty(PG_FUNCTION_ARGS)
 		n = (Box3D *) newkey->k;
 	}
 
-	*result =
-		(
-		 (float) ((int64) Max(o->high.coord[0], n->high.coord[0])
-				  - (int64) Min(o->low.coord[0], n->low.coord[0]))) * ((float) ((int64) Max(o->high.coord[1], n->high.coord[1]) - (int64) Min(o->low.coord[1], n->low.coord[1])))
-		* ((float) ((int64) Max(o->high.coord[2], n->high.coord[2]) - (int64) Min(o->low.coord[2], n->low.coord[2])))
-		- ((float) ((int64) o->high.coord[0] - (int64) o->low.coord[0]))
-		* ((float) ((int64) o->high.coord[1] - (int64) o->low.coord[1]))
-		* ((float) ((int64) o->high.coord[2] - (int64) o->low.coord[2]));
+	*result = ((float) ((int64) Max(o->high.coord[0], n->high.coord[0])
+							- (int64) Min(o->low.coord[0], n->low.coord[0])))
+			* ((float) ((int64) Max(o->high.coord[1], n->high.coord[1])
+							- (int64) Min(o->low.coord[1], n->low.coord[1])))
+			* ((float) ((int64) Max(o->high.coord[2], n->high.coord[2])
+							- (int64) Min(o->low.coord[2], n->low.coord[2])))
+			- ((float) ((int64) o->high.coord[0] - (int64) o->low.coord[0]))
+			* ((float) ((int64) o->high.coord[1] - (int64) o->low.coord[1]))
+			* ((float) ((int64) o->high.coord[2] - (int64) o->low.coord[2]));
 	PG_RETURN_POINTER(result);
 }
