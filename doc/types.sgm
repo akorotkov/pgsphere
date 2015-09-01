@@ -105,7 +105,7 @@
                 </imageobject>
               </mediaobject>
                A spherical point is an object without expanse
-               but with a position. Usage cases are:
+               but with a position. Use cases are:
             </para>
             <itemizedlist>
                 <listitem>
@@ -194,10 +194,10 @@
                   <imagedata fileref="&graph1003;" width="160px" format="JPEG"/>
                 </imageobject>
               </mediaobject>
-              A Euler transformation is done with three counterclockwise
+              An Euler transformation is done with three counterclockwise
               object rotations around following the axes:
               <literal>x</literal>-axis, <literal>y</literal>-axis, or
-              <literal>z</literal>-axis.  Usage cases are:
+              <literal>z</literal>-axis.  Use cases are:
             </para>
             <itemizedlist>
                 <listitem>
@@ -212,7 +212,7 @@
                 </listitem>
             </itemizedlist>
             <para>
-              The input syntax of a Euler transformation is:
+              The input syntax of an Euler transformation is:
             </para>
             <synopsis>angle1, angle2, angle3 &lsqb;, axes &rsqb;</synopsis>
             <para>
@@ -269,7 +269,7 @@
               </mediaobject>
               A spherical circle is an area
               around a point, where all points inside the circle have a
-              distance less than or equal to the radius of the circle.  Usage
+              distance less than or equal to the radius of the circle.  Use
               cases are:
             </para>
             <itemizedlist>
@@ -323,7 +323,7 @@
                 </imageobject>
               </mediaobject>
               A spherical line is part of a great circle (meridian) that has
-              a beginning and an end and hence, a direction.  Usage cases are:
+              a beginning and an end and hence, a direction.  Use cases are:
             </para>
             <itemizedlist>
                 <listitem>
@@ -345,7 +345,7 @@ i             syntax is a somewhat complex.
               A general located line with a length
               <parameter>length</parameter> is defined as a line starting at
               position <literal>(0d,0d)</literal> and ending at position
-              <literal>(length,0d)</literal> transformed with a Euler
+              <literal>(length,0d)</literal> transformed with an Euler
               transformation <parameter>euler</parameter>.  The input syntax
               is :
             </para>
@@ -369,7 +369,7 @@ i             syntax is a somewhat complex.
                   <listitem>
                       <para>
                           The transformation <parameter>euler</parameter>
-                          will always be converted to a Euler
+                          will always be converted to an Euler
                           transformation using axes <literal>Z</literal>,
                           <literal>X</literal>, and <literal>Z</literal>.
                       </para>
@@ -413,7 +413,7 @@ i             syntax is a somewhat complex.
                </para>
             </blockquote>
             <para>
-                Usage cases are:
+                Use cases are:
             </para>
             <itemizedlist>
                 <listitem>
@@ -510,7 +510,7 @@ i             syntax is a somewhat complex.
                 </imageobject>
               </mediaobject>
               A spherical path is a
-              concatination of spherical lines.  Usage cases are:
+              concatenation of spherical lines.  Use cases are:
             </para>
             <itemizedlist>
                 <listitem>
@@ -573,7 +573,7 @@ i             syntax is a somewhat complex.
             <para>
               A spherical polygon is a
               closed spherical path where line segments cannot be crossed.
-              One main usage case are areas on the earth and sky sphere.
+              One main use case are areas on the earth and sky sphere.
               Polygons within <application>pgSphere</application> 
               have the same input syntax as paths:
             </para>

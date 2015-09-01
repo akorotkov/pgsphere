@@ -32,7 +32,7 @@
                 Then, change into <filename>POSTGRESQL_SRC/src/contrib</filename>. 
                 If the sources are not yet installed and the directory
                 <filename>pg_sphere</filename> does not exist, take the
-                gzipped <application>pgSphere</application> sources ( e.g.,
+                gzipped <application>pgSphere</application> sources ( e. g.,
                 <filename>pg_sphere_xxx.tgz</filename> ) and run:
             </para>
             <programlisting>

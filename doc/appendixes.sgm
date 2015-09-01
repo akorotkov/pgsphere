@@ -14,7 +14,7 @@
           </listitem>
           <listitem>
             <para>
-               Remove btree index. It was used to cluster the index.
+               Remove B-tree index. It was used to cluster the index.
             </para>
           </listitem>
           <listitem>

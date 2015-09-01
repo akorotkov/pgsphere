@@ -307,7 +307,7 @@
             </title>
             <para>
                 The length/circumference operator <literal>@-@</literal> is
-                a non-boolean unary operator returning the cirumference or
+                a non-boolean unary operator returning the circumference or
                 length of an object.  In the current implementation,
                 <application>pgSphere</application> supports only
                 circumferences of circles, polygons, and boxes.  It supports
@@ -365,7 +365,7 @@
             <para>
                 The unary operator <literal>-</literal> changes the
                 direction of <type>sline</type> or <type>spath</type>
-                objects. You can use it with a Euler transformation object
+                objects. You can use it with an Euler transformation object
                 in the figurative sense, too (<xref linkend="op.trans"/>).
             </para>
             <example>

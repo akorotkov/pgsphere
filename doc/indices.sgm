@@ -8,7 +8,7 @@
         </title>
         <para>
           <application>pgSphere</application> uses <literal>GiST</literal>
-          to create spherical indices. An index speeds up the executation
+          to create spherical indices. An index speeds up the execution
           time of operators <link
           linkend="op.over"><literal>@</literal></link>, <link
           linkend="op.over"><literal>&amp;&amp;</literal></link>, <link

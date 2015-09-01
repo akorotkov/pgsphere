@@ -91,11 +91,11 @@
           <para>or</para>
           <synopsis> object + strans (&ohgr;, i, &OHgr;)</synopsis>
           <example>
-            <title>Perihel and aphel coordinates of a comet orbit</title>
+            <title>perihelion and aphelion coordinates of a comet's orbit</title>
             <simpara>
              We are assuming the orbital elements of a comet are
              &OHgr;=30&deg;, i=60&deg; and &ohgr;=90&deg;. We get the
-             spherical position of perihel and aphel with:
+             spherical position of perihelion and aphelion with:
             </simpara>
             <programlisting>
 <![CDATA[sql> SELECT set_sphere_output('DEG');]]>
@@ -104,14 +104,14 @@
 <![CDATA[ SET DEG]]>
 <![CDATA[(1 row)]]>
 <![CDATA[]]>
-<![CDATA[sql> SELECT spoint '(0,0)' + strans '90d,60d,30d' AS perihel;]]>
-<![CDATA[   perihel]]>
+<![CDATA[sql> SELECT spoint '(0,0)' + strans '90d,60d,30d' AS perihelion;]]>
+<![CDATA[   perihelion]]>
 <![CDATA[--------------]]>
 <![CDATA[ (120d , 60d)]]>
 <![CDATA[(1 row)]]>
 <![CDATA[]]>
-<![CDATA[sql> SELECT spoint '(180d,0)' + strans '90d,60d,30d' AS aphel;]]>
-<![CDATA[      aphel]]>
+<![CDATA[sql> SELECT spoint '(180d,0)' + strans '90d,60d,30d' AS aphelion;]]>
+<![CDATA[      aphelion]]>
 <![CDATA[---------------]]>
 <![CDATA[ (300d , -60d)]]>
 <![CDATA[(1 row)]]>
