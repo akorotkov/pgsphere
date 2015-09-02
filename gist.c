@@ -199,74 +199,80 @@ g_spherekey_decompress(PG_FUNCTION_ARGS)
  * General compress method for all data types. Uses genkey to generate key
  * value (see key.c).
  */
-#define PGS_COMPRESS(type, genkey, detoast)  do { \
+#define PGS_COMPRESS(type, genkey, detoast) \
+do \
+{ \
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0); \
 	GISTENTRY  *retval; \
 	if (entry->leafkey) \
 	{ \
-	  retval  =  palloc ( sizeof ( GISTENTRY ) ); \
-	  if ( DatumGetPointer(entry->key) != NULL ){ \
-		int32 * k = ( int32 * ) palloc ( KEYSIZE ) ; \
-		if( detoast ) \
+		retval = (GISTENTRY *) palloc(sizeof(GISTENTRY)); \
+		if (DatumGetPointer(entry->key) != NULL) \
 		{ \
-		  genkey ( k , ( type * )  DatumGetPointer( PG_DETOAST_DATUM( entry->key ) ) ) ; \
-		} else { \
-		  genkey ( k , ( type * )  DatumGetPointer( entry->key ) ) ; \
+			int32 *k = (int32 *) palloc(KEYSIZE); \
+			if (detoast) \
+				genkey(k, (type *) DatumGetPointer(PG_DETOAST_DATUM(entry->key))); \
+			else \
+				genkey(k, (type *) DatumGetPointer(entry->key)); \
+			gistentryinit(*retval, PointerGetDatum(k), \
+				entry->rel, entry->page, \
+				entry->offset, false); \
 		} \
-		gistentryinit(*retval, PointerGetDatum(k) , \
-		  entry->rel, entry->page, \
-		  entry->offset, FALSE ); \
-	  } else { \
-		gistentryinit(*retval, (Datum) 0, \
-		  entry->rel, entry->page, \
-		  entry->offset, FALSE ); \
-	  } \
-	} else { \
-	  retval = entry; \
+		else \
+		{ \
+			gistentryinit(*retval, (Datum) 0, \
+				entry->rel, entry->page, \
+				entry->offset, false); \
+		} \
+	} \
+	else \
+	{ \
+		retval = entry; \
 	} \
 	PG_RETURN_POINTER(retval); \
-  } while (0) ;
+} \
+while (0)
 
 Datum
 g_scircle_compress(PG_FUNCTION_ARGS)
 {
-	PGS_COMPRESS(SCIRCLE, spherecircle_gen_key, 0)
+	PGS_COMPRESS(SCIRCLE, spherecircle_gen_key, 0);
 }
 
 Datum
 g_spoint_compress(PG_FUNCTION_ARGS)
 {
-	PGS_COMPRESS(SPoint, spherepoint_gen_key, 0)
+	PGS_COMPRESS(SPoint, spherepoint_gen_key, 0);
 }
 
 Datum
 g_sline_compress(PG_FUNCTION_ARGS)
 {
-	PGS_COMPRESS(SLine, sphereline_gen_key, 0)
+	PGS_COMPRESS(SLine, sphereline_gen_key, 0);
 }
 
 Datum
 g_spath_compress(PG_FUNCTION_ARGS)
 {
-	PGS_COMPRESS(SPATH, spherepath_gen_key, 1)
+	PGS_COMPRESS(SPATH, spherepath_gen_key, 1);
 }
 
 Datum
 g_spoly_compress(PG_FUNCTION_ARGS)
 {
-	PGS_COMPRESS(SPOLY, spherepoly_gen_key, 1)
+	PGS_COMPRESS(SPOLY, spherepoly_gen_key, 1);
 }
 
 Datum
 g_sellipse_compress(PG_FUNCTION_ARGS)
 {
-	PGS_COMPRESS(SELLIPSE, sphereellipse_gen_key, 0)
+	PGS_COMPRESS(SELLIPSE, sphereellipse_gen_key, 0);
 }
 
 Datum
 g_sbox_compress(PG_FUNCTION_ARGS)
 {
-	PGS_COMPRESS(SBOX, spherebox_gen_key, 0)
+	PGS_COMPRESS(SBOX, spherebox_gen_key, 0);
 }
 
 Datum
@@ -287,12 +293,12 @@ g_spoint2_compress(PG_FUNCTION_ARGS)
 			key->lat = p->lat;
 			key->lng = p->lng;
 			gistentryinit(*retval, PointerGetDatum(key), entry->rel,
-											entry->page, entry->offset, FALSE);
+											entry->page, entry->offset, false);
 		}
 		else
 		{
 			gistentryinit(*retval, (Datum) 0, entry->rel, entry->page,
-											entry->offset, FALSE);
+											entry->offset, false);
 		}
 	}
 	else
@@ -372,7 +378,7 @@ g_spherekey_same(PG_FUNCTION_ARGS)
 	bool	   *result = (bool *) PG_GETARG_POINTER(2);
 	int			i;
 
-	*result = TRUE;
+	*result = true;
 
 	if (c1 && c2)
 	{
@@ -383,7 +389,7 @@ g_spherekey_same(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-		*result = (c1 == NULL && c2 == NULL) ? TRUE : FALSE;
+		*result = (c1 == NULL && c2 == NULL) ? true : false;
 	}
 
 	PG_RETURN_POINTER(result);
@@ -396,21 +402,21 @@ g_spoint2_same(PG_FUNCTION_ARGS)
 	GiSTSPointKey  *key2 = (GiSTSPointKey *) PG_GETARG_POINTER(1);
 	bool		   *result = (bool *) PG_GETARG_POINTER(2);
 
-	*result = TRUE;
+	*result = true;
 	if (key1 && key2)
 	{
 		if (VARSIZE(key1) == VARSIZE(key2))
 		{
-			*result = memcmp(key1, key2, VARSIZE(key1)) ? FALSE : TRUE;
+			*result = memcmp(key1, key2, VARSIZE(key1)) ? false : true;
 		}
 		else
 		{
-			*result = FALSE;
+			*result = false;
 		}
 	}
 	else
 	{
-		*result = (key1 == NULL && key2 == NULL) ? TRUE : FALSE;
+		*result = (key1 == NULL && key2 == NULL) ? true : false;
 	}
 
 	PG_RETURN_POINTER(result);
@@ -421,21 +427,24 @@ g_spoint2_same(PG_FUNCTION_ARGS)
  * generate the key value. "dir" defines which value is the first for
  * spherekey_interleave: 0 - query key, 1 - entry key.
  */
-#define SCK_INTERLEAVE( type , genkey , dir ) do { \
-  int32 * q = NULL ; \
-  if ( ! gq_cache_get_value ( PGS_TYPE_##type , query, &q ) ){ \
-	q = ( int32 *) malloc ( KEYSIZE ); \
-	genkey ( q, ( type * ) query ); \
-	gq_cache_set_value ( PGS_TYPE_##type , query, q ) ; \
-	free ( q ); \
-	gq_cache_get_value ( PGS_TYPE_##type , query, &q ) ; \
-  } \
-  if ( dir ){ \
-	i = spherekey_interleave ( ent, q  ); \
-  } else { \
-	i = spherekey_interleave ( q , ent ); \
-  } \
-} while (0);
+#define SCK_INTERLEAVE(type, genkey, dir) \
+do \
+{ \
+	int32 * q = NULL; \
+	if (!gq_cache_get_value (PGS_TYPE_##type, query, &q)) \
+	{ \
+		q = (int32 *) malloc(KEYSIZE); \
+		genkey(q, (type * )query); \
+		gq_cache_set_value(PGS_TYPE_##type, query, q); \
+		free(q); \
+		gq_cache_get_value(PGS_TYPE_##type, query, &q); \
+	} \
+	if (dir) \
+		i = spherekey_interleave(ent, q); \
+	else \
+		i = spherekey_interleave(q , ent); \
+} \
+while (0)
 
 
 Datum
@@ -444,11 +453,11 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -489,11 +498,11 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i == SCKEY_SAME)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -503,18 +512,18 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 Datum
@@ -523,11 +532,11 @@ g_spoint2_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -570,11 +579,11 @@ g_spoint2_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -611,7 +620,7 @@ g_spoint2_consistent(PG_FUNCTION_ARGS)
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 Datum
@@ -672,11 +681,11 @@ g_scircle_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -750,11 +759,11 @@ g_scircle_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i == SCKEY_SAME)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -764,17 +773,17 @@ g_scircle_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 Datum
@@ -783,11 +792,11 @@ g_sline_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -845,11 +854,11 @@ g_sline_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i == SCKEY_SAME)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -859,17 +868,17 @@ g_sline_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 Datum
@@ -878,11 +887,11 @@ g_spath_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -938,11 +947,11 @@ g_spath_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i == SCKEY_SAME)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -952,17 +961,17 @@ g_spath_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 
@@ -972,11 +981,11 @@ g_spoly_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -1050,11 +1059,11 @@ g_spoly_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i == SCKEY_SAME)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -1064,17 +1073,17 @@ g_spoly_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 Datum
@@ -1083,11 +1092,11 @@ g_sellipse_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -1161,11 +1170,11 @@ g_sellipse_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i == SCKEY_SAME)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -1175,17 +1184,17 @@ g_sellipse_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 Datum
@@ -1194,11 +1203,11 @@ g_sbox_consistent(PG_FUNCTION_ARGS)
 	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
 	void	   *query = (void *) PG_GETARG_POINTER(1);
 	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = FALSE;
+	bool		result = false;
 
 	if (DatumGetPointer(entry->key) == NULL || !query)
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
@@ -1272,11 +1281,11 @@ g_sbox_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i == SCKEY_SAME)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
@@ -1286,17 +1295,17 @@ g_sbox_consistent(PG_FUNCTION_ARGS)
 			{
 				case 1:
 					if (i > SCKEY_OVERLAP)
-						result = TRUE;
+						result = true;
 					break;
 				default:
 					if (i > SCKEY_DISJ)
-						result = TRUE;
+						result = true;
 					break;
 			}
 		}
 		PG_RETURN_BOOL(result);
 	}
-	PG_RETURN_BOOL(FALSE);
+	PG_RETURN_BOOL(false);
 }
 
 typedef int32 coord_t;

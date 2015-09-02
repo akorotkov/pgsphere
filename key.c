@@ -14,7 +14,7 @@ PG_MODULE_MAGIC;
 static void
 key_add_point(int32 *key, const SPoint *p)
 {
-	int32	k[3];
+	int32	k[6];
 
 	spherepoint_gen_key(&k[0], p);
 	spherekey_union_two(key, &k[0]);
@@ -376,7 +376,7 @@ spherepoly_gen_key(int32 *key, const SPOLY *sp)
 	int32	i;
 	SLine	l;
 	int32	tk[6];
-	bool	start = TRUE;
+	bool	start = true;
 
 	for (i = 0; i < sp->npts; i++)
 	{
@@ -384,7 +384,7 @@ spherepoly_gen_key(int32 *key, const SPOLY *sp)
 		sphereline_gen_key(&tk[0], &l);
 		if (start)
 		{
-			start = FALSE;
+			start = false;
 			memcpy((void *) key, (void *) &tk[0], KEYSIZE);
 		}
 		else
@@ -407,7 +407,7 @@ spherepath_gen_key(int32 *key, const SPATH *sp)
 				r;
 	SLine		l;
 	int32		tk[6];
-	bool		start = TRUE;
+	bool		start = true;
 
 	for (i = 0; i < sp->npts; i++)
 	{
@@ -418,7 +418,7 @@ spherepath_gen_key(int32 *key, const SPATH *sp)
 			sphereline_gen_key(&tk[0], &l);
 			if (start)
 			{
-				start = FALSE;
+				start = false;
 				memcpy((void *) key, (void *) &tk[0], KEYSIZE);
 			}
 			else

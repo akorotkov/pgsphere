@@ -617,11 +617,11 @@ sellipse_cont_point(const SELLIPSE *se, const SPoint *sp)
 		a = sellipse_dist(se->rad[0], se->rad[1], e);
 		if (FPge(a, dist))
 		{
-			return TRUE;
+			return true;
 		}
 		else
 		{
-			return FALSE;
+			return false;
 		}
 	}
 	return false;

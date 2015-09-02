@@ -40,6 +40,10 @@
 #include "utils/lsyscache.h"
 #include "utils/rel.h"
 
+#if PG_VERSION_NUM >= 90600
+#define heap_formtuple heap_form_tuple
+#endif
+
 /*
  * Pair of pages for pending scan.
  */

@@ -32,7 +32,7 @@ spoint_check(SPoint *spoint)
 {
 	bool	lat_is_neg;
 
-	lat_is_neg = (spoint->lat < 0) ? (TRUE) : (FALSE);
+	lat_is_neg = (spoint->lat < 0) ? true : false;
 
 	if (spoint->lng < 0 || spoint->lng > PID)
 		spoint->lng = spoint->lng - floor(spoint->lng / (PID)) * PID;

@@ -78,7 +78,7 @@ sline_eq(const SLine *l1, const SLine *l2)
 		e2.psi = l2->psi;
 		return (strans_eq(&e1, &e2));
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -95,9 +95,9 @@ sline_from_points(SLine *sl, const SPoint *pbeg, const SPoint *pend)
 		if (FPeq(pbeg->lng, pend->lng))
 		{
 			sline_meridian(sl, pbeg->lng);
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 
 	if (spherevector_to_euler(&se, pbeg, pend))
@@ -114,7 +114,7 @@ sline_from_points(SLine *sl, const SPoint *pbeg, const SPoint *pend)
 		sl->psi = pbeg->lng - PIH;
 		sl->length = 0.0;
 	}
-	return (TRUE);
+	return (true);
 
 }
 
@@ -417,9 +417,9 @@ sline_circle_touch(const SLine *sl, const SCIRCLE *sc)
 	{
 		if (FPeq(fabs(tc.center.lat), sc->radius))
 		{
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 	else
 	{

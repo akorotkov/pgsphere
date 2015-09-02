@@ -208,15 +208,15 @@ spherecircle_in_circle(PG_FUNCTION_ARGS)
 
 	if (scircle_eq(c1, c2))
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 	else if (FPle((dist + c1->radius), c2->radius))
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 	else
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 }
 
@@ -229,15 +229,15 @@ spherecircle_in_circle_neg(PG_FUNCTION_ARGS)
 
 	if (scircle_eq(c1, c2))
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else if (FPgt((dist + c1->radius), c2->radius))
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 	else
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 }
 
@@ -250,15 +250,15 @@ spherecircle_in_circle_com(PG_FUNCTION_ARGS)
 
 	if (scircle_eq(c1, c2))
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 	else if (FPle((dist + c1->radius), c2->radius))
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 	else
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 }
 
@@ -271,15 +271,15 @@ spherecircle_in_circle_com_neg(PG_FUNCTION_ARGS)
 
 	if (scircle_eq(c1, c2))
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else if (FPgt((dist + c1->radius), c2->radius))
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 	else
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 }
 
@@ -292,15 +292,15 @@ spherecircle_overlap(PG_FUNCTION_ARGS)
 
 	if (scircle_eq(c1, c2))
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 	else if (FPlt((c1->radius + c2->radius), dist))
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 }
 
@@ -313,15 +313,15 @@ spherecircle_overlap_neg(PG_FUNCTION_ARGS)
 
 	if (scircle_eq(c1, c2))
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else if (FPge((c1->radius + c2->radius), dist))
 	{
-		PG_RETURN_BOOL(FALSE);
+		PG_RETURN_BOOL(false);
 	}
 	else
 	{
-		PG_RETURN_BOOL(TRUE);
+		PG_RETURN_BOOL(true);
 	}
 }
 

@@ -52,11 +52,11 @@ PG_FUNCTION_INFO_V1(spherepath_add_point);
 PG_FUNCTION_INFO_V1(spherepath_add_points_finalize);
 
 
- /*
-  * ! \brief Converts an array of spherical points to SPATH \param arr pointer
-  * to array of spherical points \param nelem count of elements \return
-  * pointer to created spherical polygon
-  */
+/*
+ * ! \brief Converts an array of spherical points to SPATH \param arr pointer
+ * to array of spherical points \param nelem count of elements \return
+ * pointer to created spherical polygon
+ */
 static SPATH *
 spherepath_from_array(SPoint *arr, int32 nelem)
 {
@@ -203,10 +203,10 @@ path_circle_pos(const SPATH *path, const SCIRCLE *circ)
 }
 
 
- /*
-  * ! \brief Checks, whether path and line are overlapping \param line pointer
-  * to a line \param path pointer to a path \return true, if overlapping
-  */
+/*
+ * ! \brief Checks, whether path and line are overlapping \param line pointer
+ * to a line \param path pointer to a path \return true, if overlapping
+ */
 static bool
 path_line_overlap(const SPATH *path, const SLine *line)
 {
@@ -221,19 +221,19 @@ path_line_overlap(const SPATH *path, const SLine *line)
 		spath_segment(&sl, path, i);
 		if (sline_sline_pos(&sl, line) != PGS_LINE_AVOID)
 		{
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 
- /*
-  * ! \brief Returns the relationship between path and circle \param path
-  * pointer to path \param ell	pointer to ellipse \return relationship as a
-  * \link PGS_ELLIPSE_PATH_REL int8 value \endlink (\ref PGS_ELLIPSE_PATH_REL
-  * )
-  */
+/*
+ * ! \brief Returns the relationship between path and circle \param path
+ * pointer to path \param ell	pointer to ellipse \return relationship as a
+ * \link PGS_ELLIPSE_PATH_REL int8 value \endlink (\ref PGS_ELLIPSE_PATH_REL
+ * )
+ */
 static int8
 path_ellipse_pos(const SPATH *path, const SELLIPSE *ell)
 {

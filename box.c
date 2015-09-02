@@ -172,7 +172,7 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 						((sc->center.lat + sc->radius) <= sb->ne.lat) &&
 						((sc->center.lat - sc->radius) >= sb->sw.lat);
 		bool		bcc = sbox_cont_point(sb, &sc->center);
-		bool		ccb = FALSE;
+		bool		ccb = false;
 		int8		pw,
 					pe;
 		SLine		bw,
@@ -218,8 +218,8 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 		}
 		if (bcc && lat_b_cont_c)
 		{
-			bool		touw = FALSE,
-						toue = FALSE;
+			bool		touw = false,
+						toue = false;
 
 			if (pw == PGS_CIRCLE_LINE_OVER)
 			{
@@ -804,7 +804,7 @@ sbox_box_pos(const SBOX *b1, const SBOX *b2, bool recheck)
 
 	if (!recheck)
 	{
-		pe = sbox_box_pos(b2, b1, TRUE);
+		pe = sbox_box_pos(b2, b1, true);
 		if (pe == PGS_BOX_CONT)
 		{
 			return PGS_BOX_OVER;
@@ -1503,7 +1503,7 @@ spherebox_cont_box(PG_FUNCTION_ARGS)
 	SBOX	   *box1 = (SBOX *) PG_GETARG_POINTER(0);
 	SBOX	   *box2 = (SBOX *) PG_GETARG_POINTER(1);
 
-	PG_RETURN_BOOL(sbox_box_pos(box1, box2, FALSE) == PGS_BOX_CONT);
+	PG_RETURN_BOOL(sbox_box_pos(box1, box2, false) == PGS_BOX_CONT);
 }
 
 Datum
@@ -1512,7 +1512,7 @@ spherebox_cont_box_neg(PG_FUNCTION_ARGS)
 	SBOX	   *box1 = (SBOX *) PG_GETARG_POINTER(0);
 	SBOX	   *box2 = (SBOX *) PG_GETARG_POINTER(1);
 
-	PG_RETURN_BOOL(!(sbox_box_pos(box1, box2, FALSE) == PGS_BOX_CONT));
+	PG_RETURN_BOOL(!(sbox_box_pos(box1, box2, false) == PGS_BOX_CONT));
 }
 
 Datum
@@ -1521,7 +1521,7 @@ spherebox_cont_box_com(PG_FUNCTION_ARGS)
 	SBOX	   *box1 = (SBOX *) PG_GETARG_POINTER(1);
 	SBOX	   *box2 = (SBOX *) PG_GETARG_POINTER(0);
 
-	PG_RETURN_BOOL(sbox_box_pos(box1, box2, FALSE) == PGS_BOX_CONT);
+	PG_RETURN_BOOL(sbox_box_pos(box1, box2, false) == PGS_BOX_CONT);
 }
 
 Datum
@@ -1530,7 +1530,7 @@ spherebox_cont_box_com_neg(PG_FUNCTION_ARGS)
 	SBOX	   *box1 = (SBOX *) PG_GETARG_POINTER(1);
 	SBOX	   *box2 = (SBOX *) PG_GETARG_POINTER(0);
 
-	PG_RETURN_BOOL(!(sbox_box_pos(box1, box2, FALSE) == PGS_BOX_CONT));
+	PG_RETURN_BOOL(!(sbox_box_pos(box1, box2, false) == PGS_BOX_CONT));
 }
 
 Datum
@@ -1539,7 +1539,7 @@ spherebox_overlap_box(PG_FUNCTION_ARGS)
 	SBOX	   *box1 = (SBOX *) PG_GETARG_POINTER(0);
 	SBOX	   *box2 = (SBOX *) PG_GETARG_POINTER(1);
 
-	PG_RETURN_BOOL(sbox_box_pos(box1, box2, FALSE) > PGS_BOX_AVOID);
+	PG_RETURN_BOOL(sbox_box_pos(box1, box2, false) > PGS_BOX_AVOID);
 }
 
 Datum
@@ -1548,5 +1548,5 @@ spherebox_overlap_box_neg(PG_FUNCTION_ARGS)
 	SBOX	   *box1 = (SBOX *) PG_GETARG_POINTER(0);
 	SBOX	   *box2 = (SBOX *) PG_GETARG_POINTER(1);
 
-	PG_RETURN_BOOL(sbox_box_pos(box1, box2, FALSE) == PGS_BOX_AVOID);
+	PG_RETURN_BOOL(sbox_box_pos(box1, box2, false) == PGS_BOX_AVOID);
 }

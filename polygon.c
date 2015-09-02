@@ -119,7 +119,7 @@ spherepoly_check(const SPOLY *poly)
 	/* If 0-vector */
 	if (FPzero(v.x) && FPzero(v.y) && FPzero(v.z))
 	{
-		return FALSE;
+		return false;
 	}
 
 	for (i = 0; i < poly->npts; i++)
@@ -131,7 +131,7 @@ spherepoly_check(const SPOLY *poly)
 			pos = sline_sline_pos(&sli, &slk);
 			if (!(pos == PGS_LINE_CONNECT || pos == PGS_LINE_AVOID))
 			{
-				return FALSE;
+				return false;
 			}
 		}
 	}
@@ -152,10 +152,10 @@ spherepoly_check(const SPOLY *poly)
 		/* Do not change it! */
 		if (FPle(p.lat, 0.0))
 		{
-			return FALSE;
+			return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -465,7 +465,7 @@ poly_poly_pos(const SPOLY *p1, const SPOLY *p2, bool recheck)
 	{
 		if (!recheck)
 		{
-			pos = poly_poly_pos(p2, p1, TRUE);
+			pos = poly_poly_pos(p2, p1, true);
 		}
 		if (pos == PGS_POLY_CONT)
 		{
@@ -833,7 +833,7 @@ spherepoly_equal(PG_FUNCTION_ARGS)
 	SPOLY	   *p1 = PG_GETARG_SPOLY(0);
 	SPOLY	   *p2 = PG_GETARG_SPOLY(1);
 
-	PG_RETURN_BOOL(spoly_eq(p1, p2, FALSE));
+	PG_RETURN_BOOL(spoly_eq(p1, p2, false));
 }
 
 Datum
@@ -842,7 +842,7 @@ spherepoly_equal_neg(PG_FUNCTION_ARGS)
 	SPOLY	   *p1 = PG_GETARG_SPOLY(0);
 	SPOLY	   *p2 = PG_GETARG_SPOLY(1);
 
-	PG_RETURN_BOOL(!spoly_eq(p1, p2, FALSE));
+	PG_RETURN_BOOL(!spoly_eq(p1, p2, false));
 }
 
 Datum
@@ -1144,7 +1144,7 @@ spherepoly_cont_poly(PG_FUNCTION_ARGS)
 	SPOLY	   *poly1 = PG_GETARG_SPOLY(0);
 	SPOLY	   *poly2 = PG_GETARG_SPOLY(1);
 
-	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, FALSE) == PGS_POLY_CONT);
+	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, false) == PGS_POLY_CONT);
 }
 
 Datum
@@ -1153,7 +1153,7 @@ spherepoly_cont_poly_neg(PG_FUNCTION_ARGS)
 	SPOLY	   *poly1 = PG_GETARG_SPOLY(0);
 	SPOLY	   *poly2 = PG_GETARG_SPOLY(1);
 
-	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, FALSE) != PGS_POLY_CONT);
+	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, false) != PGS_POLY_CONT);
 }
 
 Datum
@@ -1162,7 +1162,7 @@ spherepoly_cont_poly_com(PG_FUNCTION_ARGS)
 	SPOLY	   *poly1 = PG_GETARG_SPOLY(1);
 	SPOLY	   *poly2 = PG_GETARG_SPOLY(0);
 
-	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, FALSE) == PGS_POLY_CONT);
+	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, false) == PGS_POLY_CONT);
 }
 
 Datum
@@ -1171,7 +1171,7 @@ spherepoly_cont_poly_com_neg(PG_FUNCTION_ARGS)
 	SPOLY	   *poly1 = PG_GETARG_SPOLY(1);
 	SPOLY	   *poly2 = PG_GETARG_SPOLY(0);
 
-	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, FALSE) != PGS_POLY_CONT);
+	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, false) != PGS_POLY_CONT);
 }
 
 Datum
@@ -1180,7 +1180,7 @@ spherepoly_overlap_poly(PG_FUNCTION_ARGS)
 	SPOLY	   *poly1 = PG_GETARG_SPOLY(0);
 	SPOLY	   *poly2 = PG_GETARG_SPOLY(1);
 
-	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, FALSE) > PGS_POLY_AVOID);
+	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, false) > PGS_POLY_AVOID);
 }
 
 Datum
@@ -1189,7 +1189,7 @@ spherepoly_overlap_poly_neg(PG_FUNCTION_ARGS)
 	SPOLY	   *poly1 = PG_GETARG_SPOLY(0);
 	SPOLY	   *poly2 = PG_GETARG_SPOLY(1);
 
-	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, FALSE) == PGS_POLY_AVOID);
+	PG_RETURN_BOOL(poly_poly_pos(poly1, poly2, false) == PGS_POLY_AVOID);
 }
 
 Datum
