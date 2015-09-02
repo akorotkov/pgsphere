@@ -129,8 +129,8 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 	else if (FPzero(sb->sw.lng) && FPeq(sb->ne.lng, PID))
 	{
 		/* full latitude range */
-		static const SPoint tmpn = {0.0, PIH};
-		static const SPoint tmps = {0.0, -PIH};
+		const SPoint tmpn = {0.0, PIH};
+		const SPoint tmps = {0.0, -PIH};
 
 		if (spoint_eq(&sb->ne, &tmpn)
 				&& FPge(sc->center.lat - sc->radius, sb->sw.lat))
@@ -172,18 +172,18 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 	else
 	{
 		bool		lat_b_cont_c =
-				((sc->center.lat + sc->radius) <= sb->ne.lat) &&
-				((sc->center.lat - sc->radius) >= sb->sw.lat);
+						((sc->center.lat + sc->radius) <= sb->ne.lat) &&
+						((sc->center.lat - sc->radius) >= sb->sw.lat);
 		bool		bcc = sbox_cont_point(sb, &sc->center);
 		bool		ccb = FALSE;
-		static int8 pw,
+		int8		pw,
 					pe;
-		static SLine bw,
+		SLine		bw,
 					be;
 
 		/* west and east boundary */
-		static SPoint bc;
-		static SPoint p1,
+		SPoint		bc;
+		SPoint		p1,
 					p2;
 
 		/* center */
@@ -258,11 +258,11 @@ sbox_circle_pos(const SCIRCLE *sc, const SBOX *sb)
 static int8
 sbox_line_pos(const SLine *sl, const SBOX *sb)
 {
-	static SPoint	p1, p2, pbg, ped;
-	static SPoint	lc[4];
-	static int8		pw,	pe,	lcn,lcs;
-	static SLine	bw, be;
-	static float8	minlat,	maxlat;
+	SPoint	p1, p2, pbg, ped;
+	SPoint	lc[4];
+	int8	pw,	pe,	lcn,lcs;
+	SLine	bw, be;
+	float8	minlat,	maxlat;
 
 	sline_begin(&pbg, sl);
 	sline_end(&ped, sl);
@@ -380,8 +380,8 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 
 	if (pw && pe)
 	{
-		static SPoint sp;
-		static int	i;
+		SPoint sp;
+		int	i;
 
 		for (i = 0; i < lcn; i++)
 		{
@@ -427,13 +427,13 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 static int8
 sbox_path_pos(const SPATH *path, const SBOX *box)
 {
-	static int8 pos;
-	static int32 i;
-	static SLine sl;
-	static int32 n;
-	static const int8 sb_in = (1 << PGS_BOX_CONT_LINE);
-	static const int8 sb_ov = (1 << PGS_BOX_LINE_OVER);
-	static const int8 sb_os = (1 << PGS_BOX_LINE_AVOID);
+	int8		pos;
+	int32		i;
+	SLine		sl;
+	int32		n;
+	const int8	sb_in = (1 << PGS_BOX_CONT_LINE);
+	const int8	sb_ov = (1 << PGS_BOX_LINE_OVER);
+	const int8	sb_os = (1 << PGS_BOX_LINE_AVOID);
 
 	n = path->npts - 1;
 	pos = 0;
@@ -549,14 +549,14 @@ sbox_poly_pos(const SPOLY *poly, const SBOX *box)
 static int8
 sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 {
-	static SCIRCLE sco,
+	SCIRCLE		sco,
 				sci;
-	static SPoint ec;
-	static int8 pw,
+	SPoint		ec;
+	int8		pw,
 				pe,
 				po,
 				pi;
-	static SLine bw,
+	SLine		bw,
 				be;
 
 	if (spoint_eq(&box->sw, &box->ne))
@@ -672,11 +672,8 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 	pe = sellipse_line_pos(ell, &be);
 
 	/* check meridians */
-
-	if (
-		pw == PGS_ELLIPSE_LINE_AVOID &&
-		pe == PGS_ELLIPSE_LINE_AVOID
-		)
+	if (pw == PGS_ELLIPSE_LINE_AVOID &&
+		pe == PGS_ELLIPSE_LINE_AVOID)
 	{
 		/* center is between west and east meridians */
 		if ((FPgt(box->sw.lng, box->ne.lng)
@@ -716,7 +713,7 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 	}
 	else
 	{
-		static SPoint p1, p2;
+		SPoint	p1, p2;
 
 		/* create east/west boundaries */
 		p1.lat = box->sw.lat;
@@ -749,10 +746,10 @@ sbox_ellipse_pos(const SELLIPSE *ell, const SBOX *box)
 static int8
 sbox_box_pos(const SBOX *b1, const SBOX *b2, bool recheck)
 {
-	static SPoint	p1, p2, bc;
-	static int8		pw, pe;
-	static SLine	bw, be;
-	static bool		scp;
+	SPoint	p1, p2, bc;
+	int8	pw, pe;
+	SLine	bw, be;
+	bool	scp;
 
 	if (spoint_eq(&b2->sw, &b2->ne))
 	{
@@ -784,9 +781,11 @@ sbox_box_pos(const SBOX *b1, const SBOX *b2, bool recheck)
 	/* create east/west boundaries from b2 */
 	p1.lat = b2->sw.lat;
 	p2.lat = b2->ne.lat;
+
 	/* west */
 	p1.lng = p2.lng = b2->sw.lng;
 	sline_from_points(&bw, &p1, &p2);
+
 	/* east */
 	p1.lng = p2.lng = b2->ne.lng;
 	sline_from_points(&be, &p1, &p2);

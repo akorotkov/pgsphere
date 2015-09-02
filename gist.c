@@ -45,7 +45,7 @@ uchar
 spherekey_interleave(const int32 *k1, const int32 *k2)
 {
 	uchar		i;
-	static char tb;
+	char		tb;
 
 	/* i represents x,y,z */
 	tb = 0;
@@ -95,9 +95,9 @@ spherekey_in(PG_FUNCTION_ARGS)
 Datum
 spherekey_out(PG_FUNCTION_ARGS)
 {
-	static const float8 ks = (float8) MAXCVALUE;
-	int32	   *k = (int32 *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) palloc(1024);
+	const float8	ks = (float8) MAXCVALUE;
+	int32		   *k = (int32 *) PG_GETARG_POINTER(0);
+	char		   *buffer = (char *) palloc(1024);
 
 	sprintf(buffer, "(%.9f,%.9f,%.9f),(%.9f,%.9f,%.9f)",
 			k[0] / ks, k[1] / ks, k[2] / ks,
@@ -110,8 +110,8 @@ spherekey_out(PG_FUNCTION_ARGS)
 static bool
 get_sizes(GiSTSPointKey *k, float8 sizes[3])
 {
-	int			i;
-	static const float8 ks = (float8) MAXCVALUE;
+	int				i;
+	const float8	ks = (float8) MAXCVALUE;
 
 	if (IS_LEAF(k))
 		return false;
@@ -171,9 +171,9 @@ pointkey_in(PG_FUNCTION_ARGS)
 Datum
 pointkey_out(PG_FUNCTION_ARGS)
 {
-	static const float8 ks = (float8) MAXCVALUE;
-	GiSTSPointKey *k = (GiSTSPointKey *) PG_GETARG_POINTER(0);
-	char	   *buffer = (char *) palloc(1024);
+	const float8	ks = (float8) MAXCVALUE;
+	GiSTSPointKey  *k = (GiSTSPointKey *) PG_GETARG_POINTER(0);
+	char		   *buffer = (char *) palloc(1024);
 
 	if (IS_LEAF(k))
 	{
@@ -370,7 +370,7 @@ g_spherekey_same(PG_FUNCTION_ARGS)
 	int32	   *c1 = (int32 *) PG_GETARG_POINTER(0);
 	int32	   *c2 = (int32 *) PG_GETARG_POINTER(1);
 	bool	   *result = (bool *) PG_GETARG_POINTER(2);
-	static int	i;
+	int			i;
 
 	*result = TRUE;
 

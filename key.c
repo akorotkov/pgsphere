@@ -14,7 +14,7 @@ PG_MODULE_MAGIC;
 static int32 *
 key_add_point(int32 *key, const SPoint *p)
 {
-	static int32 k[3];
+	int32	k[3];
 
 	spherepoint_gen_key(&k[0], p);
 	spherekey_union_two(key, &k[0]);
@@ -55,7 +55,7 @@ int32 *
 spherepoint_gen_key(int32 *k, const SPoint *sp)
 {
 	Vector3D	v;
-	static const int32 ks = MAXCVALUE;
+	const int32	ks = MAXCVALUE;
 
 	spoint_vector3d(&v, sp);
 
@@ -82,18 +82,17 @@ spherepoint_gen_key(int32 *k, const SPoint *sp)
 	return (k);
 }
 
-
 int32 *
 spherecircle_gen_key(int32 *k, const SCIRCLE *c)
 {
-	static double r,
+	double		r,
 				d;
-	static const int32 ks = MAXCVALUE;
-	static int	i;
-	static Vector3D v[8];
-	static Vector3D tv;
-	static Vector3D mm[2];
-	static SEuler se;
+	const int32	ks = MAXCVALUE;
+	int			i;
+	Vector3D	v[8];
+	Vector3D	tv;
+	Vector3D	mm[2];
+	SEuler		se;
 
 	r = sin(c->radius);
 	d = cos(c->radius);
@@ -191,18 +190,17 @@ spherecircle_gen_key(int32 *k, const SCIRCLE *c)
 
 }
 
-
 int32 *
 sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 {
-	static double r[2],
+	double		r[2],
 				d;
-	static const int32 ks = MAXCVALUE;
-	static int	i;
-	static Vector3D v[8];
-	static Vector3D tv;
-	static Vector3D mm[2];
-	static SEuler se;
+	const int32	ks = MAXCVALUE;
+	int			i;
+	Vector3D	v[8];
+	Vector3D	tv;
+	Vector3D	mm[2];
+	SEuler		se;
 
 	r[0] = sin(e->rad[0]);
 	r[1] = sin(e->rad[1]);
@@ -301,17 +299,15 @@ sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 int32 *
 sphereline_gen_key(int32 *k, const SLine *sl)
 {
-	static const int32 ks = MAXCVALUE;
-	static SPoint p[3];
+	const int32	ks = MAXCVALUE;
+	SPoint		p[3];
 
 	sline_begin(&p[0], sl);
 	sline_end(&p[1], sl);
 
 	if (FPzero(sl->length))
 	{
-
-		static Vector3D vbeg,
-					vend;
+		Vector3D	vbeg, vend;
 
 		spoint_vector3d(&vbeg, &p[0]);
 		spoint_vector3d(&vend, &p[1]);
@@ -322,19 +318,17 @@ sphereline_gen_key(int32 *k, const SLine *sl)
 		k[3] = Max(vbeg.x, vend.x) * ks;
 		k[4] = Max(vbeg.y, vend.y) * ks;
 		k[5] = Max(vbeg.z, vend.z) * ks;
-
 	}
 	else
 	{
-
-		static Vector3D v[4],
+		Vector3D	v[4],
 					vt,
 					vr[2];
-		static SEuler se;
-		static float8 l,
+		SEuler		se;
+		float8		l,
 					ls,
 					lc;
-		static int8 i;
+		int8		i;
 
 		sphereline_to_euler(&se, sl);
 		l = sl->length / 2.0;
@@ -387,18 +381,16 @@ sphereline_gen_key(int32 *k, const SLine *sl)
 	return k;
 }
 
- /*
-  * ! \brief Creates the key of a polygon \param sp pointer to polygon \param
-  * key pointer to key \return pointer to key
-  */
-
+/*
+ * Creates the key of a polygon.
+ */
 int32 *
 spherepoly_gen_key(int32 *key, const SPOLY *sp)
 {
-	static int32 i;
-	static SLine l;
-	static int32 tk[6];
-	bool		start = TRUE;
+	int32	i;
+	SLine	l;
+	int32	tk[6];
+	bool	start = TRUE;
 
 	for (i = 0; i < sp->npts; i++)
 	{
@@ -423,15 +415,14 @@ spherepoly_gen_key(int32 *key, const SPOLY *sp)
 	return key;
 }
 
-
 int32 *
 spherepath_gen_key(int32 *key, const SPATH *sp)
 {
-	static int32 i,
+	int32		i,
 				k,
 				r;
-	static SLine l;
-	static int32 tk[6];
+	SLine		l;
+	int32		tk[6];
 	bool		start = TRUE;
 
 	for (i = 0; i < sp->npts; i++)
@@ -461,13 +452,11 @@ spherepath_gen_key(int32 *key, const SPATH *sp)
 	return key;
 }
 
-
-
 int32 *
 spherebox_gen_key(int32 *key, const SBOX *box)
 {
-	static SPoint p;
-	static float8 d;
+	SPoint	p;
+	float8	d;
 
 	key[0] = key[1] = key[2] = MAXCVALUE;
 	key[3] = key[4] = key[5] = -MAXCVALUE;

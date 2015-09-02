@@ -30,7 +30,7 @@ spoint_eq(const SPoint *p1, const SPoint *p2)
 void
 spoint_check(SPoint *spoint)
 {
-	static bool lat_is_neg;
+	bool	lat_is_neg;
 
 	lat_is_neg = (spoint->lat < 0) ? (TRUE) : (FALSE);
 
@@ -220,7 +220,7 @@ Datum
 spherepoint_x(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
-	static Vector3D v;
+	Vector3D	v;
 
 	spoint_vector3d(&v, p);
 	PG_RETURN_FLOAT8(v.x);
@@ -230,7 +230,7 @@ Datum
 spherepoint_y(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
-	static Vector3D v;
+	Vector3D	v;
 
 	spoint_vector3d(&v, p);
 	PG_RETURN_FLOAT8(v.y);
@@ -240,7 +240,7 @@ Datum
 spherepoint_z(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
-	static Vector3D v;
+	Vector3D	v;
 
 	spoint_vector3d(&v, p);
 	PG_RETURN_FLOAT8(v.z);
@@ -252,7 +252,7 @@ spherepoint_xyz(PG_FUNCTION_ARGS)
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
 	Datum		dret[3];
 	ArrayType  *result;
-	static Vector3D v;
+	Vector3D	v;
 
 	spoint_vector3d(&v, p);
 	dret[0] = Float8GetDatumFast(v.x);

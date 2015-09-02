@@ -36,15 +36,15 @@ PG_FUNCTION_INFO_V1(spheretrans_from_line);
 PG_FUNCTION_INFO_V1(spheretrans_line);
 PG_FUNCTION_INFO_V1(spheretrans_line_inverse);
 
- /*
-  * Swaps begin and end of the line. "out" is pointer to the result spherical
-  * line. "in" is pointer to the input spherical line.
-  */
+/*
+ * Swaps begin and end of the line. "out" is pointer to the result spherical
+ * line. "in" is pointer to the input spherical line.
+ */
 static void
 sline_swap_beg_end(SLine *out, const SLine *in)
 {
-	static SLine l;
-	static SEuler se;
+	SLine	l;
+	SEuler	se;
 
 	l.length = in->length;
 	l.phi = -in->length;
@@ -66,7 +66,7 @@ sline_eq(const SLine *l1, const SLine *l2)
 	}
 	else
 	{
-		static SEuler e1, e2;
+		SEuler	e1, e2;
 
 		seuler_set_zxz(&e1);
 		seuler_set_zxz(&e2);
@@ -85,8 +85,8 @@ sline_eq(const SLine *l1, const SLine *l2)
 bool
 sline_from_points(SLine *sl, const SPoint *pbeg, const SPoint *pend)
 {
-	static SEuler se;
-	static float8 l;
+	SEuler	se;
+	float8	l;
 
 	l = spoint_dist(pbeg, pend);
 
@@ -130,8 +130,8 @@ sline_meridian(SLine *sl, float8 lng)
 void
 sline_begin(SPoint *p, const SLine *l)
 {
-	const static SPoint tmp = {0.0, 0.0};
-	static SEuler se;
+	const SPoint	tmp = {0.0, 0.0};
+	SEuler			se;
 
 	sphereline_to_euler(&se, l);
 	euler_spoint_trans(p, &tmp, &se);
@@ -140,8 +140,8 @@ sline_begin(SPoint *p, const SLine *l)
 void
 sline_end(SPoint *p, const SLine *l)
 {
-	static SPoint tmp = {0.0, 0.0};
-	static SEuler se;
+	SPoint	tmp = {0.0, 0.0};
+	SEuler	se;
 
 	tmp.lng = l->length;
 	sphereline_to_euler(&se, l);
@@ -154,8 +154,8 @@ sline_end(SPoint *p, const SLine *l)
 static void
 sline_vector_begin(Vector3D *v, const SLine *l)
 {
-	const static Vector3D tmp = {1.0, 0.0, 0.0};
-	static SEuler se;
+	const Vector3D	tmp = {1.0, 0.0, 0.0};
+	SEuler			se;
 
 	sphereline_to_euler(&se, l);
 	euler_vector_trans(v, &tmp, &se);
@@ -167,8 +167,8 @@ sline_vector_begin(Vector3D *v, const SLine *l)
 static void
 sline_vector_end(Vector3D *v, const SLine *l)
 {
-	static Vector3D tmp = {0.0, 0.0, 0.0};
-	static SEuler se;
+	Vector3D	tmp = {0.0, 0.0, 0.0};
+	SEuler		se;
 
 	tmp.x = cos(l->length);
 	tmp.y = sin(l->length);
@@ -339,13 +339,13 @@ sphereline_latitude_points(const SLine *sl, float8 lat, SPoint *p1, SPoint *p2)
 int8
 sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 {
-	static float8	i, mi;
-	static const	float8 step = (PI - 0.01);
-	static SPoint	p[2] = {{0.0, 0.0}, {0.0, 0.0}};
-	static SCIRCLE	c;
-	static bool		bbeg, bend;
-	static SEuler	se;
-	static int		contain;
+	float8			i, mi;
+	const float8	step = (PI - 0.01);
+	SPoint			p[2] = {{0.0, 0.0}, {0.0, 0.0}};
+	SCIRCLE			c;
+	bool			bbeg, bend;
+	SEuler			se;
+	int				contain;
 
 	if (FPzero(sl->length))
 	{
@@ -408,8 +408,8 @@ bool
 sline_circle_touch(const SLine *sl, const SCIRCLE *sc)
 {
 	/* we assume here, line and circle are overlapping */
-	static SEuler se;
-	static SCIRCLE tc;
+	SEuler	se;
+	SCIRCLE	tc;
 
 	sphereline_to_euler_inv(&se, sl);
 	euler_scircle_trans(&tc, sc, &se);
@@ -597,7 +597,7 @@ sphereline_to_euler(SEuler *se, const SLine *sl)
 void
 euler_sline_trans(SLine *out, const SLine *in, const SEuler *se)
 {
-	static SEuler stmp[2];
+	SEuler	stmp[2];
 
 	sphereline_to_euler(&stmp[0], in);
 	seuler_trans_zxz(&stmp[1], &stmp[0], se);
@@ -610,8 +610,8 @@ euler_sline_trans(SLine *out, const SLine *in, const SEuler *se)
 bool
 spoint_at_sline(const SPoint *p, const SLine *sl)
 {
-	static SEuler se;
-	static SPoint sp;
+	SEuler	se;
+	SPoint	sp;
 
 	sphereline_to_euler_inv(&se, sl);
 	euler_spoint_trans(&sp, p, &se);
@@ -636,8 +636,8 @@ spoint_at_sline(const SPoint *p, const SLine *sl)
 void
 sline_center(SPoint *c, const SLine *sl)
 {
-	static SEuler se;
-	static SPoint p;
+	SEuler	se;
+	SPoint	p;
 
 	p.lng = sl->length / 2.0;
 	p.lat = 0.0;
@@ -772,7 +772,7 @@ sphereline_from_trans(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-		static SEuler tmp;
+		SEuler	tmp;
 
 		if (FPgt(l, PID))
 		{

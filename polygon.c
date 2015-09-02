@@ -179,8 +179,8 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 	else
 	{
 
-		static int32 i;
-		static float8 scheck;
+		int32		i;
+		float8		scheck;
 		int32		size;
 
 		for (i = 0; i < nelem; i++)
@@ -449,10 +449,9 @@ poly_poly_pos(const SPOLY *p1, const SPOLY *p2, bool recheck)
 	SLine		sl;
 	int8		pos = 0,
 				res = 0;
-
-	const static int8 sp_os = (1 << PGS_LINE_POLY_AVOID);
-	const static int8 sp_ct = (1 << PGS_POLY_CONT_LINE);
-	const static int8 sp_ov = (1 << PGS_LINE_POLY_OVER);
+	const int8	sp_os = (1 << PGS_LINE_POLY_AVOID);
+	const int8	sp_ct = (1 << PGS_POLY_CONT_LINE);
+	const int8	sp_ov = (1 << PGS_LINE_POLY_OVER);
 
 	for (i = 0; i < p2->npts; i++)
 	{
@@ -494,7 +493,7 @@ poly_poly_pos(const SPOLY *p1, const SPOLY *p2, bool recheck)
 bool
 spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir)
 {
-	bool		ret = FALSE;
+	bool		ret = false;
 
 	if (p1->npts == p2->npts)
 	{
@@ -519,7 +518,7 @@ spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir)
 			}
 			if (cntr == p1->npts)
 			{
-				ret = TRUE;
+				ret = true;
 				break;
 			}
 		}
@@ -527,7 +526,7 @@ spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir)
 		/* Try other direction, if not equal */
 		if (!dir && !ret)
 		{
-			ret = spoly_eq(p1, p2, TRUE);
+			ret = spoly_eq(p1, p2, true);
 		}
 
 	}
@@ -561,11 +560,11 @@ spoly_segment(SLine *sl, const SPOLY *poly, int32 i)
 bool
 spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 {
-	static int32 i;
-	static SLine sl;
-	bool		res = FALSE;
-	static float8 scp;
-	static Vector3D vc,
+	int32		i;
+	SLine		sl;
+	bool		res = false;
+	float8		scp;
+	Vector3D	vc,
 				vp;
 
 	/* First check, if point is outside polygon (behind) */
@@ -582,7 +581,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 	{
 		if (spoint_eq(&pg->p[i], sp))
 		{
-			return TRUE;
+			return true;
 		}
 	}
 
@@ -592,13 +591,12 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 		spoly_segment(&sl, pg, i);
 		if (spoint_at_sline(sp, &sl))
 		{
-			return TRUE;
+			return true;
 		}
 	}
 
 	do
 	{
-
 		SEuler		se,
 					te;
 		SPoint		p,
@@ -631,7 +629,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 		cntr = 0;
 		do
 		{
-			eqa = FALSE;
+			eqa = false;
 			for (i = 0; i < pg->npts; i++)
 			{
 				if (FPzero(tmp->p[i].lat))
@@ -642,7 +640,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 					}
 					else
 					{
-						eqa = TRUE;
+						eqa = true;
 						break;
 					}
 				}
@@ -709,7 +707,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 		pfree(tmp);
 		if (cntr % 2)
 		{
-			res = TRUE;
+			res = true;
 		}
 
 	} while (0);
@@ -725,21 +723,20 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 int8
 poly_line_pos(const SPOLY *poly, const SLine *line)
 {
-	static int32 i;
-	static SLine sl;
-	static SPoint slbeg,
+	int32		i;
+	SLine		sl;
+	SPoint		slbeg,
 				slend;
-	static int8 p1,
+	int8		p1,
 				p2,
 				pos,
 				res;
-
-	const static int8 sl_os = (1 << PGS_LINE_AVOID);
-	const static int8 sl_cl = (1 << PGS_LINE_CONT_LINE);
-	const static int8 sl_cr = (1 << PGS_LINE_CROSS);
-	const static int8 sl_cn = (1 << PGS_LINE_CONNECT);
-	const static int8 sl_ov = (1 << PGS_LINE_OVER);
-	const static int8 sl_eq = (1 << PGS_LINE_EQUAL);
+	const int8	sl_os = (1 << PGS_LINE_AVOID);
+	const int8	sl_cl = (1 << PGS_LINE_CONT_LINE);
+	const int8	sl_cr = (1 << PGS_LINE_CROSS);
+	const int8	sl_cn = (1 << PGS_LINE_CONNECT);
+	const int8	sl_ov = (1 << PGS_LINE_OVER);
+	const int8	sl_eq = (1 << PGS_LINE_EQUAL);
 
 	pos = 0;
 	res = 0;
@@ -767,8 +764,8 @@ poly_line_pos(const SPOLY *poly, const SLine *line)
 		/* Recheck line crossing */
 		if (pos == sl_cr)
 		{
-			static bool bal,
-						eal;
+			bool	bal,
+					eal;
 
 			bal = spoint_at_sline(&slbeg, &sl);
 			eal = spoint_at_sline(&slend, &sl);
@@ -811,7 +808,7 @@ spherepoly_in(PG_FUNCTION_ARGS)
 {
 	SPOLY	   *poly;
 	char	   *c = PG_GETARG_CSTRING(0);
-	static int32 i,
+	int32		i,
 				nelem;
 
 	void		sphere_yyparse(void);
