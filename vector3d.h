@@ -22,7 +22,7 @@ typedef struct
  * Calculate the cross product of two vectors. Puts cross product of v1 and v2
  * into out and returns it.
  */
-Vector3D   *vector3d_cross(Vector3D *out, const Vector3D *v1, const Vector3D *v2);
+void		vector3d_cross(Vector3D *out, const Vector3D *v1, const Vector3D *v2);
 
 /*
  * Checks equality of two vectors.

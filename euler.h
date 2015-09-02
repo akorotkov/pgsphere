@@ -25,7 +25,7 @@ typedef struct
  * Transforms a spherical point and returns pointer to transformed spherical
  * point.
  */
-SPoint	   *euler_spoint_trans(SPoint *out, const SPoint *in, const SEuler *se);
+void		euler_spoint_trans(SPoint *out, const SPoint *in, const SEuler *se);
 
 /*
  * Transforms a spherical vector from spb to spe into a Euler transformation.
@@ -47,31 +47,31 @@ bool		strans_eq(const SEuler *e1, const SEuler *e2);
  * Transforms a vector using an Euler transformation. Returns pointer to
  * result vector.
  */
-Vector3D   *euler_vector_trans(Vector3D *out, const Vector3D *in, const SEuler *se);
+void		euler_vector_trans(Vector3D *out, const Vector3D *in, const SEuler *se);
 
 /*
  * Inverts an Euler transformation. Returns pointer to inverted transformation.
  */
-SEuler	   *spheretrans_inverse(SEuler *se_out, const SEuler *se_in);
+void		spheretrans_inverse(SEuler *se_out, const SEuler *se_in);
 
 /*
  * Inverts an Euler transformation replacing original Euler transformation.
  * Returns pointer to inverted transformation.
  */
-SEuler	   *spheretrans_inv(SEuler *se);
+void		spheretrans_inv(SEuler *se);
 
 /*
  * Converts an Euler transformation to a ZXZ-axis transformation. Returns
  * pointer to converted transformation.
  */
-SEuler	   *strans_zxz(SEuler *ret, const SEuler *se);
+void		strans_zxz(SEuler *ret, const SEuler *se);
 
 /*
  * Transforms an Euler transformation "in" into "out" using "se". The result
  * is always a ZXZ-axis transformation. Returns pointer to transformed
  * transformation.
  */
-SEuler	   *seuler_trans_zxz(SEuler *out, const SEuler *in, const SEuler *se);
+void		seuler_trans_zxz(SEuler *out, const SEuler *in, const SEuler *se);
 
 /*
  * Input of Euler transformation \return a Euler transformation.

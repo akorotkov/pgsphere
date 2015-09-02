@@ -109,13 +109,12 @@ vector3d_spoint(SPoint *p, const Vector3D *v)
 	}
 }
 
-Vector3D *
+void
 spoint_vector3d(Vector3D *v, const SPoint *p)
 {
 	v->x = cos(p->lng) * cos(p->lat);
 	v->y = sin(p->lng) * cos(p->lat);
 	v->z = sin(p->lat);
-	return (v);
 }
 
 Datum

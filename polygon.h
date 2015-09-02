@@ -87,7 +87,7 @@ bool		spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir);
  * line segment \param poly pointer to polygon \param i	number of segment
  * \return pointer to line segment, NULL if fails
  */
-SLine	   *spoly_segment(SLine *sl, const SPOLY *poly, int32 i);
+bool		spoly_segment(SLine *sl, const SPOLY *poly, int32 i);
 
 /*
  * ! \brief Checks, whether polygon contains point \param sp pointer to point

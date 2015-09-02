@@ -68,7 +68,7 @@ PG_FUNCTION_INFO_V1(spherepoly_add_points_finalize);
   * ! \brief "Center" of a polygon \param v pointer to center of polygon
   * \param poly pointer to polygon \return true if crossing
   */
-static Vector3D *
+static void
 spherepoly_center(Vector3D *v, const SPOLY *poly)
 {
 	int32		i;
@@ -96,8 +96,6 @@ spherepoly_center(Vector3D *v, const SPOLY *poly)
 	v->x = (v1.x + v2.x) / 2.0;
 	v->y = (v1.y + v2.y) / 2.0;
 	v->z = (v1.z + v2.z) / 2.0;
-
-	return v;
 }
 
 
@@ -246,7 +244,7 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 		return NULL;
 	}
 
-	return (poly);
+	return poly;
 
 }
 
@@ -257,7 +255,7 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
   * \param out pointer to transformed polygon \return pointer to transformed
   * polygon
   */
-static SPOLY *
+static void
 euler_spoly_trans(SPOLY *out, const SPOLY *in, const SEuler *se)
 {
 	int32		i;
@@ -265,10 +263,7 @@ euler_spoly_trans(SPOLY *out, const SPOLY *in, const SEuler *se)
 	out->size = in->size;
 	out->npts = in->npts;
 	for (i = 0; i < in->npts; i++)
-	{
 		euler_spoint_trans(&out->p[i], &in->p[i], se);
-	}
-	return out;
 }
 
 
@@ -534,28 +529,22 @@ spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir)
 	return ret;
 }
 
-
-SLine *
+bool
 spoly_segment(SLine *sl, const SPOLY *poly, int32 i)
 {
 	if (i >= 0 && i < poly->npts)
 	{
 		if (i == (poly->npts - 1))
-		{
 			sline_from_points(sl, &poly->p[i], &poly->p[0]);
-		}
 		else
-		{
 			sline_from_points(sl, &poly->p[i], &poly->p[i + 1]);
-		}
-		return sl;
+		return true;
 	}
 	else
 	{
-		return NULL;
+		return false;
 	}
 }
-
 
 bool
 spoly_contains_point(const SPOLY *pg, const SPoint *sp)
@@ -866,7 +855,8 @@ spherepoly_circ(PG_FUNCTION_ARGS)
 
 	for (i = 0; i < poly->npts; i++)
 	{
-		sum += (spoly_segment(&l, poly, i))->length;
+		spoly_segment(&l, poly, i);
+		sum += l.length;
 	}
 	PG_RETURN_FLOAT8(sum);
 }
@@ -1317,7 +1307,8 @@ spheretrans_poly(PG_FUNCTION_ARGS)
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
 	SPOLY	   *out = (SPOLY *) palloc(VARSIZE(sp));
 
-	PG_RETURN_POINTER(euler_spoly_trans(out, sp, se));
+	euler_spoly_trans(out, sp, se);
+	PG_RETURN_POINTER(out);
 }
 
 Datum

@@ -79,7 +79,7 @@ bool		spath_cont_point(const SPATH *path, const SPoint *sp);
  * line segment \param path pointer to path \param i	 number of segment
  * \return pointer to line segment, NULL if fails
  */
-SLine	   *spath_segment(SLine *sl, const SPATH *path, int32 i);
+bool		spath_segment(SLine *sl, const SPATH *path, int32 i);
 
 
 /*

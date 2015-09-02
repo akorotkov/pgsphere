@@ -126,13 +126,12 @@ spherepath_from_array(SPoint *arr, int32 nelem)
 
 }
 
-
- /*
-  * ! \brief Does an Euler transformation on a path \param out pointer to
-  * result path \param in  pointer to input path \param se	pointer to Euler
-  * transformation \return pointer to result path
-  */
-static SPATH *
+/*
+ * ! \brief Does an Euler transformation on a path \param out pointer to
+ * result path \param in  pointer to input path \param se	pointer to Euler
+ * transformation \return pointer to result path
+ */
+static void
 euler_spath_trans(SPATH *out, const SPATH *in, const SEuler *se)
 {
 	int32		i;
@@ -140,20 +139,14 @@ euler_spath_trans(SPATH *out, const SPATH *in, const SEuler *se)
 	out->size = in->size;
 	out->npts = in->npts;
 	for (i = 0; i < in->npts; i++)
-	{
 		euler_spoint_trans(&out->p[i], &in->p[i], se);
-	}
-	return out;
 }
 
-
-
-
- /*
-  * ! \brief Returns the relationship between path and circle \param path
-  * pointer to path \param circ pointer to circle \return relationship as a
-  * \link PGS_CIRCLE_PATH_REL int8 value \endlink (\ref PGS_CIRCLE_PATH_REL )
-  */
+/*
+ * ! \brief Returns the relationship between path and circle \param path
+ * pointer to path \param circ pointer to circle \return relationship as a
+ * \link PGS_CIRCLE_PATH_REL int8 value \endlink (\ref PGS_CIRCLE_PATH_REL )
+ */
 static int8
 path_circle_pos(const SPATH *path, const SCIRCLE *circ)
 {
@@ -277,9 +270,7 @@ path_ellipse_pos(const SPATH *path, const SELLIPSE *ell)
 		SLine	l;
 
 		sellipse_line(&l, ell);
-/*!
-\todo implement ellipse contains path if ellipse is a line
-*/
+		/* TODO implement ellipse contains path if ellipse is a line */
 		if (path_line_overlap(path, &l))
 		{
 			return PGS_ELLIPSE_PATH_OVER;
@@ -318,11 +309,11 @@ path_ellipse_pos(const SPATH *path, const SELLIPSE *ell)
 }
 
 
- /*
-  * ! \brief Checks, whether two pathes are overlapping \param path1 pointer
-  * to first path \param path2 pointer to second path \return true, if
-  * overlapping
-  */
+/*
+ * ! \brief Checks, whether two pathes are overlapping \param path1 pointer
+ * to first path \param path2 pointer to second path \return true, if
+ * overlapping
+ */
 static bool
 path_overlap(const SPATH *path1, const SPATH *path2)
 {
@@ -334,19 +325,19 @@ path_overlap(const SPATH *path1, const SPATH *path2)
 		spath_segment(&sl, path1, i);
 		if (path_line_overlap(path2, &sl))
 		{
-			return TRUE;
 			/* overlap */
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 
- /*
-  * ! \brief Returns the relationship between path and polygon \param path
-  * pointer to path \param poly pointer to polygon \return relationship as a
-  * \link PGS_POLY_PATH_REL int8 value \endlink (\ref PGS_POLY_PATH_REL )
-  */
+/*
+ * ! \brief Returns the relationship between path and polygon \param path
+ * pointer to path \param poly pointer to polygon \return relationship as a
+ * \link PGS_POLY_PATH_REL int8 value \endlink (\ref PGS_POLY_PATH_REL )
+ */
 static int8
 path_poly_pos(const SPATH *path, const SPOLY *poly)
 {
@@ -369,8 +360,7 @@ path_poly_pos(const SPATH *path, const SPOLY *poly)
 		pos = (1 << poly_line_pos(poly, &sl));
 		if (pos == sp_ov)
 		{
-			return PGS_POLY_PATH_OVER;
-			/* overlap */
+			return PGS_POLY_PATH_OVER; /* overlap */
 		}
 		res |= pos;
 	}
@@ -392,15 +382,15 @@ path_poly_pos(const SPATH *path, const SPOLY *poly)
   * point \param path pointer to path \param i	  number of point \return
   * pointer to result point \see spath_point ( SPoint * , SPATH *, float8 )
   */
-static SPoint *
+static bool
 spath_get_point(SPoint *sp, const SPATH *path, int32 i)
 {
 	if (i >= 0 && i < path->npts)
 	{
 		memcpy((void *) sp, (void *) &path->p[i], sizeof(SPoint));
-		return sp;
+		return true;
 	}
-	return NULL;
+	return false;
 }
 
  /*
@@ -409,21 +399,15 @@ spath_get_point(SPoint *sp, const SPATH *path, int32 i)
   * \param f	"number" of point \return pointer to result point \see
   * spherepath_point(PG_FUNCTION_ARGS)
   */
-static SPoint *
+static bool
 spath_point(SPoint *sp, const SPATH *path, float8 f)
 {
 	SLine		sl;
-	SLine	   *slp;
 	int32		i;
 
 	i = (int32) floor(f);
 
-	slp = spath_segment(&sl, path, i);
-	if (!slp)
-	{
-		return NULL;
-	}
-	else
+	if (spath_segment(&sl, path, i))
 	{
 		SEuler	se;
 		SPoint	tp;
@@ -433,17 +417,18 @@ spath_point(SPoint *sp, const SPATH *path, float8 f)
 		tp.lng = sl.length * (f - (float8) i);
 		tp.lat = 0.0;
 		euler_spoint_trans(sp, &tp, &se);
-		return sp;
+		return true;
 	}
-	return NULL;
+	else
+	{
+		return false;
+	}
 }
 
-
-
- /*
-  * ! \brief Checks whether two pathes are equal \param p1	pointer to first
-  * path \param p2	pointer to secondpath \return true, if equal
-  */
+/*
+ * ! \brief Checks whether two pathes are equal \param p1	pointer to first
+ * path \param p2	pointer to secondpath \return true, if equal
+ */
 bool
 spath_eq(const SPATH *p1, const SPATH *p2)
 {
@@ -452,19 +437,19 @@ spath_eq(const SPATH *p1, const SPATH *p2)
 		int32	i;
 		bool	ret;
 
-		ret = TRUE;
+		ret = true;
 
 		for (i = 0; i < p1->npts; i++)
 		{
 			if (!spoint_eq(&p1->p[i], &p2->p[i]))
 			{
-				ret = FALSE;
+				ret = false;
 				break;
 			}
 		}
-		return (ret);
+		return ret;
 	}
-	return (FALSE);
+	return false;
 }
 
 bool
@@ -476,32 +461,31 @@ spath_cont_point(const SPATH *path, const SPoint *sp)
 	int32	i;
 
 	n = path->npts - 1;
-	ret = FALSE;
+	ret = false;
 
 	for (i = 0; i < n; i++)
 	{
 		spath_segment(&sl, path, i);
 		if (spoint_at_sline(sp, &sl))
 		{
-			ret = TRUE;
+			ret = true;
 			break;
 		}
 	}
 
-	return (ret);
+	return ret;
 }
 
-SLine *
+bool
 spath_segment(SLine *sl, const SPATH *path, int32 i)
 {
 	if (i >= 0 && i < (path->npts - 1))
 	{
 		sline_from_points(sl, &path->p[i], &path->p[i + 1]);
-		return sl;
+		return true;
 	}
-	return NULL;
+	return false;
 }
-
 
 Datum
 spherepath_in(PG_FUNCTION_ARGS)
@@ -602,7 +586,8 @@ spherepath_length(PG_FUNCTION_ARGS)
 
 	for (i = 0; i < n; i++)
 	{
-		sum += (spath_segment(&l, path, i))->length;
+		spath_segment(&l, path, i);
+		sum += l.length;
 	}
 	PG_RETURN_FLOAT8(sum);
 }
@@ -948,7 +933,8 @@ spheretrans_path(PG_FUNCTION_ARGS)
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
 	SPATH	   *out = (SPATH *) palloc(VARSIZE(sp));
 
-	PG_RETURN_POINTER(euler_spath_trans(out, sp, se));
+	euler_spath_trans(out, sp, se);
+	PG_RETURN_POINTER(out);
 }
 
 Datum

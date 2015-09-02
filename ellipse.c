@@ -68,7 +68,7 @@ my_acos(float8 a)
 /*
  *  Checks the parameter of an ellipse.
  */
-static SELLIPSE *
+static void
 sellipse_check(SELLIPSE *e)
 {
 	SPoint sp;
@@ -76,13 +76,9 @@ sellipse_check(SELLIPSE *e)
 	sp.lng = e->phi;
 	spoint_check(&sp);
 	if (sp.lng < PI)
-	{
 		e->phi = sp.lng;
-	}
 	else
-	{
 		e->phi = sp.lng - PI;
-	}
 	sp.lng = 0.0;
 	sp.lat = e->theta;
 	spoint_check(&sp);
@@ -91,13 +87,12 @@ sellipse_check(SELLIPSE *e)
 	sp.lat = 0.0;
 	spoint_check(&sp);
 	e->psi = sp.lng;
-	return e;
 }
 
 /*
  * Returns the boundary circle of an ellipse.
  */
-static SCIRCLE *
+static void
 sellipse_circle(SCIRCLE *sc, const SELLIPSE *e)
 {
 	SPoint sp;
@@ -105,7 +100,6 @@ sellipse_circle(SCIRCLE *sc, const SELLIPSE *e)
 	sellipse_center(&sp, e);
 	memcpy((void *) &sc->center, (void *) &sp, sizeof(SPoint));
 	sc->radius = e->rad[0];
-	return sc;
 }
 
 /*
@@ -132,7 +126,7 @@ sellipse_in(float8 r1, float8 r2, const SPoint *c, float8 inc)
 	{
 		sellipse_check(e);
 	}
-	return (e);
+	return e;
 }
 
 /*---
@@ -199,7 +193,7 @@ sellipse_point_dist(const SELLIPSE *se, const SPoint *sp)
 /*
  * Does an Euler transformation of ellipse.
  */
-static SELLIPSE *
+static void
 euler_sellipse_trans(SELLIPSE *out, const SELLIPSE *in, const SEuler *se)
 {
 	SEuler	et;
@@ -227,7 +221,6 @@ euler_sellipse_trans(SELLIPSE *out, const SELLIPSE *in, const SEuler *se)
 	out->phi = et.theta;
 	out->rad[0] = in->rad[0];
 	out->rad[1] = in->rad[1];
-	return out;
 }
 
 
@@ -501,7 +494,7 @@ sellipse_ellipse_pos(const SELLIPSE *se1, const SELLIPSE *se2)
 	return PGS_ELLIPSE_AVOID;
 }
 
-SEuler *
+void
 sellipse_trans(SEuler *se, const SELLIPSE *e)
 {
 	se->psi = e->psi;
@@ -510,20 +503,17 @@ sellipse_trans(SEuler *se, const SELLIPSE *e)
 	se->phi_a = EULER_AXIS_X;
 	se->theta_a = EULER_AXIS_Y;
 	se->psi_a = EULER_AXIS_Z;
-	return se;
 }
 
- /* Returns center of ellipse */
-SPoint *
+/* Returns center of ellipse */
+void
 sellipse_center(SPoint *sp, const SELLIPSE *e)
 {
 	sp->lng = e->psi;
 	sp->lat = -e->theta;
-	return sp;
 }
 
-
-SLine *
+bool
 sellipse_line(SLine *sl, const SELLIPSE *e)
 {
 	if (!FPzero(e->rad[0]))
@@ -536,22 +526,22 @@ sellipse_line(SLine *sl, const SELLIPSE *e)
 		p[0].lng = -e->rad[0];
 		p[1].lng = e->rad[0];
 		sline_from_points(&slt, &p[0], &p[1]);
-		euler_sline_trans(sl, &slt, sellipse_trans(&se, e));
+		sellipse_trans(&se, e);
+		euler_sline_trans(sl, &slt, &se);
+		return true;
 	}
 	else
 	{
-		sl = NULL;
+		return false;
 	}
-	return sl;
 }
-
 
 bool
 sellipse_eq(const SELLIPSE *e1, const SELLIPSE *e2)
 {
 	if (FPne(e1->rad[0], e2->rad[0]) || FPne(e1->rad[1], e2->rad[1]))
 	{
-		return FALSE;
+		return false;
 	}
 	else if (FPzero(e1->rad[0]))
 	{
@@ -579,22 +569,25 @@ sellipse_eq(const SELLIPSE *e1, const SELLIPSE *e2)
 		sellipse_trans(&se[1], e2);
 		return strans_eq(&se[0], &se[1]);
 	}
-	return FALSE;
+	return false;
 }
 
 bool
 sellipse_cont_point(const SELLIPSE *se, const SPoint *sp)
 {
 	SPoint		c;
-	float8		dist = spoint_dist(sp, sellipse_center(&c, se));
+	float8		dist;
+
+	sellipse_center(&c, se);
+	dist = spoint_dist(sp, &c);
 
 	if (FPgt(dist, se->rad[0]))
 	{
-		return FALSE;
+		return false;
 	}
 	if (FPle(dist, se->rad[1]))
 	{
-		return TRUE;
+		return true;
 	}
 	if (FPzero(se->rad[1]))
 	{
@@ -631,7 +624,7 @@ sellipse_cont_point(const SELLIPSE *se, const SPoint *sp)
 			return FALSE;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -934,7 +927,8 @@ sellipse_circle_pos(const SELLIPSE *se, const SCIRCLE *sc)
 		float8	dist;
 		SPoint	c;
 
-		dist = spoint_dist(&sc->center, sellipse_center(&c, se));
+		sellipse_center(&c, se);
+		dist = spoint_dist(&sc->center, &c);
 
 		if (FPzero(dist))
 		{
@@ -1421,7 +1415,8 @@ spheretrans_ellipse(PG_FUNCTION_ARGS)
 	SELLIPSE   *out = (SELLIPSE *) palloc(sizeof(SELLIPSE));
 
 	euler_sellipse_trans(out, e, se);
-	PG_RETURN_POINTER(sellipse_check(out));
+	sellipse_check(out);
+	PG_RETURN_POINTER(out);
 }
 
 Datum
@@ -1434,5 +1429,6 @@ spheretrans_ellipse_inv(PG_FUNCTION_ARGS)
 
 	spheretrans_inverse(&tmp, se);
 	euler_sellipse_trans(out, e, &tmp);
-	PG_RETURN_POINTER(sellipse_check(out));
+	sellipse_check(out);
+	PG_RETURN_POINTER(out);
 }

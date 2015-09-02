@@ -40,7 +40,7 @@ void		vector3d_spoint(SPoint *p, const Vector3D *v);
 /*
  * Transforms a spherical point to a 3 dim.vector.
  */
-Vector3D   *spoint_vector3d(Vector3D *v, const SPoint *p);
+void		spoint_vector3d(Vector3D *v, const SPoint *p);
 
 /*
  * Take the input and stores it as a spherical point.

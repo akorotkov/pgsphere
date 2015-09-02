@@ -99,16 +99,13 @@ sbox_check(SBOX *box)
  /*
   * Puts "center" of box "b" into point "c" and returns it.
   */
-static SPoint *
+static void
 sbox_center(SPoint *c, const SBOX *b)
 {
 	c->lat = (b->ne.lat + b->sw.lat) / 2.0;
 	c->lng = (b->ne.lng + b->sw.lng) / 2.0;
 	if (FPgt(b->sw.lng, b->ne.lng))
-	{
 		c->lng += PI;
-	}
-	return c;
 }
 
 

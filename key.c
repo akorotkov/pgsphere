@@ -11,17 +11,16 @@ PG_MODULE_MAGIC;
 /*
  * Unions a key with the key value of a point.
  */
-static int32 *
+static void
 key_add_point(int32 *key, const SPoint *p)
 {
 	int32	k[3];
 
 	spherepoint_gen_key(&k[0], p);
 	spherekey_union_two(key, &k[0]);
-	return key;
 }
 
-int32 *
+void
 spherekey_union_two(int32 *kunion, const int32 *key)
 {
 	kunion[0] = Min(kunion[0], key[0]);
@@ -30,28 +29,27 @@ spherekey_union_two(int32 *kunion, const int32 *key)
 	kunion[3] = Max(kunion[3], key[3]);
 	kunion[4] = Max(kunion[4], key[4]);
 	kunion[5] = Max(kunion[5], key[5]);
-	return kunion;
 }
 
-int32 *
+bool
 spherekey_inter_two(int32 *kinter, const int32 *key)
 {
 	if (kinter[3] < key[0] || key[3] < kinter[0])
-		return NULL;
+		return false;
 	if (kinter[4] < key[1] || key[4] < kinter[1])
-		return NULL;
+		return false;
 	if (kinter[5] < key[2] || key[5] < kinter[2])
-		return NULL;
+		return false;
 	kinter[0] = Max(kinter[0], key[0]);
 	kinter[1] = Max(kinter[1], key[1]);
 	kinter[2] = Max(kinter[2], key[2]);
 	kinter[3] = Min(kinter[3], key[3]);
 	kinter[4] = Min(kinter[4], key[4]);
 	kinter[5] = Min(kinter[5], key[5]);
-	return kinter;
+	return true;
 }
 
-int32 *
+void
 spherepoint_gen_key(int32 *k, const SPoint *sp)
 {
 	Vector3D	v;
@@ -78,11 +76,9 @@ spherepoint_gen_key(int32 *k, const SPoint *sp)
 	k[3] = v.x * ks;
 	k[4] = v.y * ks;
 	k[5] = v.z * ks;
-
-	return (k);
 }
 
-int32 *
+void
 spherecircle_gen_key(int32 *k, const SCIRCLE *c)
 {
 	double		r,
@@ -185,12 +181,9 @@ spherecircle_gen_key(int32 *k, const SCIRCLE *c)
 	k[3] = mm[1].x * ks;
 	k[4] = mm[1].y * ks;
 	k[5] = mm[1].z * ks;
-
-	return (k);
-
 }
 
-int32 *
+void
 sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 {
 	double		r[2],
@@ -282,21 +275,17 @@ sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 		{
 			mm[1].z = 1.0;
 		}
-
-
 	}
+
 	k[0] = mm[0].x * ks;
 	k[1] = mm[0].y * ks;
 	k[2] = mm[0].z * ks;
 	k[3] = mm[1].x * ks;
 	k[4] = mm[1].y * ks;
 	k[5] = mm[1].z * ks;
-
-	return (k);
 }
 
-
-int32 *
+void
 sphereline_gen_key(int32 *k, const SLine *sl)
 {
 	const int32	ks = MAXCVALUE;
@@ -375,16 +364,13 @@ sphereline_gen_key(int32 *k, const SLine *sl)
 		k[3] = vr[1].x * ks;
 		k[4] = vr[1].y * ks;
 		k[5] = vr[1].z * ks;
-
 	}
-
-	return k;
 }
 
 /*
  * Creates the key of a polygon.
  */
-int32 *
+void
 spherepoly_gen_key(int32 *key, const SPOLY *sp)
 {
 	int32	i;
@@ -411,11 +397,9 @@ spherepoly_gen_key(int32 *key, const SPOLY *sp)
 			key[5] = Max(key[5], tk[5]);
 		}
 	}
-
-	return key;
 }
 
-int32 *
+void
 spherepath_gen_key(int32 *key, const SPATH *sp)
 {
 	int32		i,
@@ -448,11 +432,9 @@ spherepath_gen_key(int32 *key, const SPATH *sp)
 			}
 		}
 	}
-
-	return key;
 }
 
-int32 *
+void
 spherebox_gen_key(int32 *key, const SBOX *box)
 {
 	SPoint	p;
@@ -493,6 +475,4 @@ spherebox_gen_key(int32 *key, const SBOX *box)
 			key_add_point(key, &p);
 		}
 	}
-
-	return key;
 }

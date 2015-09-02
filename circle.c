@@ -44,17 +44,16 @@ spoint_in_circle(const SPoint *p, const SCIRCLE *c)
 
 	if (FPle(dist, c->radius))
 	{
-		return (TRUE);
+		return true;
 	}
-	return (FALSE);
+	return false;
 }
 
-SCIRCLE *
+void
 euler_scircle_trans(SCIRCLE *out, const SCIRCLE *in, const SEuler *se)
 {
 	euler_spoint_trans(&out->center, &in->center, se);
 	out->radius = in->radius;
-	return out;
 }
 
 Datum
@@ -392,11 +391,12 @@ spherecircle_circ(PG_FUNCTION_ARGS)
 Datum
 spheretrans_circle(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *sc = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *sc = (SCIRCLE *) PG_GETARG_POINTER(0);
 	SEuler	   *se = (SEuler *) PG_GETARG_POINTER(1);
-	SCIRCLE    *out = (SCIRCLE *) palloc(sizeof(SCIRCLE));
+	SCIRCLE	   *out = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 
-	PG_RETURN_POINTER(euler_scircle_trans(out, sc, se));
+	euler_scircle_trans(out, sc, se);
+	PG_RETURN_POINTER(out);
 }
 
 Datum

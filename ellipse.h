@@ -54,7 +54,7 @@ bool		sellipse_eq(const SELLIPSE *e1, const SELLIPSE *e2);
 /*
  * Returns the center of an ellipse.
  */
-SPoint	   *sellipse_center(SPoint *sp, const SELLIPSE *e);
+void		sellipse_center(SPoint *sp, const SELLIPSE *e);
 
 /*
  * Checks, whether a ellipse contains point.
@@ -64,7 +64,7 @@ bool		sellipse_cont_point(const SELLIPSE *se, const SPoint *sp);
 /*
  * Returns the large axis of an ellipse as line.
  */
-SLine	   *sellipse_line(SLine *sl, const SELLIPSE *e);
+bool		sellipse_line(SLine *sl, const SELLIPSE *e);
 
 /*
  * Relationship between line and ellipse as PGS_ELLIPSE_LINE_REL int8 value.
@@ -79,7 +79,7 @@ int8		sellipse_circle_pos(const SELLIPSE *se, const SCIRCLE *sc);
 /*
  * Returns the Euler transformation of an ellipse.
  */
-SEuler	   *sellipse_trans(SEuler *se, const SELLIPSE *e);
+void		sellipse_trans(SEuler *se, const SELLIPSE *e);
 
 /*
  * Input of spherical ellipse.

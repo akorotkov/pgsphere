@@ -111,8 +111,8 @@ int			get_circle(double *lng, double *lat, double *radius);
  * \param inc pointer to inclination angle \return <>0 , if user input is
  * spherical ellipse
  */
-int get_ellipse(double *lng, double *lat, double *r1,
-			double *r2, double *inc);
+int			get_ellipse(double *lng, double *lat, double *r1,
+													double *r2, double *inc);
 
 /*
  * Returns the line parameters \param phi   pointer to first angle
@@ -122,7 +122,7 @@ int get_ellipse(double *lng, double *lat, double *r1,
  * pointer to length value \return <>0 , if user input is spherical line
  */
 int			get_line(double *phi, double *theta, double *psi,
-		 	 	 	 	 	 	 	 	 unsigned char *etype, double *length);
+										unsigned char *etype, double *length);
 
 /*
  * Returns the Euler transformation parameters \param phi   pointer
