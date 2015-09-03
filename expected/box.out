@@ -2064,4 +2064,155 @@ SELECT sbox '((170d,-50d),(190d,-40d))'  ~ sline ( spoint '(170d, -40d)', spoint
  t
 (1 row)
 
+-- all less/equals/greater permutations of spoint coordinates with respect to a fixed sbox
+select 'f' as expected, spoint(0.50, 0.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(0.50, 0.75) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(0.50, 1.00) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(0.50, 1.25) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(0.50, 1.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(0.75, 0.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 't' as expected, spoint(0.75, 0.75) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 't' as expected, spoint(0.75, 1.00) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 't' as expected, spoint(0.75, 1.25) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 'f' as expected, spoint(0.75, 1.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(1.00, 0.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 't' as expected, spoint(1.00, 0.75) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 't' as expected, spoint(1.00, 1.00) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 't' as expected, spoint(1.00, 1.25) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 'f' as expected, spoint(1.00, 1.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(1.25, 0.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 't' as expected, spoint(1.25, 0.75) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 't' as expected, spoint(1.25, 1.00) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 't' as expected, spoint(1.25, 1.25) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ t        | t
+(1 row)
+
+select 'f' as expected, spoint(1.25, 1.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(1.50, 0.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(1.50, 0.75) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(1.50, 1.00) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(1.50, 1.25) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
+select 'f' as expected, spoint(1.50, 1.50) <@ sbox(spoint(0.75, 0.75), spoint(1.25, 1.25)) as actual;
+ expected | actual 
+----------+--------
+ f        | f
+(1 row)
+
 -- wide spherical boxes

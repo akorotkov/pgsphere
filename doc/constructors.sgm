@@ -382,7 +382,7 @@
           </para>
           <funcsynopsis>
             <funcprototype>
-              <funcdef><function>sellipse</function></funcdef>
+              <funcdef><function>sbox</function></funcdef>
                 <paramdef>spoint <parameter>south_west</parameter></paramdef>
                 <paramdef>spoint <parameter>north_east</parameter></paramdef>
             </funcprototype>
