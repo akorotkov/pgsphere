@@ -151,7 +151,7 @@
                Contain and overlap
             </title>
             <para>
-                On sphere, an equality relationship is rarely used. There
+                On the sphere, an equality relationship is rarely used. There
                 are frequently questions like <emphasis>Is object
                 <literal>a</literal> contained by object
                 <literal>b</literal>?</emphasis> or <emphasis>Does object
@@ -175,34 +175,34 @@
                 <tbody>
                   <row>
                     <entry>
-                      @
+                      @ or &lt;@
                     </entry>
                     <entry>
-                      the left object is contained by right object
-                    </entry>
-                  </row>
-                  <row>
-                    <entry>
-                      &tilde;
-                    </entry>
-                    <entry>
-                      the left object contains right object
+                      the left object is contained by the right object
                     </entry>
                   </row>
                   <row>
                     <entry>
-                      !@
+                      &tilde; or @&gt;
                     </entry>
                     <entry>
-                      the left object is not contained by right object
+                      the left object contains the right object
                     </entry>
                   </row>
                   <row>
                     <entry>
-                      !&tilde;
+                      !@  or !&lt;@
                     </entry>
                     <entry>
-                      the left object does not contain right object
+                      the left object is not contained by the right object
+                    </entry>
+                  </row>
+                  <row>
+                    <entry>
+                      !&tilde; or !@&gt;
+                    </entry>
+                    <entry>
+                      the left object does not contain the right object
                     </entry>
                   </row>
                   <row>

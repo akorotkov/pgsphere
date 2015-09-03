@@ -1,6 +1,6 @@
     <sect1 id="appendixes">
       <title>
-        Appendixes
+        Appendix
       </title>
       <sect2 id="appendixes.changelog-1-1">
         <title>
@@ -24,14 +24,44 @@
           </listitem>
         </itemizedlist>
       </sect2>
-      <sect2 id="appendixes.changelog-1-2">
+      <sect2 id="appendixes.changelog-1-1-5">
         <title>
-          Changes from version 1.1 to 1.2
+          Changes from version 1.1 to 1.1.5
         </title>
         <itemizedlist>
           <listitem>
             <para>
               Modify behavior of function <function>set_sphere_output_precision</function>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+	      Compatibility with <application>PostgreSQL</application> 9.2
+	      and later.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+	      Creating spath and spolygon objects &quot;as aggregate&quot;
+	      from tables should now work.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+	      Improved accuracy of spoint (great circle) distance calculation.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+	      Add new contains operators consistent with the geometry operators
+	      of the plain used in <application>PostgreSQL</application> 8.2
+	      and later:
+	       &lt;@ and @&gt;, the old operators @ and &tilde; still work.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+	      Improved correctness of spatial indexing.
             </para>
           </listitem>
         </itemizedlist>
