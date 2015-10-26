@@ -15,7 +15,7 @@ INSTALLATION:
 
 USING PG_CONFIG:
 
-gmake USE_PGXS=1 PG_CONFIG=/path/to/pg_config
+gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config
 gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config install
 -- load extension:
 CREATE EXTENSION pg_sphere;
