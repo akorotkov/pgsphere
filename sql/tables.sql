@@ -31,6 +31,8 @@ CREATE TABLE spheretmp6 (id int PRIMARY KEY , p spath );
 
 -- Aggregate data from tables
 
+SELECT set_sphere_output_precision(12);
+
 CREATE TABLE spheretmp7 (p spoint);
 \copy spheretmp7 from 'data/test_spherepolygon_aggregate.data'
 SELECT spoly(p) FROM spheretmp7;
