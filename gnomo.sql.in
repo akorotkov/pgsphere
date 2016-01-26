@@ -1,0 +1,17 @@
+-- gnomonic projection and its inverse
+
+CREATE FUNCTION gnomonic_proj(spoint, spoint)
+RETURNS point
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION gnomonic_proj(spoint, spoint) IS
+'gnomonic projection, the second argument is the tangential point';
+
+CREATE FUNCTION gnomonic_inv(point, spoint)
+RETURNS spoint
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION gnomonic_inv(point, spoint) IS
+'inverse of gnomonic projection, the second argument is the tangential point';

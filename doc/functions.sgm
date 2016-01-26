@@ -14,8 +14,8 @@
             <para>
               The <function>area</function> function returns the area of a
               spherical object in square radians. Supported data types are:
-              <type>scircle</type>, <type>spolygon</type>, and
-              <type>sbox</type>.
+              <type>scircle</type>, <type>spolygon</type> (if the polygon
+	      is convex), and <type>sbox</type>.
             </para>
             <example>
               <title>Area of a spherical circle as a multiple of &pgr;</title>
