@@ -89,15 +89,12 @@ int8		sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc);
 bool		sline_circle_touch(const SLine *sl, const SCIRCLE *sc);
 
 /*
- * Returns the relationship between two lines \param l1  pointer to
- * first line \param l2  pointer to second line \return relationship as a
- * \link PGS_LINE_LINE_REL int8 value \endlink (\ref  PGS_LINE_LINE_REL )
+ * Returns the relationship between two lines as PGS_LINE_LINE_REL int8 value.
  */
 int8		sline_sline_pos(const SLine *l1, const SLine *l2);
 
 /*
- * Checks, whether the point is on line \param p	pointer to given
- * point \param sl pointer to the line \return bool, true if point at line
+ * Returns true if the point is on line.
  */
 bool		spoint_at_sline(const SPoint *p, const SLine *sl);
 

@@ -7,9 +7,14 @@
 
 #include <math.h>
 
-/* point gnomonic_proj(spoint spherical_point, spoint tangential_point) */
-
 PG_FUNCTION_INFO_V1(gnomonic_proj);
+PG_FUNCTION_INFO_V1(gnomonic_inv);
+
+/*
+ * Direct gnomonic projection.
+ *
+ * point gnomonic_proj(spoint spherical_point, spoint tangential_point)
+ */
 Datum gnomonic_proj(PG_FUNCTION_ARGS)
 {
 	Point*  g = (Point*)  palloc(sizeof(Point));
@@ -33,9 +38,11 @@ Datum gnomonic_proj(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(g);
 }
 
-/* spoint gnomonic_inv(point plane_point, spoint tangential_point) */
-
-PG_FUNCTION_INFO_V1(gnomonic_inv);
+/*
+ * Inverse gnomonic projection.
+ *
+ * spoint gnomonic_inv(point plane_point, spoint tangential_point)
+ */
 Datum gnomonic_inv(PG_FUNCTION_ARGS)
 {
 	SPoint* p = (SPoint*) palloc(sizeof(SPoint));
