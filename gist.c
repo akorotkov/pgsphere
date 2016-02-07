@@ -14,7 +14,6 @@ PG_FUNCTION_INFO_V1(spherekey_out);
 PG_FUNCTION_INFO_V1(g_spherekey_decompress);
 PG_FUNCTION_INFO_V1(g_scircle_compress);
 PG_FUNCTION_INFO_V1(g_spoint_compress);
-PG_FUNCTION_INFO_V1(g_spoint2_compress);
 PG_FUNCTION_INFO_V1(g_sline_compress);
 PG_FUNCTION_INFO_V1(g_spath_compress);
 PG_FUNCTION_INFO_V1(g_spoly_compress);
@@ -22,10 +21,7 @@ PG_FUNCTION_INFO_V1(g_sellipse_compress);
 PG_FUNCTION_INFO_V1(g_sbox_compress);
 PG_FUNCTION_INFO_V1(g_spherekey_union);
 PG_FUNCTION_INFO_V1(g_spherekey_same);
-PG_FUNCTION_INFO_V1(g_spoint2_union);
-PG_FUNCTION_INFO_V1(g_spoint2_same);
 PG_FUNCTION_INFO_V1(g_spoint_consistent);
-PG_FUNCTION_INFO_V1(g_spoint2_consistent);
 PG_FUNCTION_INFO_V1(g_scircle_consistent);
 PG_FUNCTION_INFO_V1(g_sline_consistent);
 PG_FUNCTION_INFO_V1(g_spath_consistent);
@@ -34,9 +30,6 @@ PG_FUNCTION_INFO_V1(g_sellipse_consistent);
 PG_FUNCTION_INFO_V1(g_sbox_consistent);
 PG_FUNCTION_INFO_V1(g_spherekey_penalty);
 PG_FUNCTION_INFO_V1(g_spherekey_picksplit);
-PG_FUNCTION_INFO_V1(g_spoint2_penalty);
-PG_FUNCTION_INFO_V1(g_spoint2_picksplit);
-PG_FUNCTION_INFO_V1(g_spoint2_distance);
 
  /*
   * Returns the relationship of two keys as PGS_KEY_REL.
@@ -276,39 +269,6 @@ g_sbox_compress(PG_FUNCTION_ARGS)
 }
 
 Datum
-g_spoint2_compress(PG_FUNCTION_ARGS)
-{
-	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-	GISTENTRY  *retval;
-
-	if (entry->leafkey)
-	{
-		retval = palloc(sizeof(GISTENTRY));
-		if (DatumGetPointer(entry->key) != NULL)
-		{
-			GiSTSPointKey *key;
-			SPoint	   *p = (SPoint *) DatumGetPointer(entry->key);
-
-			ALLOC_LEAF_KEY(key);
-			key->lat = p->lat;
-			key->lng = p->lng;
-			gistentryinit(*retval, PointerGetDatum(key), entry->rel,
-											entry->page, entry->offset, false);
-		}
-		else
-		{
-			gistentryinit(*retval, (Datum) 0, entry->rel, entry->page,
-											entry->offset, false);
-		}
-	}
-	else
-	{
-		retval = entry;
-	}
-	PG_RETURN_POINTER(retval);
-}
-
-Datum
 g_spherekey_union(PG_FUNCTION_ARGS)
 {
 	GistEntryVector	   *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
@@ -322,49 +282,6 @@ g_spherekey_union(PG_FUNCTION_ARGS)
 	for (i = 1; i < numranges; i++)
 	{
 		spherekey_union_two(ret, (int32 *) DatumGetPointer(entryvec->vector[i].key));
-	}
-	*sizep = KEYSIZE;
-	PG_RETURN_POINTER(ret);
-}
-
-Datum
-g_spoint2_union(PG_FUNCTION_ARGS)
-{
-	GistEntryVector	   *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
-	int				   *sizep = (int *) PG_GETARG_POINTER(1);
-	int					numranges, i;
-	GiSTSPointKey	   *ret;
-
-	ALLOC_INTERNAL_KEY(ret);
-	numranges = entryvec->n;
-
-	for (i = 0; i < numranges; i++)
-	{
-		GiSTSPointKey *key;
-		int32	   *p;
-		int32		k[6];
-
-		key = (GiSTSPointKey *) DatumGetPointer(entryvec->vector[i].key);
-
-		if (IS_LEAF(key))
-		{
-			SPoint		point;
-
-			point.lat = key->lat;
-			point.lng = key->lng;
-			spherepoint_gen_key(k, &point);
-			p = k;
-		}
-		else
-		{
-			p = key->k;
-		}
-
-		if (i == 0)
-			memcpy(ret->k, p, KEYSIZE);
-		else
-			spherekey_union_two(ret->k, p);
-		/* checkKey(ret); */
 	}
 	*sizep = KEYSIZE;
 	PG_RETURN_POINTER(ret);
@@ -390,33 +307,6 @@ g_spherekey_same(PG_FUNCTION_ARGS)
 	else
 	{
 		*result = (c1 == NULL && c2 == NULL) ? true : false;
-	}
-
-	PG_RETURN_POINTER(result);
-}
-
-Datum
-g_spoint2_same(PG_FUNCTION_ARGS)
-{
-	GiSTSPointKey  *key1 = (GiSTSPointKey *) PG_GETARG_POINTER(0);
-	GiSTSPointKey  *key2 = (GiSTSPointKey *) PG_GETARG_POINTER(1);
-	bool		   *result = (bool *) PG_GETARG_POINTER(2);
-
-	*result = true;
-	if (key1 && key2)
-	{
-		if (VARSIZE(key1) == VARSIZE(key2))
-		{
-			*result = memcmp(key1, key2, VARSIZE(key1)) ? false : true;
-		}
-		else
-		{
-			*result = false;
-		}
-	}
-	else
-	{
-		*result = (key1 == NULL && key2 == NULL) ? true : false;
 	}
 
 	PG_RETURN_POINTER(result);
@@ -542,155 +432,6 @@ g_spoint_consistent(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(result);
 	}
 	PG_RETURN_BOOL(false);
-}
-
-Datum
-g_spoint2_consistent(PG_FUNCTION_ARGS)
-{
-	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-	void	   *query = (void *) PG_GETARG_POINTER(1);
-	StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2);
-	bool		result = false;
-
-	if (DatumGetPointer(entry->key) == NULL || !query)
-	{
-		PG_RETURN_BOOL(false);
-	}
-	else
-	{
-
-		bool	   *recheck = (bool *) PG_GETARG_POINTER(4);
-		GiSTSPointKey *key = (GiSTSPointKey *) DatumGetPointer(entry->key);
-		int			i = SCKEY_DISJ;
-
-		*recheck = false;
-
-		if (!IS_LEAF(key))
-		{
-			int32	   *ent = key->k;
-
-			switch (strategy)
-			{
-				case 1:
-					SCK_INTERLEAVE(SPoint, spherepoint_gen_key, 1);
-					break;
-				case 11:
-					SCK_INTERLEAVE(SCIRCLE, spherecircle_gen_key, 0);
-					break;
-				case 12:
-					SCK_INTERLEAVE(SLine, sphereline_gen_key, 0);
-					break;
-				case 13:
-					SCK_INTERLEAVE(SPATH, spherepath_gen_key, 0);
-					break;
-				case 14:
-					SCK_INTERLEAVE(SPOLY, spherepoly_gen_key, 0);
-					break;
-				case 15:
-					SCK_INTERLEAVE(SELLIPSE, sphereellipse_gen_key, 0);
-					break;
-				case 16:
-					SCK_INTERLEAVE(SBOX, spherebox_gen_key, 0);
-					break;
-			}
-			switch (strategy)
-			{
-				case 1:
-					if (i > SCKEY_OVERLAP)
-						result = true;
-					break;
-				default:
-					if (i > SCKEY_DISJ)
-						result = true;
-					break;
-			}
-		}
-		else
-		{
-			SPoint		point;
-
-			point.lat = key->lat;
-			point.lng = key->lng;
-			switch (strategy)
-			{
-				case 1:
-					result = spoint_eq(&point, (SPoint *) query);
-					break;
-				case 11:
-					result = spoint_in_circle(&point, (SCIRCLE *) query);
-					break;
-				case 12:
-					result = spoint_at_sline(&point, (SLine *) query);
-					break;
-				case 13:
-					result = spath_cont_point((SPATH *) query, &point);
-					break;
-				case 14:
-					result = spoly_contains_point((SPOLY *) query, &point);
-					break;
-				case 15:
-					result = sellipse_cont_point((SELLIPSE *) query, &point);
-					break;
-				case 16:
-					result = sbox_cont_point((SBOX *) query, &point);
-					break;
-			}
-		}
-		PG_RETURN_BOOL(result);
-	}
-	PG_RETURN_BOOL(false);
-}
-
-Datum
-g_spoint2_distance(PG_FUNCTION_ARGS)
-{
-	GISTENTRY  *entry = (GISTENTRY *) PG_GETARG_POINTER(0);
-	SPoint	   *query = (SPoint *) PG_GETARG_POINTER(1);
-
-	/* StrategyNumber strategy = (StrategyNumber) PG_GETARG_UINT16(2); */
-	GiSTSPointKey *key = (GiSTSPointKey *) DatumGetPointer(entry->key);
-
-	if (IS_LEAF(key))
-	{
-		SPoint		point;
-
-		point.lat = key->lat;
-		point.lng = key->lng;
-		PG_RETURN_FLOAT8(spoint_dist(&point, query));
-	}
-	else
-	{
-		Vector3D	v;
-		float8		sum = 0.0,
-					x_min, x_max,
-					y_min, y_max,
-					z_min, z_max;
-
-		spoint_vector3d(&v, query);
-
-		x_min = (float8) key->k[0] / (float8) MAXCVALUE;
-		x_max = (float8) (key->k[3] + 1) / (float8) MAXCVALUE;
-		if (v.x < x_min)
-			sum += Sqr(v.x - x_min);
-		else if (v.x > x_max)
-			sum += Sqr(v.x - x_max);
-
-		y_min = (float8) key->k[1] / (float8) MAXCVALUE;
-		y_max = (float8) (key->k[4] + 1) / (float8) MAXCVALUE;
-		if (v.y < y_min)
-			sum += Sqr(v.y - y_min);
-		else if (v.y > y_max)
-			sum += Sqr(v.y - y_max);
-
-		z_min = (float8) key->k[2] / (float8) MAXCVALUE;
-		z_max = (float8) (key->k[5] + 1) / (float8) MAXCVALUE;
-		if (v.z < z_min)
-			sum += Sqr(v.z - z_min);
-		else if (v.z > z_max)
-			sum += Sqr(v.z - z_max);
-
-		PG_RETURN_FLOAT8(sqrt(sum));
-	}
 }
 
 Datum
@@ -2214,54 +1955,6 @@ g_spherekey_picksplit(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(v);
 }
 
-Datum
-g_spoint2_picksplit(PG_FUNCTION_ARGS)
-{
-	GistEntryVector *entryvec = (GistEntryVector *) PG_GETARG_POINTER(0);
-	GIST_SPLITVEC *v = (GIST_SPLITVEC *) PG_GETARG_POINTER(1);
-	OffsetNumber i,
-				maxoff;
-	Box3D	   *boxes;
-	GiSTSPointKey *leftKey,
-			   *rightKey;
-
-	maxoff = entryvec->n - 1;
-	boxes = (Box3D *) palloc(sizeof(Box3D) * entryvec->n);
-	for (i = FirstOffsetNumber; i <= maxoff; i = OffsetNumberNext(i))
-	{
-		GiSTSPointKey *key = (GiSTSPointKey *) DatumGetPointer(entryvec->vector[i].key);
-
-		/* checkKey(key); */
-		if (IS_LEAF(key))
-		{
-			SPoint		point;
-
-			point.lat = key->lat;
-			point.lng = key->lng;
-			spherepoint_gen_key((int32 *) &boxes[i], &point);
-		}
-		else
-		{
-			boxes[i] = *((Box3D *) key->k);
-		}
-		/* checkBox3D(&boxes[i]); */
-	}
-
-	do_picksplit(boxes, maxoff, v);
-
-	ALLOC_INTERNAL_KEY(leftKey);
-	ALLOC_INTERNAL_KEY(rightKey);
-	memcpy(leftKey->k, DatumGetPointer(v->spl_ldatum), KEYSIZE);
-	memcpy(rightKey->k, DatumGetPointer(v->spl_rdatum), KEYSIZE);
-	v->spl_ldatum = PointerGetDatum(leftKey);
-	v->spl_rdatum = PointerGetDatum(rightKey);
-
-	/* checkKey(leftKey); */
-	/* checkKey(rightKey); */
-
-	PG_RETURN_POINTER(v);
-}
-
  /*
   * The GiST Penalty method for boxes. We have to make panalty as fast as
   * possible ( offen called ! )
@@ -2290,71 +1983,4 @@ g_spherekey_penalty(PG_FUNCTION_ARGS)
 	{
 		PG_RETURN_POINTER(NULL);
 	}
-}
-
-/*
-* The GiST Penalty method for spherical points.
-* We have to make panalty as fast as possible (offen called !)
-*/
-Datum
-g_spoint2_penalty(PG_FUNCTION_ARGS)
-{
-	GISTENTRY  *origentry = (GISTENTRY *) PG_GETARG_POINTER(0);
-	GISTENTRY  *newentry = (GISTENTRY *) PG_GETARG_POINTER(1);
-	float	   *result = (float *) PG_GETARG_POINTER(2);
-	GiSTSPointKey *origkey = (GiSTSPointKey *) DatumGetPointer(origentry->key);
-	GiSTSPointKey *newkey = (GiSTSPointKey *) DatumGetPointer(newentry->key);
-	Box3D	   *o, *n;
-	int32		k[6], ok[6];
-
-	if (IS_LEAF(origkey))
-	{
-		SPoint		point;
-
-		point.lat = origkey->lat;
-		point.lng = origkey->lng;
-		spherepoint_gen_key(ok, &point);
-		o = (Box3D *) ok;
-	}
-	else
-	{
-		o = (Box3D *) origkey->k;
-	}
-
-	if (newentry == NULL)
-		PG_RETURN_NULL();
-
-	if (IS_LEAF(newkey))
-	{
-		int32	   *ptr;
-		SPoint		point;
-
-		point.lat = newkey->lat;
-		point.lng = newkey->lng;
-		if (!gq_cache_get_value(PGS_TYPE_SPoint, &point, &ptr))
-		{
-			spherepoint_gen_key(k, &point);
-			gq_cache_set_value(PGS_TYPE_SPoint, &point, k);
-			n = (Box3D *) k;
-		}
-		else
-		{
-			n = (Box3D *) ptr;
-		}
-	}
-	else
-	{
-		n = (Box3D *) newkey->k;
-	}
-
-	*result = ((float) ((int64) Max(o->high.coord[0], n->high.coord[0])
-							- (int64) Min(o->low.coord[0], n->low.coord[0])))
-			* ((float) ((int64) Max(o->high.coord[1], n->high.coord[1])
-							- (int64) Min(o->low.coord[1], n->low.coord[1])))
-			* ((float) ((int64) Max(o->high.coord[2], n->high.coord[2])
-							- (int64) Min(o->low.coord[2], n->low.coord[2])))
-			- ((float) ((int64) o->high.coord[0] - (int64) o->low.coord[0]))
-			* ((float) ((int64) o->high.coord[1] - (int64) o->low.coord[1]))
-			* ((float) ((int64) o->high.coord[2] - (int64) o->low.coord[2]));
-	PG_RETURN_POINTER(result);
 }
