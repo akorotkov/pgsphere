@@ -1,5 +1,5 @@
 This is R-Tree implementation using GiST for spherical objects
-like spherical points and spherical circles with 
+like spherical points and spherical circles with
 useful functions and operators.
 
 
@@ -13,6 +13,13 @@ INSTALLATION:
   -- load functions
   psql <database> < pg_sphere.sql
 
+USING PG_CONFIG:
+
+gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config
+gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config install
+-- load extension:
+CREATE EXTENSION pg_sphere;
+
 REGRESSION TEST:
 
    gmake installcheck
@@ -23,5 +30,5 @@ LONG REGRESSION TEST:
 
 For more informations have a look at http://pgsphere.projects.postgresql.org/
 
-Have a lot of fun! 
+Have a lot of fun!
 
