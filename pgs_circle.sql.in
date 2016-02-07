@@ -221,20 +221,6 @@ CREATE FUNCTION scircle_contained_by_circle(scircle,scircle)
 COMMENT ON FUNCTION scircle_contained_by_circle(scircle,scircle) IS
   'true if spherical circle is contained by spherical circle'; 
 
-CREATE OPERATOR @ (
-   LEFTARG    = scircle,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contained_by_circle,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( scircle, scircle ) IS
-  'true if spherical circle is contained by spherical circle'; 
-
-
 --
 -- circle is not contained by circle
 --
@@ -248,20 +234,6 @@ CREATE FUNCTION scircle_contained_by_circle_neg (scircle,scircle)
 COMMENT ON FUNCTION scircle_contained_by_circle_neg (scircle,scircle) IS
   'true if spherical circle is not contained by spherical circle'; 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = scircle,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contained_by_circle_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( scircle, scircle ) IS
-  'true if spherical circle is not contained by spherical circle'; 
-
-
 --
 -- circle contains circle
 --
@@ -273,19 +245,6 @@ CREATE FUNCTION scircle_contains_circle (scircle,scircle)
    IMMUTABLE STRICT ;
 
 COMMENT ON FUNCTION scircle_contains_circle (scircle,scircle) IS
-  'true if spherical circle contains spherical circle'; 
-
-CREATE OPERATOR ~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_circle,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( scircle, scircle ) IS
   'true if spherical circle contains spherical circle'; 
 
 --
@@ -301,20 +260,6 @@ CREATE FUNCTION scircle_contains_circle_neg (scircle,scircle)
 COMMENT ON FUNCTION scircle_contains_circle_neg (scircle,scircle) IS
   'true if spherical circle does not contain spherical circle'; 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_circle_neg,
-   COMMUTATOR = '!@',
-NEGATOR       = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( scircle, scircle ) IS
-  'true if spherical circle does not contain spherical circle'; 
-
-
 --
 -- point is contained by circle
 --
@@ -326,20 +271,6 @@ CREATE FUNCTION spoint_contained_by_circle(spoint,scircle)
    IMMUTABLE STRICT ;
    
 COMMENT ON FUNCTION spoint_contained_by_circle(spoint,scircle) IS
-  'true if spherical point is contained by spherical circle'; 
-
-
-CREATE OPERATOR @ (
-   LEFTARG    = spoint,
-   RIGHTARG   = scircle,
-   PROCEDURE  = spoint_contained_by_circle,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoint, scircle ) IS
   'true if spherical point is contained by spherical circle'; 
 
 
@@ -357,20 +288,6 @@ COMMENT ON FUNCTION spoint_contained_by_circle_neg (spoint,scircle) IS
   'true if spherical point is not contained by spherical circle '; 
 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = spoint,
-   RIGHTARG   = scircle,
-   PROCEDURE  = spoint_contained_by_circle_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoint, scircle ) IS
-  'true if spherical point is not contained by spherical circle'; 
-
-
 --
 -- circle contains point
 --
@@ -385,20 +302,6 @@ COMMENT ON FUNCTION spoint_contained_by_circle_com (scircle,spoint) IS
   'true if spherical circle contains spherical point '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = spoint,
-   PROCEDURE  = spoint_contained_by_circle_com,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( scircle, spoint ) IS
-  'true if spherical circle contains spherical point'; 
-
-
 --
 -- circle does not contain point
 --
@@ -411,20 +314,6 @@ CREATE FUNCTION spoint_contained_by_circle_com_neg(scircle,spoint)
 
 COMMENT ON FUNCTION spoint_contained_by_circle_com_neg (scircle,spoint) IS
   'true if spherical circle does not contain spherical point '; 
-
-
-CREATE OPERATOR !~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = spoint,
-   PROCEDURE  = spoint_contained_by_circle_com_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( scircle, spoint ) IS
-  'true if spherical circle does not contain spherical point'; 
 
 
 --

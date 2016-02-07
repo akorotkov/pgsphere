@@ -45,10 +45,11 @@
 #include <math.h>
 #include <float.h>
 
-#define PI	3.141592653589793116			//!< pi
-#define PIH 1.570796326794896558			//!< pi/2
-#define PID 6.283185307179586232			//!< 2*pi
-#define RADIANS 57.29577951308232311024		//!< 180/pi
+#define PI  3.14159265358979323846          //!< pi
+#define PIH 1.57079632679489661923          //!< pi/2
+#define PID 6.2831853071795864769           //!< 2*pi
+#define RADIANS 57.295779513082320877       //!< 180/pi
+#define PI_EPS 4.4408920985006261617e-16 /* 2 ** -51 */
 
 #define Sqr(a)	 ( ( a ) * ( a ) )			/* square function as macro */
 

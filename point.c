@@ -158,27 +158,22 @@ spherepoint_from_long_lat(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(p);
 }
 
+static double
+norm2(double a, double b)
+{
+	return sqrt(a * a + b * b);
+}
+
 float8
 spoint_dist(const SPoint *p1, const SPoint *p2)
 {
 	float8		dl = p1->lng - p2->lng;
-	float8		f = ((sin(p1->lat) * sin(p2->lat) +
-					  cos(p1->lat) * cos(p2->lat) * cos(dl)));
-
-	if (FPeq(f, 1.0))
-	{
-		/* for small distances */
-		Vector3D	v1,	v2,	v3;
-
-		spoint_vector3d(&v1, p1);
-		spoint_vector3d(&v2, p2);
-		vector3d_cross(&v3, &v1, &v2);
-		f = vector3d_length(&v3);
-	}
-	else
-	{
-		f = acos(f);
-	}
+	/* use Vincenty's formula for the inverse geodesic problem on the sphere */
+	float8 f = atan2(norm2(cos(p2->lat) * sin(dl),
+							 cos(p1->lat) * sin(p2->lat)
+						   - sin(p1->lat) * cos(p2->lat) * cos(dl)),
+					   sin(p1->lat) * sin(p2->lat)
+					 + cos(p1->lat) * cos(p2->lat) * cos(dl));
 	if (FPzero(f))
 	{
 		return 0.0;

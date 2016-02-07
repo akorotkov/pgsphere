@@ -1,3 +1,7 @@
+\set ECHO none
+SELECT set_sphere_output_precision(8);
+\set ECHO all
+
 -- checking spherical line operators
 
 SELECT sline ( spoint '(0, 90d)', spoint '(0, -89d)' )   =

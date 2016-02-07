@@ -1,36 +1,31 @@
-This is R-Tree implementation using GiST for spherical objects
-like spherical points and spherical circles with
+This is an R-Tree implementation using GiST for spherical objects
+like spherical points and spherical circles with 
 useful functions and operators.
 
 
 NOTICE:
-     This version will works only with postgresql version 8.0 and above.
+     This version will work only with postgresql version 9.1 and above.
 
-INSTALLATION AS EXTENSION (RECOMMENDED):
+INSTALLATION:
 
   -- build and install
   gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config
   gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config install
   -- load extension
-  psql <database> -c "CREATE EXTENSION pg_sphere;"
+  psql -c "CREATE EXTENSION pg_sphere;" <database>
 
-INSTALLATION AS MODULE (DEPRECATED):
+REGRESSION TEST (as the same user as the currently running postgresql server):
 
-  -- build and install
-  gmake
-  gmake install
-  -- load functions
-  psql <database> < pg_sphere.sql
-
-REGRESSION TEST:
-
-   gmake installcheck
+  make USE_PGXS=1 installcheck
 
 LONG REGRESSION TEST:
 
-   gmake crushtest
+  make USE_PGXS=1 crushtest
 
-For more informations have a look at http://pgsphere.projects.postgresql.org/
+The 'make' program must be compatible with GNU make.
+
+For more information, have a look at http://pgsphere.projects.postgresql.org
+and https://github.com/akorotkov/pgsphere
 
 Have a lot of fun!
 

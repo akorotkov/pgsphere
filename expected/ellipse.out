@@ -1,3 +1,9 @@
+\set ECHO none
+ set_sphere_output_precision 
+-----------------------------
+ SET 8
+(1 row)
+
 -- ellipse tests
 --equal operator
 SELECT sellipse '<{0d,0d},(170d,-12d),0d>' = sellipse '<{0d,0d},(170d,-12d),0d>'; 

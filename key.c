@@ -197,7 +197,7 @@ sphereellipse_gen_key(int32 *k, const SELLIPSE *e)
 
 	r[0] = sin(e->rad[0]);
 	r[1] = sin(e->rad[1]);
-	d = cos(e->rad[1]);
+	d = cos(e->rad[0]);
 
 	v[0].x = d;
 	v[0].y = -r[0];
@@ -341,21 +341,36 @@ sphereline_gen_key(int32 *k, const SLine *sl)
 		for (i = 0; i < 4; i++)
 		{
 			euler_vector_trans(&vt, &v[i], &se);
-			if (vt.x >= -1.0 && vt.x <= 1.0)
+			if (vt.x < -1.0)
 			{
-				vr[0].x = Min(vr[0].x, vt.x);
-				vr[1].x = Max(vr[1].x, vt.x);
+				vt.x = -1.0;
 			}
-			if (vt.y >= -1.0 && vt.y <= 1.0)
+			if (vt.y < -1.0)
 			{
-				vr[0].y = Min(vr[0].y, vt.y);
-				vr[1].y = Max(vr[1].y, vt.y);
+				vt.y = -1.0;
 			}
-			if (vt.z >= -1.0 && vt.z <= 1.0)
+			if (vt.z < -1.0)
 			{
-				vr[0].z = Min(vr[0].z, vt.z);
-				vr[1].z = Max(vr[1].z, vt.z);
+				vt.z = -1.0;
 			}
+			if (vt.x > 1.0)
+			{
+				vt.x = 1.0;
+			}
+			if (vt.y > 1.0)
+			{
+				vt.y = 1.0;
+			}
+			if (vt.z > 1.0)
+			{
+				vt.z = 1.0;
+			}
+			vr[0].x = Min(vr[0].x, vt.x);
+			vr[1].x = Max(vr[1].x, vt.x);
+			vr[0].y = Min(vr[0].y, vt.y);
+			vr[1].y = Max(vr[1].y, vt.y);
+			vr[0].z = Min(vr[0].z, vt.z);
+			vr[1].z = Max(vr[1].z, vt.z);
 		}
 
 		k[0] = vr[0].x * ks;
@@ -375,6 +390,7 @@ spherepoly_gen_key(int32 *key, const SPOLY *sp)
 {
 	int32	i;
 	SLine	l;
+	SPoint	p;
 	int32	tk[6];
 	bool	start = true;
 
@@ -396,40 +412,65 @@ spherepoly_gen_key(int32 *key, const SPOLY *sp)
 			key[4] = Max(key[4], tk[4]);
 			key[5] = Max(key[5], tk[5]);
 		}
+		p.lng = 0.0;
+		p.lat = PIH;
+		if (spoly_contains_point(sp, &p))
+		{
+			key[5] = MAXCVALUE;
+		}
+		p.lat = -PIH;
+		if (spoly_contains_point(sp, &p))
+		{
+			key[2] = -MAXCVALUE;
+		}
+		p.lat = 0.0;
+		if (spoly_contains_point(sp, &p))
+		{
+			key[3] = MAXCVALUE;
+		}
+		p.lng = PI;
+		if (spoly_contains_point(sp, &p))
+		{
+			key[0] = -MAXCVALUE;
+		}
+		p.lng = PIH;
+		if (spoly_contains_point(sp, &p))
+		{
+			key[4] = MAXCVALUE;
+		}
+		p.lng = PI + PIH;
+		if (spoly_contains_point(sp, &p))
+		{
+			key[1] = -MAXCVALUE;
+		}
 	}
 }
 
 void
 spherepath_gen_key(int32 *key, const SPATH *sp)
 {
-	int32		i,
-				k,
-				r;
+	int32		i;
 	SLine		l;
 	int32		tk[6];
 	bool		start = true;
 
-	for (i = 0; i < sp->npts; i++)
+	for (i=0; i < sp->npts - 1; i++)
 	{
-		for (k = i + 1; i < sp->npts; i++)
+		sline_from_points(&l, &sp->p[i], &sp->p[i + 1]);
+		sphereline_gen_key(&tk[0], &l);
+		if (start)
 		{
-			r = ((k == sp->npts) ? (0) : (k));
-			sline_from_points(&l, &sp->p[i], &sp->p[r]);
-			sphereline_gen_key(&tk[0], &l);
-			if (start)
-			{
-				start = false;
-				memcpy((void *) key, (void *) &tk[0], KEYSIZE);
-			}
-			else
-			{
-				key[0] = Min(key[0], tk[0]);
-				key[1] = Min(key[1], tk[1]);
-				key[2] = Min(key[2], tk[2]);
-				key[3] = Max(key[3], tk[3]);
-				key[4] = Max(key[4], tk[4]);
-				key[5] = Max(key[5], tk[5]);
-			}
+			start = false;
+			memcpy((void *) key, (void *) &tk[0], KEYSIZE);
+		}
+		else
+		{
+			key[0] = Min(key[0], tk[0]);
+			key[1] = Min(key[1], tk[1]);
+			key[2] = Min(key[2], tk[2]);
+			key[3] = Max(key[3], tk[3]);
+			key[4] = Max(key[4], tk[4]);
+			key[5] = Max(key[5], tk[5]);
 		}
 	}
 }

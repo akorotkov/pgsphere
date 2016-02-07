@@ -1,3 +1,9 @@
+\set ECHO none
+ set_sphere_output_precision 
+-----------------------------
+ SET 8
+(1 row)
+
 -- without idx
 SELECT count(*) FROM spheretmp1 WHERE p @ scircle '<(1,1),0.3>';
  count 

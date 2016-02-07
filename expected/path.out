@@ -1,3 +1,9 @@
+\set ECHO none
+ set_sphere_output_precision 
+-----------------------------
+ SET 8
+(1 row)
+
 --
 -- ellipse and path
 --
@@ -245,6 +251,13 @@ SELECT spath '{(280d, -8d),(280d, -9d)}'  &&  sellipse '<{10d,5d},(280d, -8d),90
  ?column? 
 ----------
  t
+(1 row)
+
+-- create path as aggregate
+SELECT spath(data.p) FROM ( SELECT spoint '(0,1)' as p UNION ALL SELECT spoint '(1,1)' UNION ALL SELECT '(1,0)' ) AS data ;
+           spath           
+---------------------------
+ {(0 , 1),(1 , 1),(1 , 0)}
 (1 row)
 
 --

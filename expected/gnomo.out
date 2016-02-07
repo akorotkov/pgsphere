@@ -1,0 +1,979 @@
+SET extra_float_digits TO -3;
+SELECT set_sphere_output_precision(12);
+ set_sphere_output_precision 
+-----------------------------
+ SET 12
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, -0.455)', spoint '(1, -0.45)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0449403289896,-0.00549389025232)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, -0.45)', spoint '(1, -0.45)');
+             gnomonic_proj             
+---------------------------------------
+ (-0.0450492463284,-0.000489973819396)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, -0.445)', spoint '(1, -0.45)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0451581642008,0.00451396713168)
+(1 row)
+
+select gnomonic_proj(spoint '(1, -0.455)', spoint '(1, -0.45)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(1, -0.45)', spoint '(1, -0.45)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(1, -0.445)', spoint '(1, -0.45)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, -0.455)', spoint '(1, -0.45)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0449403289896,-0.00549389025232)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, -0.45)', spoint '(1, -0.45)');
+            gnomonic_proj             
+--------------------------------------
+ (0.0450492463284,-0.000489973819396)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, -0.445)', spoint '(1, -0.45)');
+           gnomonic_proj            
+------------------------------------
+ (0.0451581642008,0.00451396713168)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, 0.045)', spoint '(1, 0.05)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0499915339465,-0.00494380775197)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, 0.05)', spoint '(1, 0.05)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0499790130537,6.24607520336e-05)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, 0.055)', spoint '(1, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0499664921686,0.00506872612906)
+(1 row)
+
+select gnomonic_proj(spoint '(1, 0.045)', spoint '(1, 0.05)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(1, 0.05)', spoint '(1, 0.05)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(1, 0.055)', spoint '(1, 0.05)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, 0.045)', spoint '(1, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0499915339465,-0.00494380775197)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, 0.05)', spoint '(1, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0499790130537,6.24607520336e-05)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, 0.055)', spoint '(1, 0.05)');
+           gnomonic_proj            
+------------------------------------
+ (0.0499664921686,0.00506872612906)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, 0.545)', spoint '(1, 0.55)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0427780606339,-0.00444549618887)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, 0.55)', spoint '(1, 0.55)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0426472042059,0.000557394853467)
+(1 row)
+
+select gnomonic_proj(spoint '(0.95, 0.555)', spoint '(1, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0425163485073,0.00556025800979)
+(1 row)
+
+select gnomonic_proj(spoint '(1, 0.545)', spoint '(1, 0.55)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(1, 0.55)', spoint '(1, 0.55)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(1, 0.555)', spoint '(1, 0.55)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, 0.545)', spoint '(1, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0427780606339,-0.00444549618887)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, 0.55)', spoint '(1, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0426472042059,0.000557394853467)
+(1 row)
+
+select gnomonic_proj(spoint '(1.05, 0.555)', spoint '(1, 0.55)');
+           gnomonic_proj            
+------------------------------------
+ (0.0425163485073,0.00556025800979)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, -0.455)', spoint '(3, -0.45)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0449403289896,-0.00549389025232)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, -0.45)', spoint '(3, -0.45)');
+             gnomonic_proj             
+---------------------------------------
+ (-0.0450492463284,-0.000489973819396)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, -0.445)', spoint '(3, -0.45)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0451581642008,0.00451396713168)
+(1 row)
+
+select gnomonic_proj(spoint '(3, -0.455)', spoint '(3, -0.45)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(3, -0.45)', spoint '(3, -0.45)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(3, -0.445)', spoint '(3, -0.45)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, -0.455)', spoint '(3, -0.45)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0449403289896,-0.00549389025232)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, -0.45)', spoint '(3, -0.45)');
+            gnomonic_proj             
+--------------------------------------
+ (0.0450492463284,-0.000489973819396)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, -0.445)', spoint '(3, -0.45)');
+           gnomonic_proj            
+------------------------------------
+ (0.0451581642008,0.00451396713168)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, 0.045)', spoint '(3, 0.05)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0499915339465,-0.00494380775197)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, 0.05)', spoint '(3, 0.05)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0499790130537,6.24607520336e-05)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, 0.055)', spoint '(3, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0499664921686,0.00506872612906)
+(1 row)
+
+select gnomonic_proj(spoint '(3, 0.045)', spoint '(3, 0.05)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(3, 0.05)', spoint '(3, 0.05)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(3, 0.055)', spoint '(3, 0.05)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, 0.045)', spoint '(3, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0499915339465,-0.00494380775197)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, 0.05)', spoint '(3, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0499790130537,6.24607520336e-05)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, 0.055)', spoint '(3, 0.05)');
+           gnomonic_proj            
+------------------------------------
+ (0.0499664921686,0.00506872612906)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, 0.545)', spoint '(3, 0.55)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0427780606339,-0.00444549618887)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, 0.55)', spoint '(3, 0.55)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0426472042059,0.000557394853467)
+(1 row)
+
+select gnomonic_proj(spoint '(2.95, 0.555)', spoint '(3, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0425163485073,0.00556025800979)
+(1 row)
+
+select gnomonic_proj(spoint '(3, 0.545)', spoint '(3, 0.55)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(3, 0.55)', spoint '(3, 0.55)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(3, 0.555)', spoint '(3, 0.55)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, 0.545)', spoint '(3, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0427780606339,-0.00444549618887)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, 0.55)', spoint '(3, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0426472042059,0.000557394853467)
+(1 row)
+
+select gnomonic_proj(spoint '(3.05, 0.555)', spoint '(3, 0.55)');
+           gnomonic_proj            
+------------------------------------
+ (0.0425163485073,0.00556025800979)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, -0.455)', spoint '(5, -0.45)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0449403289896,-0.00549389025232)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, -0.45)', spoint '(5, -0.45)');
+             gnomonic_proj             
+---------------------------------------
+ (-0.0450492463284,-0.000489973819396)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, -0.445)', spoint '(5, -0.45)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0451581642008,0.00451396713168)
+(1 row)
+
+select gnomonic_proj(spoint '(5, -0.455)', spoint '(5, -0.45)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(5, -0.45)', spoint '(5, -0.45)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(5, -0.445)', spoint '(5, -0.45)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, -0.455)', spoint '(5, -0.45)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0449403289896,-0.00549389025232)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, -0.45)', spoint '(5, -0.45)');
+            gnomonic_proj             
+--------------------------------------
+ (0.0450492463284,-0.000489973819396)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, -0.445)', spoint '(5, -0.45)');
+           gnomonic_proj            
+------------------------------------
+ (0.0451581642008,0.00451396713168)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, 0.045)', spoint '(5, 0.05)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0499915339465,-0.00494380775197)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, 0.05)', spoint '(5, 0.05)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0499790130537,6.24607520336e-05)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, 0.055)', spoint '(5, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0499664921686,0.00506872612906)
+(1 row)
+
+select gnomonic_proj(spoint '(5, 0.045)', spoint '(5, 0.05)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(5, 0.05)', spoint '(5, 0.05)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(5, 0.055)', spoint '(5, 0.05)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, 0.045)', spoint '(5, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0499915339465,-0.00494380775197)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, 0.05)', spoint '(5, 0.05)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0499790130537,6.24607520336e-05)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, 0.055)', spoint '(5, 0.05)');
+           gnomonic_proj            
+------------------------------------
+ (0.0499664921686,0.00506872612906)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, 0.545)', spoint '(5, 0.55)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0427780606339,-0.00444549618887)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, 0.55)', spoint '(5, 0.55)');
+            gnomonic_proj             
+--------------------------------------
+ (-0.0426472042059,0.000557394853467)
+(1 row)
+
+select gnomonic_proj(spoint '(4.95, 0.555)', spoint '(5, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (-0.0425163485073,0.00556025800979)
+(1 row)
+
+select gnomonic_proj(spoint '(5, 0.545)', spoint '(5, 0.55)');
+     gnomonic_proj     
+-----------------------
+ (0,-0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(5, 0.55)', spoint '(5, 0.55)');
+ gnomonic_proj 
+---------------
+ (0,0)
+(1 row)
+
+select gnomonic_proj(spoint '(5, 0.555)', spoint '(5, 0.55)');
+    gnomonic_proj     
+----------------------
+ (0,0.00500004166708)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, 0.545)', spoint '(5, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0427780606339,-0.00444549618887)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, 0.55)', spoint '(5, 0.55)');
+            gnomonic_proj            
+-------------------------------------
+ (0.0426472042059,0.000557394853467)
+(1 row)
+
+select gnomonic_proj(spoint '(5.05, 0.555)', spoint '(5, 0.55)');
+           gnomonic_proj            
+------------------------------------
+ (0.0425163485073,0.00556025800979)
+(1 row)
+
+select gnomonic_inv(point '(0.95, -0.455)', spoint '(1, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (1.93404045604 , -0.620644470397)
+(1 row)
+
+select gnomonic_inv(point '(0.95, -0.45)', spoint '(1, -0.45)');
+          gnomonic_inv           
+---------------------------------
+ (1.93256213345 , -0.6176011915)
+(1 row)
+
+select gnomonic_inv(point '(0.95, -0.445)', spoint '(1, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (1.93108704609 , -0.614550369264)
+(1 row)
+
+select gnomonic_inv(point '(1, -0.455)', spoint '(1, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (1.95836918132 , -0.604764854006)
+(1 row)
+
+select gnomonic_inv(point '(1, -0.45)', spoint '(1, -0.45)');
+          gnomonic_inv           
+---------------------------------
+ (1.956914533 , -0.601789767222)
+(1 row)
+
+select gnomonic_inv(point '(1, -0.445)', spoint '(1, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (1.95546286092 , -0.598807609319)
+(1 row)
+
+select gnomonic_inv(point '(1.05, -0.455)', spoint '(1, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (1.98112232487 , -0.589335241812)
+(1 row)
+
+select gnomonic_inv(point '(1.05, -0.45)', spoint '(1, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (1.97969293971 , -0.586426792177)
+(1 row)
+
+select gnomonic_inv(point '(1.05, -0.445)', spoint '(1, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (1.97826629181 , -0.583511718073)
+(1 row)
+
+select gnomonic_inv(point '(0.95, 0.045)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.76151307432 , 0.0688368263878)
+(1 row)
+
+select gnomonic_inv(point '(0.95, 0.05)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.76163833436 , 0.0724553691159)
+(1 row)
+
+select gnomonic_inv(point '(0.95, 0.055)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.76176362732 , 0.0760729610951)
+(1 row)
+
+select gnomonic_inv(point '(1, 0.045)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.78715062848 , 0.0671371183392)
+(1 row)
+
+select gnomonic_inv(point '(1, 0.05)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.78727603001 , 0.0706664479787)
+(1 row)
+
+select gnomonic_inv(point '(1, 0.055)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.78740146287 , 0.0741948953969)
+(1 row)
+
+select gnomonic_inv(point '(1.05, 0.045)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.81153380434 , 0.0654793685341)
+(1 row)
+
+select gnomonic_inv(point '(1.05, 0.05)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.81165903459 , 0.0689216776286)
+(1 row)
+
+select gnomonic_inv(point '(1.05, 0.055)', spoint '(1, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (1.81178429461 , 0.0723631680984)
+(1 row)
+
+select gnomonic_inv(point '(0.95, 0.545)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.03218995407 , 0.728455908477)
+(1 row)
+
+select gnomonic_inv(point '(0.95, 0.55)', spoint '(1, 0.55)');
+          gnomonic_inv           
+---------------------------------
+ (2.03421959002 , 0.73119792829)
+(1 row)
+
+select gnomonic_inv(point '(0.95, 0.555)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.03625413817 , 0.733931067146)
+(1 row)
+
+select gnomonic_inv(point '(1, 0.545)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.05449576075 , 0.709476159185)
+(1 row)
+
+select gnomonic_inv(point '(1, 0.55)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.05647450328 , 0.712160401141)
+(1 row)
+
+select gnomonic_inv(point '(1, 0.555)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.05845768052 , 0.714836300149)
+(1 row)
+
+select gnomonic_inv(point '(1.05, 0.545)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.07517654321 , 0.691081532871)
+(1 row)
+
+select gnomonic_inv(point '(1.05, 0.55)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.07710459256 , 0.693709435824)
+(1 row)
+
+select gnomonic_inv(point '(1.05, 0.555)', spoint '(1, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (2.07903665116 , 0.696329506692)
+(1 row)
+
+select gnomonic_inv(point '(2.95, -0.455)', spoint '(3, -0.45)');
+           gnomonic_inv           
+----------------------------------
+ (4.33700283527 , -0.27165319266)
+(1 row)
+
+select gnomonic_inv(point '(2.95, -0.45)', spoint '(3, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (4.33630528922 , -0.270232089821)
+(1 row)
+
+select gnomonic_inv(point '(2.95, -0.445)', spoint '(3, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (4.33560797557 , -0.268810216042)
+(1 row)
+
+select gnomonic_inv(point '(3, -0.455)', spoint '(3, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (4.34076229378 , -0.267566262208)
+(1 row)
+
+select gnomonic_inv(point '(3, -0.45)', spoint '(3, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (4.34007515086 , -0.266165779414)
+(1 row)
+
+select gnomonic_inv(point '(3, -0.445)', spoint '(3, -0.45)');
+           gnomonic_inv           
+----------------------------------
+ (4.3393882297 , -0.264764558966)
+(1 row)
+
+select gnomonic_inv(point '(3.05, -0.455)', spoint '(3, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (4.34440480094 , -0.263594269354)
+(1 row)
+
+select gnomonic_inv(point '(3.05, -0.45)', spoint '(3, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (4.34372777472 , -0.262213858104)
+(1 row)
+
+select gnomonic_inv(point '(3.05, -0.445)', spoint '(3, -0.45)');
+           gnomonic_inv           
+----------------------------------
+ (4.34305096026 , -0.26083274066)
+(1 row)
+
+select gnomonic_inv(point '(2.95, 0.045)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.24503385176 , 0.0304755271062)
+(1 row)
+
+select gnomonic_inv(point '(2.95, 0.05)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.24510988812 , 0.0320785494309)
+(1 row)
+
+select gnomonic_inv(point '(2.95, 0.055)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.24518592839 , 0.0336814889852)
+(1 row)
+
+select gnomonic_inv(point '(3, 0.045)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.25009578006 , 0.0300187358568)
+(1 row)
+
+select gnomonic_inv(point '(3, 0.05)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.25017080308 , 0.0315977381062)
+(1 row)
+
+select gnomonic_inv(point '(3, 0.055)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.25024582985 , 0.0331766612496)
+(1 row)
+
+select gnomonic_inv(point '(3.05, 0.045)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.25500799412 , 0.0295747078489)
+(1 row)
+
+select gnomonic_inv(point '(3.05, 0.05)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.25508202643 , 0.0311303608536)
+(1 row)
+
+select gnomonic_inv(point '(3.05, 0.055)', spoint '(3, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (4.25515606233 , 0.0326859382093)
+(1 row)
+
+select gnomonic_inv(point '(2.95, 0.545)', spoint '(3, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (4.38069288002 , 0.317532355075)
+(1 row)
+
+select gnomonic_inv(point '(2.95, 0.55)', spoint '(3, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (4.38154729845 , 0.318861246744)
+(1 row)
+
+select gnomonic_inv(point '(2.95, 0.555)', spoint '(3, 0.55)');
+          gnomonic_inv           
+---------------------------------
+ (4.38240199663 , 0.32018919076)
+(1 row)
+
+select gnomonic_inv(point '(3, 0.545)', spoint '(3, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (4.38378731662 , 0.312753597658)
+(1 row)
+
+select gnomonic_inv(point '(3, 0.55)', spoint '(3, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (4.38462848315 , 0.314063671577)
+(1 row)
+
+select gnomonic_inv(point '(3, 0.555)', spoint '(3, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (4.38546991631 , 0.315372838396)
+(1 row)
+
+select gnomonic_inv(point '(3.05, 0.545)', spoint '(3, 0.55)');
+          gnomonic_inv           
+---------------------------------
+ (4.38678374836 , 0.30810938986)
+(1 row)
+
+select gnomonic_inv(point '(3.05, 0.55)', spoint '(3, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (4.38761205219 , 0.309401127485)
+(1 row)
+
+select gnomonic_inv(point '(3.05, 0.555)', spoint '(3, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (4.38844061031 , 0.310691996365)
+(1 row)
+
+select gnomonic_inv(point '(4.95, -0.455)', spoint '(5, -0.45)');
+           gnomonic_inv           
+----------------------------------
+ (6.42981110208 , -0.16736666225)
+(1 row)
+
+select gnomonic_inv(point '(4.95, -0.45)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.42938044467 , -0.166481000773)
+(1 row)
+
+select gnomonic_inv(point '(4.95, -0.445)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.42894984006 , -0.165595153928)
+(1 row)
+
+select gnomonic_inv(point '(5, -0.455)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.43120262006 , -0.165755596923)
+(1 row)
+
+select gnomonic_inv(point '(5, -0.45)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.43077610111 , -0.164878340453)
+(1 row)
+
+select gnomonic_inv(point '(5, -0.445)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.43034963344 , -0.164000903857)
+(1 row)
+
+select gnomonic_inv(point '(5.05, -0.455)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.43256711154 , -0.164174672255)
+(1 row)
+
+select gnomonic_inv(point '(5.05, -0.45)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.43214465391 , -0.163305666876)
+(1 row)
+
+select gnomonic_inv(point '(5.05, -0.445)', spoint '(5, -0.45)');
+           gnomonic_inv            
+-----------------------------------
+ (6.43172224608 , -0.162436486422)
+(1 row)
+
+select gnomonic_inv(point '(4.95, 0.045)', spoint '(5, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (6.37213822757 , 0.0187969806712)
+(1 row)
+
+select gnomonic_inv(point '(4.95, 0.05)', spoint '(5, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (6.37218674577 , 0.0197858028573)
+(1 row)
+
+select gnomonic_inv(point '(4.95, 0.055)', spoint '(5, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (6.37223526492 , 0.0207746056121)
+(1 row)
+
+select gnomonic_inv(point '(5, 0.045)', spoint '(5, 0.05)');
+           gnomonic_inv           
+----------------------------------
+ (6.37407370398 , 0.018616268731)
+(1 row)
+
+select gnomonic_inv(point '(5, 0.05)', spoint '(5, 0.05)');
+           gnomonic_inv           
+----------------------------------
+ (6.37412177425 , 0.019595585605)
+(1 row)
+
+select gnomonic_inv(point '(5, 0.055)', spoint '(5, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (6.37416984544 , 0.0205748836027)
+(1 row)
+
+select gnomonic_inv(point '(5.05, 0.045)', spoint '(5, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (6.37597230446 , 0.0184389309028)
+(1 row)
+
+select gnomonic_inv(point '(5.05, 0.05)', spoint '(5, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (6.37601993463 , 0.0194089199093)
+(1 row)
+
+select gnomonic_inv(point '(5.05, 0.055)', spoint '(5, 0.05)');
+           gnomonic_inv            
+-----------------------------------
+ (6.37606756569 , 0.0203788905738)
+(1 row)
+
+select gnomonic_inv(point '(4.95, 0.545)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45661633464 , 0.195624197626)
+(1 row)
+
+select gnomonic_inv(point '(4.95, 0.55)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45713747936 , 0.196458682014)
+(1 row)
+
+select gnomonic_inv(point '(4.95, 0.555)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45765868608 , 0.197292936568)
+(1 row)
+
+select gnomonic_inv(point '(5, 0.545)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45774838305 , 0.193741168464)
+(1 row)
+
+select gnomonic_inv(point '(5, 0.55)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45826444902 , 0.194567808878)
+(1 row)
+
+select gnomonic_inv(point '(5, 0.555)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45878057519 , 0.195394225934)
+(1 row)
+
+select gnomonic_inv(point '(5.05, 0.545)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45885829716 , 0.191893369946)
+(1 row)
+
+select gnomonic_inv(point '(5.05, 0.55)', spoint '(5, 0.55)');
+          gnomonic_inv           
+---------------------------------
+ (6.45936938113 , 0.19271230794)
+(1 row)
+
+select gnomonic_inv(point '(5.05, 0.555)', spoint '(5, 0.55)');
+           gnomonic_inv           
+----------------------------------
+ (6.45988052356 , 0.193531028815)
+(1 row)
+

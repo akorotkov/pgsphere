@@ -210,20 +210,6 @@ COMMENT ON FUNCTION sellipse_contains_ellipse(sellipse,sellipse) IS
   'true if spherical ellipse contains spherical ellipse '; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_ellipse,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sellipse, sellipse ) IS
-  'true if spherical ellipse contains spherical ellipse'; 
-
-
 --
 -- ellipse is contained by ellipse
 --
@@ -237,19 +223,6 @@ CREATE FUNCTION sellipse_contains_ellipse_com(sellipse, sellipse)
 COMMENT ON FUNCTION sellipse_contains_ellipse_com(sellipse, sellipse) IS
   'true if spherical ellipse is contained by spherical ellipse '; 
 
-
-CREATE OPERATOR @ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_ellipse_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sellipse, sellipse ) IS
-  'true if spherical ellipse is contained by spherical ellipse'; 
 
 --
 -- ellipse does not contain ellipse
@@ -265,20 +238,6 @@ COMMENT ON FUNCTION sellipse_contains_ellipse_neg(sellipse,sellipse) IS
   'true if spherical ellipse does not contain spherical ellipse '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_ellipse_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sellipse, sellipse ) IS
-  'true if spherical ellipse does not contain spherical ellipse'; 
-
-
 --
 -- ellipse is not contained by ellipse
 --
@@ -291,20 +250,6 @@ CREATE FUNCTION sellipse_contains_ellipse_com_neg(sellipse, sellipse)
 
 COMMENT ON FUNCTION sellipse_contains_ellipse_com_neg(sellipse, sellipse) IS
   'true if spherical ellipse is not contained by spherical ellipse '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_ellipse_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sellipse, sellipse ) IS
-  'true if spherical ellipse is not contained by spherical ellipse'; 
 
 
 --
@@ -375,19 +320,6 @@ CREATE FUNCTION sellipse_contains_point(sellipse,spoint)
 COMMENT ON FUNCTION sellipse_contains_point(sellipse, spoint) IS
   'true if spherical ellipse contains spherical point '; 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = spoint,
-   PROCEDURE  = sellipse_contains_point,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sellipse, spoint ) IS
-  'true if spherical ellipse contains spherical point '; 
-
 --
 --  point is contained by ellipse
 --
@@ -402,19 +334,6 @@ COMMENT ON FUNCTION sellipse_contains_point_com(spoint, sellipse) IS
   'true if spherical ellipse contains spherical point '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = spoint,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_point_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( spoint, sellipse ) IS
-  'true if spherical ellipse contains spherical point '; 
-
 --
 -- ellipse does not contain point
 --
@@ -428,19 +347,6 @@ CREATE FUNCTION sellipse_contains_point_neg(sellipse,spoint)
 COMMENT ON FUNCTION sellipse_contains_point_neg(sellipse, spoint) IS
   'true if spherical ellipse contains spherical point '; 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = spoint,
-   PROCEDURE  = sellipse_contains_point_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sellipse, spoint ) IS
-  'true if spherical ellipse does not contain spherical point'; 
-
 --
 --  point is not contained by ellipse
 --
@@ -453,20 +359,6 @@ CREATE FUNCTION sellipse_contains_point_com_neg(spoint,sellipse)
 
 COMMENT ON FUNCTION sellipse_contains_point_com_neg(spoint, sellipse) IS
   'true if spherical ellipse contains spherical point '; 
-
-
-CREATE OPERATOR !@ (
-   LEFTARG    = spoint,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_point_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( spoint, sellipse ) IS
-  'true if spherical ellipse does not contain spherical point'; 
 
 
 --
@@ -525,19 +417,6 @@ COMMENT ON FUNCTION sellipse_contains_circle(sellipse,scircle) IS
   'true if spherical ellipse contains spherical circle ';
 
 
-CREATE OPERATOR ~ (    
-   LEFTARG    = sellipse,  
-   RIGHTARG   = scircle,
-   PROCEDURE  = sellipse_contains_circle,
-   COMMUTATOR = '@',       
-   NEGATOR    = '!~',     
-   RESTRICT   = contsel,   
-   JOIN       = contjoinsel
-);
-
-COMMENT ON OPERATOR ~ ( sellipse, scircle ) IS
-  'true if spherical ellipse contains spherical circle';
-
 --
 -- circle is contained by ellipse
 --
@@ -552,20 +431,6 @@ COMMENT ON FUNCTION sellipse_contains_circle_com(scircle, sellipse) IS
   'true if spherical ellipse contains spherical circle '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sellipse,  
-   PROCEDURE  = sellipse_contains_circle_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel
-);
-  
-COMMENT ON OPERATOR @ ( scircle, sellipse ) IS
-  'true if spherical ellipse contains spherical circle';
-
-  
 --
 -- ellipse does not contain circle
 --
@@ -579,19 +444,6 @@ CREATE FUNCTION sellipse_contains_circle_neg(sellipse,scircle)
 COMMENT ON FUNCTION sellipse_contains_circle_neg(sellipse,scircle) IS
   'true if spherical ellipse does not contain spherical circle ';
 
-
-CREATE OPERATOR !~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = scircle,
-   PROCEDURE  = sellipse_contains_circle_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel
-);
-  
-COMMENT ON OPERATOR !~ ( sellipse, scircle ) IS
-  'true if spherical ellipse does not contain spherical circle';
 
 --
 -- circle is not contained by ellipse
@@ -607,19 +459,6 @@ COMMENT ON FUNCTION sellipse_contains_circle_com_neg(scircle, sellipse) IS
   'true if spherical ellipse does not contain spherical circle ';   
 
 
-CREATE OPERATOR !@ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sellipse,  
-   PROCEDURE  = sellipse_contains_circle_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',  
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel
-);
-  
-COMMENT ON OPERATOR !@ ( scircle, sellipse ) IS
-  'true if spherical ellipse does not contain spherical circle';
-
 --
 -- circle contains ellipse
 --
@@ -632,20 +471,6 @@ CREATE FUNCTION scircle_contains_ellipse(scircle,sellipse)
 
 COMMENT ON FUNCTION scircle_contains_ellipse(scircle,sellipse) IS
   'true if spherical circle contains spherical ellipse '; 
-
-
-CREATE OPERATOR ~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sellipse,  
-   PROCEDURE  = scircle_contains_ellipse,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel
-);
-  
-COMMENT ON OPERATOR ~ ( scircle, sellipse ) IS
-  'true if spherical circle contains spherical ellipse';
 
 
 --
@@ -662,19 +487,6 @@ COMMENT ON FUNCTION scircle_contains_ellipse_com(sellipse, scircle) IS
   'true if spherical circle contains spherical ellipse '; 
 
 
-CREATE OPERATOR @ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_ellipse_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel
-);
-  
-COMMENT ON OPERATOR @ ( sellipse, scircle ) IS
-  'true if spherical circle contains spherical ellipse';
-
 --
 -- circle does not contain ellipse
 --
@@ -689,19 +501,6 @@ COMMENT ON FUNCTION scircle_contains_ellipse_neg(scircle,sellipse) IS
   'true if spherical circle does not contain spherical ellipse '; 
 
 
-CREATE OPERATOR !~ (
-   LEFTARG    = scircle,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = scircle_contains_ellipse_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel
-);
-  
-COMMENT ON OPERATOR !~ ( scircle, sellipse ) IS
-  'true if spherical circle does not contain spherical ellipse';
-
 --
 -- ellipse is not contained by circle
 --
@@ -715,19 +514,6 @@ CREATE FUNCTION scircle_contains_ellipse_com_neg(sellipse, scircle)
 COMMENT ON FUNCTION scircle_contains_ellipse_com_neg(sellipse, scircle) IS
   'true if spherical circle does not contain spherical ellipse '; 
 
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = scircle,
-   PROCEDURE  = scircle_contains_ellipse_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',  
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel
-);
-  
-COMMENT ON OPERATOR !@ ( sellipse, scircle ) IS
-  'true if spherical circle does not contain spherical ellipse';
 
 --
 -- circle overlaps ellipse
@@ -967,20 +753,6 @@ COMMENT ON FUNCTION sellipse_contains_line( sellipse , sline ) IS
   'returns true if spherical ellipse contains spherical line'; 
 
 
-CREATE OPERATOR ~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sline,
-   PROCEDURE  = sellipse_contains_line,
-   COMMUTATOR = '@',
-   NEGATOR    = '!~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR ~ ( sellipse, sline ) IS
-  'true if spherical ellipse contains spherical line'; 
-
-
 --
 -- line is contained by ellipse
 --
@@ -995,20 +767,6 @@ CREATE FUNCTION sellipse_contains_line_com( sline , sellipse )
 COMMENT ON FUNCTION sellipse_contains_line_com( sline , sellipse ) IS
   'returns true if spherical ellipse contains spherical line'; 
 
-CREATE OPERATOR @ (
-   LEFTARG    = sline,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_line_com,
-   COMMUTATOR = '~',
-   NEGATOR    = '!@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR @ ( sline, sellipse ) IS
-  'true if spherical ellipse contains spherical line'; 
-
-
 --
 -- ellipse does not contain line
 --
@@ -1021,20 +779,6 @@ CREATE FUNCTION sellipse_contains_line_neg( sellipse , sline )
 
 COMMENT ON FUNCTION sellipse_contains_line_neg( sellipse , sline ) IS
   'returns true if spherical ellipse does not contain spherical line'; 
-
-
-CREATE OPERATOR !~ (
-   LEFTARG    = sellipse,
-   RIGHTARG   = sline,
-   PROCEDURE  = sellipse_contains_line_neg,
-   COMMUTATOR = '!@',
-   NEGATOR    = '~',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !~ ( sellipse, sline ) IS
-  'true if spherical ellipse does not contain spherical line'; 
 
 
 --
@@ -1051,17 +795,4 @@ CREATE FUNCTION sellipse_contains_line_com_neg( sline , sellipse )
 COMMENT ON FUNCTION sellipse_contains_line_com_neg( sline , sellipse ) IS
   'returns true if spherical ellipse does not contain spherical line'; 
 
-
-CREATE OPERATOR !@ (
-   LEFTARG    = sline,
-   RIGHTARG   = sellipse,
-   PROCEDURE  = sellipse_contains_line_com_neg,
-   COMMUTATOR = '!~',
-   NEGATOR    = '@',
-   RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sline, sellipse ) IS
-  'true if spherical ellipse does not contain spherical line'; 
 

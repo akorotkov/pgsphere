@@ -14,8 +14,8 @@
             <para>
               The <function>area</function> function returns the area of a
               spherical object in square radians. Supported data types are:
-              <type>scircle</type>, <type>spolygon</type>, and
-              <type>sbox</type>.
+              <type>scircle</type>, <type>spolygon</type> (if the polygon
+	      is convex), and <type>sbox</type>.
             </para>
             <example>
               <title>Area of a spherical circle as a multiple of &pgr;</title>
@@ -95,7 +95,7 @@
               </funcprototype>
             </funcsynopsis>
             <para>
-              return the cartesian
+              return the Cartesian
               <literal>x</literal>, <literal>y</literal> or
               <literal>z</literal> value of a spherical position
               <parameter>p</parameter>. The returned values are always
@@ -103,7 +103,7 @@
             </para>
             <example>
               <title>
-                Get the cartesian <literal>z</literal>-value
+                Get the Cartesian <literal>z</literal>-value
                 of a spherical point
               </title>
               <programlisting>
@@ -115,7 +115,7 @@
               </programlisting>
             </example>
             <para>
-              You can get a <type>float8</type> array of cartesian values using the function
+              You can get a <type>float8</type> array of Cartesian values using the function
             </para>
             <funcsynopsis>
               <funcprototype>
@@ -125,7 +125,7 @@
             </funcsynopsis>
             <example>
               <title>
-                Get the cartesian values of a spherical point
+                Get the Cartesian values of a spherical point
               </title>
               <programlisting>
 <![CDATA[sql> SELECT xyz ( spoint '(0d,0d)' ) AS cart;]]>
@@ -151,14 +151,14 @@
                 <para>
                     Using the function
                     <function>strans_zxz(strans),</function> you can convert
-                    a Euler transformation to <literal>ZXZ</literal>-axes
+                    an Euler transformation to <literal>ZXZ</literal> axes
                     transformation.
                 </para>
                 <example>
                   <title>Change the transformation axes to <literal>ZXZ</literal></title>
                   <simpara>
                     Convert the transformation <literal>strans '20d, -270d, 70.5d,
-                    XZY'</literal> to a <literal>ZXZ</literal>-transformation.
+                    XZY'</literal> to a <literal>ZXZ</literal> transformation.
                   </simpara>
                   <programlisting>
 <![CDATA[sql> SELECT strans_zxz ( strans '20d, -270d, 70.5d, XZY' );]]>
@@ -502,7 +502,7 @@
           </title>
           <sect3 id="funcs.spoly.npts">
             <title>
-              Cnunt of edges
+              Count of edges
             </title>
             <para>
               Similar to an <type>spath</type> (<xref linkend="funcs.spath.npts"/>), 

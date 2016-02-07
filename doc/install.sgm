@@ -9,7 +9,7 @@
             <para>  
                 <application>pgSphere</application> is not part of the <application>PostgreSQL</application> software. 
                 You can download it from the <application>pgSphere</application> homepage
-                <ulink url="http://pgfoundry.org/projects/pgsphere/"><citetitle>http://pgfoundry.org/projects/pgsphere/</citetitle></ulink>
+                <ulink url="https://github.com/akorotkov/pgsphere"><citetitle>https://github.com/akorotkov/pgsphere</citetitle></ulink>
             </para>
         </sect2>
 
@@ -19,7 +19,7 @@
             </title>
             <para>
                 You will need <application>PostgreSQL
-                7.3</application> or above. We assume that you have
+                9.1</application> or above. We assume that you have
                 <application>PostgreSQL</application> already compiled and
                 installed. Please note: Depending on your system configuration mostly you have to be logged in as the system
                 superuser.
@@ -32,7 +32,7 @@
                 Then, change into <filename>POSTGRESQL_SRC/src/contrib</filename>. 
                 If the sources are not yet installed and the directory
                 <filename>pg_sphere</filename> does not exist, take the
-                gzipped <application>pgSphere</application> sources ( e.g.,
+                gzipped <application>pgSphere</application> sources ( e. g.,
                 <filename>pg_sphere_xxx.tgz</filename> ) and run:
             </para>
             <programlisting>
@@ -97,14 +97,13 @@
             <para>
                 We assume you have already created a database
                 <database>datab</database>, where <database>datab</database>
-                is the name of any database. Now change into the directory
-                <filename>POSTGRESQL_INSTALL_PATH/share/contrib</filename>. 
+                is the name of any database. 
                 Presupposing the name of your
                 <application>PostgreSQL</application>'s superuser is
-                <parameter>postgres</parameter> type:
+                <parameter>postgres</parameter>, type:
             </para>
             <programlisting>
-<![CDATA[shell> psql -U postgres datab < pg_sphere.sql]]>
+<![CDATA[shell> psql -U postgres -c 'CREATE EXTENSION pg_sphere;' datab]]>
             </programlisting>
             <para>
                 Depending on your system, it may be necessary to give more
@@ -118,7 +117,7 @@
                 call:
             </para>
             <programlisting>
-<![CDATA[pgsql> SELECT pg_sphere_version()]]>
+<![CDATA[pgsql> SELECT pg_sphere_version();]]>
             </programlisting>
         </sect2>
         

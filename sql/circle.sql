@@ -1,3 +1,7 @@
+\set ECHO none
+SELECT set_sphere_output_precision(8);
+\set ECHO all
+
 -- Input/Output ---
 
 SELECT set_sphere_output( 'RAD' );

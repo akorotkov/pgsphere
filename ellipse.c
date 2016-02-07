@@ -75,7 +75,7 @@ sellipse_check(SELLIPSE *e)
 
 	sp.lng = e->phi;
 	spoint_check(&sp);
-	if (sp.lng < PI)
+	if (PI - sp.lng >= PI_EPS)
 		e->phi = sp.lng;
 	else
 		e->phi = sp.lng - PI;

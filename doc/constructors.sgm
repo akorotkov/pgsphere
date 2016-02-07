@@ -5,7 +5,7 @@
         <para>
           Constructors within <application>pgSphere</application> are
           functions needed to create spherical data types from other data
-          types. In usage, there isn't a difference from
+          types. For actual use, there isn't a difference to
           <emphasis>usual</emphasis> <application>PostgreSQL</application>
           functions.  <application>pgSphere</application> constructor
           functions are named by returned data type. Constructor functions
@@ -51,7 +51,7 @@
             Euler transformation
           </title>
           <para>
-            There are two constructor functions for a Euler transformation:
+            There are two constructor functions for an Euler transformation:
           </para>
           <funcsynopsis>
             <funcprototype>
@@ -77,7 +77,7 @@
             For more information about that parameter, see <xref linkend="dt.strans"/>.
           </para>
           <example>
-            <title>Create a Euler transformation object</title>
+            <title>Create an Euler transformation object</title>
             <simpara>
               Create a transformation object to rotate a spherical object
               counterclockwise, first 20&deg; around
@@ -114,7 +114,7 @@
             Otherwise, this function returns an error.
           </para>
           <example>
-            <title>A circle around the Noth Pole</title>
+            <title>A circle around the north pole</title>
             <simpara>
              Get a spherical circle around the North Pole with a radius
              of 30&deg;.
@@ -144,7 +144,7 @@
             The input of spherical lines using Euler transformation and
             length is quite circumstantial (see <xref linkend="dt.sline"/>). 
             For short lines it is easier to input a line specifying the
-            begining and the end of the line.
+            beginning and the end of the line.
           </para>              
           <funcsynopsis>
             <funcprototype>
@@ -382,7 +382,7 @@
           </para>
           <funcsynopsis>
             <funcprototype>
-              <funcdef><function>sellipse</function></funcdef>
+              <funcdef><function>sbox</function></funcdef>
                 <paramdef>spoint <parameter>south_west</parameter></paramdef>
                 <paramdef>spoint <parameter>north_east</parameter></paramdef>
             </funcprototype>

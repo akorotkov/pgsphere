@@ -32,6 +32,39 @@ Stylesheet//EN" CDATA DSSSL>
 
 (define %indent-programlisting-lines% "  " )
 
+(element sect1 ($section1$))
+
+;; Enables page break per sect1
+(define ($section1$)
+  (if (node-list=? (current-node) (sgml-root-element))
+      (make simple-page-sequence
+        page-n-columns: %page-n-columns%
+        page-number-restart?: (or %page-number-restart% 
+                                  (book-start?) 
+                                  (first-chapter?))
+        page-number-format: ($page-number-format$)
+        use: default-text-style
+        left-header:   ($left-header$)
+        center-header: ($center-header$)
+        right-header:  ($right-header$)
+        left-footer:   ($left-footer$)
+        center-footer: ($center-footer$)
+        right-footer:  ($right-footer$)
+        start-indent: %body-start-indent%
+        input-whitespace-treatment: 'collapse
+        quadding: %default-quadding%
+        (make sequence
+          ($section-title$)
+          (process-children)))
+      (make display-group
+        space-before: %block-sep%
+        space-after: %block-sep%
+        start-indent: %body-start-indent%
+        break-before: 'page
+        (make sequence
+          ($section-title$)
+          (process-children)))))
+
 (define %paper-type%
   ;; Name of paper type
   ;; "USletter"
@@ -40,7 +73,6 @@ Stylesheet//EN" CDATA DSSSL>
 (define %two-side% 
   ;; Is two-sided output being produced?
   #t)
-
 
 ;; Titlepage and TOC
 
@@ -70,7 +102,6 @@ Stylesheet//EN" CDATA DSSSL>
 (define %hyphenation%
   ;; Allow automatic hyphenation?
   #t)
-
 
 (element ( itemizedlist title )
   (
@@ -141,8 +172,6 @@ Stylesheet//EN" CDATA DSSSL>
         (normalize "abstract")
         (normalize "legalnotice")
         (normalize "revhistory")))
-
-
 ]]>
 
 
@@ -168,7 +197,7 @@ Stylesheet//EN" CDATA DSSSL>
   )
 )
 
-(define %stylesheet%            "pg_sphere.css")
+(define %stylesheet%  "pg_sphere.css")
 
 (define %generate-article-titlepage%
   ;; produce a title page for articles
@@ -186,9 +215,42 @@ Stylesheet//EN" CDATA DSSSL>
   ;; The filename of the root HTML document (e.g, "index").
   "index")
 
+(define ($shade-verbatim-attr$)
+  ;; REFENTRY shade-verbatim-attr
+  ;; PURP Attributes used to create a shaded verbatim environment.
+  ;; DESC
+  ;; See '%shade-verbatim%'
+  ;; /DESC
+  ;; AUTHOR N/A
+  ;; /REFENTRY
+  (list
+   (list "BORDER" "0")
+   (list "BGCOLOR" "#F7F7F7")
+   (list "WIDTH" ($table-width$))))
+
+;; ...but we need to do some extra work to make the above apply to PRE
+;; as well.  (mostly pasted from dbverb.dsl)
+(define ($verbatim-display$ indent line-numbers?)
+  (let ((content (make element gi: "PRE"
+                       attributes: (list
+                                    (list "CLASS" (gi)))
+                       (if (or indent line-numbers?)
+                           ($verbatim-line-by-line$ indent line-numbers?)
+                           (process-children)))))
+    (if %shade-verbatim%
+        (make element gi: "TABLE"
+              attributes: ($shade-verbatim-attr$)
+              (make element gi: "TR"
+                    (make element gi: "TD"
+                          content)))
+	(make sequence
+	  (para-check)
+	  content
+	  (para-check 'restart)))))
+
 (define %shade-verbatim%
   ;; verbatim sections will be shaded if t(rue)
-  #t)
+  #f)
 
 (define %use-id-as-filename%
   ;; Use ID attributes as name for component HTML files?
@@ -249,6 +311,13 @@ Stylesheet//EN" CDATA DSSSL>
 (mode subtitle-mode
   ;; do not print subtitle on subsequent pages
   (element subtitle (empty-sosofo)))
+
+;; notes.
+(element note
+  (make sequence
+    (para-check)
+    ($admonition$)
+    (para-check 'restart)))
 
 ]]>
 
