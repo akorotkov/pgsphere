@@ -6,19 +6,21 @@ useful functions and operators.
 NOTICE:
      This version will works only with postgresql version 8.0 and above.
 
-INSTALLATION:
+INSTALLATION AS EXTENSION (RECOMMENDED):
 
+  -- build and install
+  gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config
+  gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config install
+  -- load extension
+  psql <database> -c "CREATE EXTENSION pg_sphere;"
+
+INSTALLATION AS MODULE (DEPRECATED):
+
+  -- build and install
   gmake
   gmake install
   -- load functions
   psql <database> < pg_sphere.sql
-
-USING PG_CONFIG:
-
-gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config
-gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config install
--- load extension:
-CREATE EXTENSION pg_sphere;
 
 REGRESSION TEST:
 
