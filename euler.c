@@ -413,7 +413,7 @@ spheretrans_point_inverse(PG_FUNCTION_ARGS)
 }
 
  /*
-  * Transforms a spherical vector from spb to spe into a inverse Euler
+  * Transforms a spherical vector from 'spb' to 'spe' into an inverse Euler
   * transformation. Returns true if the transformation was successful.
   */
 static bool
