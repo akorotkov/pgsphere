@@ -1,9 +1,6 @@
 #include "polygon.h"
 
-/*!
-  \file
-  \brief Polygon functions
-*/
+/* Polygon functions */
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -65,8 +62,9 @@ PG_FUNCTION_INFO_V1(spherepoly_add_points_finalize);
 
 
  /*
-  * ! \brief "Center" of a polygon \param v pointer to center of polygon
-  * \param poly pointer to polygon \return true if crossing
+  * "Center" of a polygon. "v" is the pointer to the center of
+  * the polygon, "poly" is the pointer to the polygon.
+  * Returns true if crossing.
   */
 static void
 spherepoly_center(Vector3D *v, const SPOLY *poly)
@@ -100,8 +98,8 @@ spherepoly_center(Vector3D *v, const SPOLY *poly)
 
 
  /*
-  * ! \brief Checks crossing of line segments \param poly pointer to polygon
-  * \return true if crossing
+  * Checks crossing of line segments. "poly" is the pointer to a polygon.
+  * Returns true if crossing.
   */
 static bool
 spherepoly_check(const SPOLY *poly)
@@ -160,14 +158,14 @@ spherepoly_check(const SPOLY *poly)
 
 
  /*
-  * ! \brief Converts an array of spherical points to SPOLY \param arr pointer
-  * to array of spherical points \param nelem count of elements \return
-  * pointer to created spherical polygon
+  * Converts an array of spherical points to SPOLY. "arr" is the pointer
+  * to the array of spherical point,s "nelem" is the number of the
+  * elements. Returns the pointer to the created spherical polygon.
   */
 static SPOLY *
 spherepoly_from_array(SPoint *arr, int32 nelem)
 {
-	SPOLY	   *poly = NULL;
+	SPOLY *poly = NULL;
 
 	if (nelem < 3)
 	{
@@ -176,10 +174,9 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 	}
 	else
 	{
-
-		int32		i;
-		float8		scheck;
-		int32		size;
+		int32	i;
+		float8	scheck;
+		int32	size;
 
 		for (i = 0; i < nelem; i++)
 		{
@@ -196,7 +193,9 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 			{
 				if (i < (nelem - 2))
 				{
-					memmove((void *) &arr[i + 1], (void *) &arr[i + 2], (nelem - i - 2) * sizeof(SPoint));
+					memmove((void *) &arr[i + 1],
+							(void *) &arr[i + 2],
+							(nelem - i - 2) * sizeof(SPoint));
 				}
 				nelem--;
 				continue;
@@ -232,7 +231,9 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 				elog(ERROR, "spherepoly_from_array: a polygon segment length must be not equal 180 degrees.");
 				return NULL;
 			}
-			memcpy((void *) &poly->p[i], (void *) &arr[i], sizeof(SPoint));
+			memcpy((void *) &poly->p[i],
+				   (void *) &arr[i],
+				   sizeof(SPoint));
 		}
 
 	}
@@ -250,10 +251,9 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 
 
  /*
-  * ! \brief Does a transformation of polygon using Euler transformation
-  * \param se pointer to Euler transformation \param in pointer to polygon
-  * \param out pointer to transformed polygon \return pointer to transformed
-  * polygon
+  * Performs a transform of a polygon using an Euler transformation.
+  * "se" is the pointer to the Euler transformation, "in" is the pointer
+  * to the polygon, "out" is the pointer to the transformed polygon.
   */
 static void
 euler_spoly_trans(SPOLY *out, const SPOLY *in, const SEuler *se)
@@ -267,11 +267,10 @@ euler_spoly_trans(SPOLY *out, const SPOLY *in, const SEuler *se)
 }
 
 
-
  /*
-  * ! \brief Returns the relationship between polygon and circle \param circ
-  * pointer to circle \param poly pointer to polygon \return relationship as a
-  * \link PGS_CIRCLE_POLY_REL int8 value \endlink (\ref PGS_CIRCLE_POLY_REL )
+  * Returns the relationship between polygon and circle as an int8 value.
+  * "circ" is the pointer to the circle, "poly" is the pointer to the
+  * polygon.
   */
 static int8
 poly_circle_pos(const SPOLY *poly, const SCIRCLE *circ)
@@ -337,12 +336,10 @@ poly_circle_pos(const SPOLY *poly, const SCIRCLE *circ)
 }
 
 
-
  /*
-  * ! \brief Returns the relationship between polygon and ellipse \param ell
-  * pointer to ellipse \param poly pointer to polygon \return relationship as
-  * a \link PGS_ELLIPSE_POLY_REL int8 value \endlink (\ref
-  * PGS_ELLIPSE_POLY_REL )
+  * Returns the relationship between a polygon and an ellipse
+  * as an int8 value. "ell" is the pointer to the ellipse,
+  * "poly" is the pointer to the polygon.
   */
 static int8
 poly_ellipse_pos(const SPOLY *poly, const SELLIPSE *ell)
@@ -430,12 +427,10 @@ poly_ellipse_pos(const SPOLY *poly, const SELLIPSE *ell)
 }
 
 
-
  /*
-  * ! \brief Returns the relationship between two polygons \param p1  pointer
-  * to first polygon \param p2	pointer to second polygon \param recheck swap
-  * p1 and p2 \return relationship as a \link PGS_POLY_REL int8 value \endlink
-  * (\ref PGS_POLY_REL )
+  * Returns the relationship between two polygons as an int8 value.
+  * "p1" is the pointer to the first polygon, "p2" is the pointer
+  * to the second polygon. If "recheck" is true, swaps p1 and p2.
   */
 static int8
 poly_poly_pos(const SPOLY *p1, const SPOLY *p2, bool recheck)
@@ -484,11 +479,10 @@ poly_poly_pos(const SPOLY *p1, const SPOLY *p2, bool recheck)
 }
 
 
-
 bool
 spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir)
 {
-	bool		ret = false;
+	bool ret = false;
 
 	if (p1->npts == p2->npts)
 	{
@@ -518,7 +512,7 @@ spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir)
 			}
 		}
 
-		/* Try other direction, if not equal */
+		/* Try other direction if not equal */
 		if (!dir && !ret)
 		{
 			ret = spoly_eq(p1, p2, true);
@@ -556,7 +550,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 	Vector3D	vc,
 				vp;
 
-	/* First check, if point is outside polygon (behind) */
+	/* First check if point is outside polygon (behind) */
 	spherepoly_center(&vc, pg);
 	spoint_vector3d(&vp, sp);
 	scp = vector3d_scalar(&vp, &vc);
@@ -597,7 +591,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 		SPOLY	   *tmp = (SPOLY *) palloc(VARSIZE(pg));
 
 		/*
-		 * Make a transformation, so point is (0,0)
+		 * Make a transformation, so the point is (0,0)
 		 */
 
 		se.phi_a = EULER_AXIS_Z;
@@ -612,7 +606,7 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 		p.lng = 0.0;
 		p.lat = 0.0;
 
-		/* Check, whether an edge is on equator. */
+		/* Check whether an edge is on equator. */
 		/* If yes, rotate randomized around 0,0 */
 
 		cntr = 0;
@@ -705,9 +699,8 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 }
 
  /*
-  * ! \brief Returns the relationship between polygon and line \param line
-  * pointer to line \param poly pointer to polygon \return relationship as a
-  * \link PGS_LINE_POLY_REL int8 value \endlink (\ref PGS_LINE_POLY_REL )
+  * Returns the relationship between polygon and line. "line" is
+  * the pointer to line, "poly" is the pointer to polygon.
   */
 int8
 poly_line_pos(const SPOLY *poly, const SLine *line)
@@ -881,7 +874,9 @@ spherepoly_area(PG_FUNCTION_ARGS)
 	SEuler		se;
 	float8		sum = 0.0;
 
-	memcpy((void *) &s[1], (void *) &poly->p[0], poly->npts * sizeof(SPoint));
+	memcpy((void *) &s[1],
+		   (void *) &poly->p[0],
+		   poly->npts * sizeof(SPoint));
 	memcpy((void *) &s[0], (void *) &s[poly->npts], sizeof(SPoint));
 	memcpy((void *) &s[poly->npts + 1], (void *) &s[1], sizeof(SPoint));
 
@@ -1376,7 +1371,7 @@ spherepoly_add_point(PG_FUNCTION_ARGS)
 Datum
 spherepoly_add_points_finalize(PG_FUNCTION_ARGS)
 {
-	SPOLY	   *poly = (SPOLY *) PG_GETARG_POINTER(0);
+	SPOLY *poly = (SPOLY *) PG_GETARG_POINTER(0);
 
 	if (poly == NULL)
 	{
@@ -1391,7 +1386,7 @@ spherepoly_add_points_finalize(PG_FUNCTION_ARGS)
 		pfree(poly);
 		PG_RETURN_NULL();
 	}
-	/* Skip if distance is equal 180deg */
+	/* Skip if distance is equal to 180deg */
 	if (FPeq(spoint_dist(&poly->p[0], &poly->p[poly->npts - 1]), PI))
 	{
 		elog(NOTICE, "spoly(spoint): Cannot close polygon. Distance between first and last point is 180deg");
