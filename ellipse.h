@@ -9,7 +9,7 @@
 
 /*
  * Spherical ellipse data structure. A spherical ellipse is represented using
- * two radii and a Euler transformation (ZXZ-axis). The "untransformed" ellipse
+ * two radii and an Euler transformation (ZXZ-axis). The "untransformed" ellipse
  * is located on equator at position (0,0). The large radius is along equator.
  */
 typedef struct
@@ -47,260 +47,260 @@ typedef struct
 #define PGS_ELLIPSE_OVER			2	/* ellipse overlaps other ellipse */
 
 /*
- * Checks, whether two ellipses are equal .
+ * Checks whether two ellipses are equal .
  */
-bool		sellipse_eq(const SELLIPSE *e1, const SELLIPSE *e2);
+bool	sellipse_eq(const SELLIPSE *e1, const SELLIPSE *e2);
 
 /*
  * Returns the center of an ellipse.
  */
-void		sellipse_center(SPoint *sp, const SELLIPSE *e);
+void	sellipse_center(SPoint *sp, const SELLIPSE *e);
 
 /*
- * Checks, whether a ellipse contains point.
+ * Checks whether a ellipse contains point.
  */
-bool		sellipse_cont_point(const SELLIPSE *se, const SPoint *sp);
+bool	sellipse_cont_point(const SELLIPSE *se, const SPoint *sp);
 
 /*
  * Returns the large axis of an ellipse as line.
  */
-bool		sellipse_line(SLine *sl, const SELLIPSE *e);
+bool	sellipse_line(SLine *sl, const SELLIPSE *e);
 
 /*
- * Relationship between line and ellipse as PGS_ELLIPSE_LINE_REL int8 value.
+ * Relationship between a line and an ellipse as PGS_ELLIPSE_LINE_REL int8 value.
  */
-int8		sellipse_line_pos(const SELLIPSE *se, const SLine *sl);
+int8	sellipse_line_pos(const SELLIPSE *se, const SLine *sl);
 
 /*
- * Relationship between circle and ellipse as PGS_ELLIPSE_CIRCLE_REL int8 value.
+ * Relationship between a circle and an ellipse as PGS_ELLIPSE_CIRCLE_REL int8 value.
  */
-int8		sellipse_circle_pos(const SELLIPSE *se, const SCIRCLE *sc);
+int8	sellipse_circle_pos(const SELLIPSE *se, const SCIRCLE *sc);
 
 /*
  * Returns the Euler transformation of an ellipse.
  */
-void		sellipse_trans(SEuler *se, const SELLIPSE *e);
+void	sellipse_trans(SEuler *se, const SELLIPSE *e);
 
 /*
- * Input of spherical ellipse.
+ * Input of the spherical ellipse.
  */
-Datum		sphereellipse_in(PG_FUNCTION_ARGS);
+Datum	sphereellipse_in(PG_FUNCTION_ARGS);
 
 /*
- * Input of spherical ellipse from center, axes and inclination.
+ * Input of the spherical ellipse from center, axes and inclination.
  */
-Datum		sphereellipse_infunc(PG_FUNCTION_ARGS);
+Datum	sphereellipse_infunc(PG_FUNCTION_ARGS);
 
 /*
  * Returns the inclination of an ellipse.
  */
-Datum		sphereellipse_incl(PG_FUNCTION_ARGS);
+Datum	sphereellipse_incl(PG_FUNCTION_ARGS);
 
 /*
- * Returns the length of major axis of an ellipse.
+ * Returns the length of the major axis of an ellipse.
  */
-Datum		sphereellipse_rad1(PG_FUNCTION_ARGS);
+Datum	sphereellipse_rad1(PG_FUNCTION_ARGS);
 
 /*
- * Returns the length of minor axis of an ellipse.
+ * Returns the length of the minor axis of an ellipse.
  */
-Datum		sphereellipse_rad2(PG_FUNCTION_ARGS);
+Datum	sphereellipse_rad2(PG_FUNCTION_ARGS);
 
 /*
  * Returns the center of an ellipse.
  */
-Datum		sphereellipse_center(PG_FUNCTION_ARGS);
+Datum	sphereellipse_center(PG_FUNCTION_ARGS);
 
 /*
  * Returns the Euler transformation of an ellipse.
  */
-Datum		sphereellipse_trans(PG_FUNCTION_ARGS);
+Datum	sphereellipse_trans(PG_FUNCTION_ARGS);
 
 /*
  * Casts a spherical ellipse as circle. The created circle is the boundary
  * circle of ellipse. The diameter of returned circle is equal to length of
  * major axis of ellipse.
   */
-Datum		sphereellipse_circle(PG_FUNCTION_ARGS);
+Datum	sphereellipse_circle(PG_FUNCTION_ARGS);
 
 /*
  * Casts a spherical point to an ellipse.
  */
-Datum		spherepoint_ellipse(PG_FUNCTION_ARGS);
+Datum	spherepoint_ellipse(PG_FUNCTION_ARGS);
 
 /*
  * Casts a spherical circle to an ellipse.
  */
-Datum		spherecircle_ellipse(PG_FUNCTION_ARGS);
+Datum	spherecircle_ellipse(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether two ellipses are equal.
+ * Checks whether two ellipses are equal.
  */
-Datum		sphereellipse_equal(PG_FUNCTION_ARGS);
+Datum	sphereellipse_equal(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether two ellipses are not equal.
+ * Checks whether two ellipses are not equal.
  */
-Datum		sphereellipse_equal_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_equal_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse contains point.
+ * Checks whether an ellipse contains a point.
  */
-Datum		sphereellipse_cont_point(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_point(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse doesn't contain point.
+ * Checks whether an ellipse doesn't contain a point.
  */
-Datum		sphereellipse_cont_point_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_point_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse contains point.
+ * Checks whether an ellipse contains a point.
  */
-Datum		sphereellipse_cont_point_com(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_point_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse doesn't contain point.
+ * Checks whether an ellipse doesn't contain a point.
  */
-Datum		sphereellipse_cont_point_com_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_point_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse contains line.
+ * Checks whether an ellipse contains a line.
  */
-Datum		sphereellipse_cont_line(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_line(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse doesn't contain line.
+ * Checks whether an ellipse doesn't contain a line.
  */
-Datum		sphereellipse_cont_line_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_line_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse contains line.
+ * Checks whether an ellipse contains a line.
  */
-Datum		sphereellipse_cont_line_com(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_line_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse doesn't contain line.
+ * Checks whether an ellipse doesn't contain a line.
  */
-Datum		sphereellipse_cont_line_com_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_line_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse and line are overlapping.
+ * Checks whether an ellipse and a line are overlapping.
  */
-Datum		sphereellipse_overlap_line(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_line(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse and line are not overlapping.
+ * Checks whether an ellipse and a line are not overlapping.
  */
-Datum		sphereellipse_overlap_line_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_line_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse and line are overlapping.
+ * Checks whether an ellipse and a line are overlapping.
  */
-Datum		sphereellipse_overlap_line_com(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_line_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse and line are not overlapping.
+ * Checks whether an ellipse and a line are not overlapping.
  */
-Datum		sphereellipse_overlap_line_com_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_line_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse contains circle.
+ * Checks whether an ellipse contains a circle.
  */
-Datum		sphereellipse_cont_circle(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_circle(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse doesn't contain circle.
+ * Checks whether an ellipse doesn't contain a circle.
  */
-Datum		sphereellipse_cont_circle_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_circle_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse contains circle.
+ * Checks whether an ellipse contains a circle.
  */
-Datum		sphereellipse_cont_circle_com(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_circle_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether ellipse doesn't contain circle.
+ * Checks whether an ellipse doesn't contain a circle.
  */
-Datum		sphereellipse_cont_circle_com_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_circle_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle contains ellipse.
+ * Checks whether a circle contains an ellipse.
  */
-Datum		spherecircle_cont_ellipse(PG_FUNCTION_ARGS);
+Datum	spherecircle_cont_ellipse(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle doesn't contain ellipse.
+ * Checks whether a circle doesn't contain an ellipse.
  */
-Datum		spherecircle_cont_ellipse_neg(PG_FUNCTION_ARGS);
+Datum	spherecircle_cont_ellipse_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle contains ellipse.
+ * Checks whether a circle contains an ellipse.
  */
-Datum		spherecircle_cont_ellipse_com(PG_FUNCTION_ARGS);
+Datum	spherecircle_cont_ellipse_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle doesn't contain ellipse.
+ * Checks whether a circle doesn't contain an ellipse.
  */
-Datum		spherecircle_cont_ellipse_com_neg(PG_FUNCTION_ARGS);
+Datum	spherecircle_cont_ellipse_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle and ellipse are overlapping.
+ * Checks whether a circle and an ellipse are overlapping.
  */
-Datum		sphereellipse_overlap_circle(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_circle(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle and ellipse are not overlapping.
+ * Checks whether a circle and an ellipse are not overlapping.
  */
-Datum		sphereellipse_overlap_circle_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_circle_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle and ellipse are overlapping.
+ * Checks whether a circle and an ellipse are overlapping.
  */
-Datum		sphereellipse_overlap_circle_com(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_circle_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether circle and ellipse are not overlapping.
+ * Checks whether a circle and an ellipse are not overlapping.
  */
-Datum		sphereellipse_overlap_circle_com_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_circle_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether an ellipse contains an other ellipse.
+ * Checks whether an ellipse contains other ellipse.
  */
-Datum		sphereellipse_cont_ellipse(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_ellipse(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether an ellipse doesn't contain an other ellipse.
+ * Checks whether an ellipse doesn't contain other ellipse.
  */
-Datum		sphereellipse_cont_ellipse_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_ellipse_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether an ellipse is contained by an other ellipse.
+ * Checks whether an ellipse is contained by other ellipse.
  */
-Datum		sphereellipse_cont_ellipse_com(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_ellipse_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether an ellipse isn't contained by an other ellipse.
+ * Checks whether an ellipse isn't contained by other ellipse.
  */
-Datum		sphereellipse_cont_ellipse_com_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_cont_ellipse_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether two ellipses are overlapping.
+ * Checks whether two ellipses are overlapping.
  */
-Datum		sphereellipse_overlap_ellipse(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_ellipse(PG_FUNCTION_ARGS);
 
 /*
- * Checks, whether two ellipses are not overlapping.
+ * Checks whether two ellipses are not overlapping.
  */
-Datum		sphereellipse_overlap_ellipse_neg(PG_FUNCTION_ARGS);
+Datum	sphereellipse_overlap_ellipse_neg(PG_FUNCTION_ARGS);
 
 /*
- * Transforms an ellipse using Euler transformation.
+ * Transforms an ellipse using an Euler transformation.
  */
-Datum		spheretrans_ellipse(PG_FUNCTION_ARGS);
+Datum	spheretrans_ellipse(PG_FUNCTION_ARGS);
 
 /*
- * Transforms an ellipse using Euler transformation.
+ * Transforms an ellipse using an Euler transformation.
  */
-Datum		spheretrans_ellipse_inv(PG_FUNCTION_ARGS);
+Datum	spheretrans_ellipse_inv(PG_FUNCTION_ARGS);
 
 #endif

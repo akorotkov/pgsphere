@@ -1,8 +1,6 @@
 #include "circle.h"
 
-/*
- * Circle functions
- */
+/* Circle functions */
 
 PG_FUNCTION_INFO_V1(spherecircle_in);
 PG_FUNCTION_INFO_V1(spherecircle_equal);
@@ -33,14 +31,14 @@ PG_FUNCTION_INFO_V1(spheretrans_circle_inverse);
 bool
 scircle_eq(const SCIRCLE *c1, const SCIRCLE *c2)
 {
-	return (spoint_eq(&c1->center, &c2->center)
-			&& FPeq(c1->radius, c2->radius));
+	return (spoint_eq(&c1->center, &c2->center) &&
+				FPeq(c1->radius, c2->radius));
 }
 
 bool
 spoint_in_circle(const SPoint *p, const SCIRCLE *c)
 {
-	float8		dist = spoint_dist(p, &c->center);
+	float8 dist = spoint_dist(p, &c->center);
 
 	if (FPle(dist, c->radius))
 	{
@@ -59,7 +57,7 @@ euler_scircle_trans(SCIRCLE *out, const SCIRCLE *in, const SEuler *se)
 Datum
 spherecircle_in(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
+	SCIRCLE	   *c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 	char	   *s = PG_GETARG_CSTRING(0);
 	double		lng,
 				lat,
@@ -103,8 +101,8 @@ spherecircle_in(PG_FUNCTION_ARGS)
 Datum
 spherecircle_equal(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(scircle_eq(c1, c2));
 }
@@ -112,8 +110,8 @@ spherecircle_equal(PG_FUNCTION_ARGS)
 Datum
 spherecircle_equal_neg(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(!scircle_eq(c1, c2));
 }
@@ -121,8 +119,8 @@ spherecircle_equal_neg(PG_FUNCTION_ARGS)
 Datum
 spherecircle_distance(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
 	float8		dist = spoint_dist(&c1->center, &c2->center);
 
 	dist -= (c1->radius + c2->radius);
@@ -136,7 +134,7 @@ spherecircle_distance(PG_FUNCTION_ARGS)
 Datum
 spherecircle_point_distance(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(0);
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(1);
 	float8		dist = spoint_dist(&c->center, p);
 
@@ -152,7 +150,7 @@ Datum
 spherecircle_point_distance_com(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(1);
 	float8		dist = spoint_dist(&c->center, p);
 
 	dist = dist - c->radius;
@@ -167,7 +165,7 @@ Datum
 spherepoint_in_circle(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(spoint_in_circle(p, c));
 }
@@ -185,7 +183,7 @@ Datum
 spherepoint_in_circle_com(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(1);
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(0);
 
 	PG_RETURN_BOOL(spoint_in_circle(p, c));
 }
@@ -194,7 +192,7 @@ Datum
 spherepoint_in_circle_com_neg(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(1);
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(0);
 
 	PG_RETURN_BOOL(!spoint_in_circle(p, c));
 }
@@ -202,8 +200,8 @@ spherepoint_in_circle_com_neg(PG_FUNCTION_ARGS)
 Datum
 spherecircle_in_circle(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
 	float8		dist = spoint_dist(&c1->center, &c2->center);
 
 	if (scircle_eq(c1, c2))
@@ -223,8 +221,8 @@ spherecircle_in_circle(PG_FUNCTION_ARGS)
 Datum
 spherecircle_in_circle_neg(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
 	float8		dist = spoint_dist(&c1->center, &c2->center);
 
 	if (scircle_eq(c1, c2))
@@ -244,8 +242,8 @@ spherecircle_in_circle_neg(PG_FUNCTION_ARGS)
 Datum
 spherecircle_in_circle_com(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(1);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(0);
 	float8		dist = spoint_dist(&c1->center, &c2->center);
 
 	if (scircle_eq(c1, c2))
@@ -265,8 +263,8 @@ spherecircle_in_circle_com(PG_FUNCTION_ARGS)
 Datum
 spherecircle_in_circle_com_neg(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(1);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(0);
 	float8		dist = spoint_dist(&c1->center, &c2->center);
 
 	if (scircle_eq(c1, c2))
@@ -286,8 +284,8 @@ spherecircle_in_circle_com_neg(PG_FUNCTION_ARGS)
 Datum
 spherecircle_overlap(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
 	float8		dist = spoint_dist(&c1->center, &c2->center);
 
 	if (scircle_eq(c1, c2))
@@ -307,8 +305,8 @@ spherecircle_overlap(PG_FUNCTION_ARGS)
 Datum
 spherecircle_overlap_neg(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
+	SCIRCLE	   *c1 = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c2 = (SCIRCLE *) PG_GETARG_POINTER(1);
 	float8		dist = spoint_dist(&c1->center, &c2->center);
 
 	if (scircle_eq(c1, c2))
@@ -328,7 +326,7 @@ spherecircle_overlap_neg(PG_FUNCTION_ARGS)
 Datum
 spherecircle_center(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(0);
 	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
 
 	memcpy((void *) p, (void *) &c->center, sizeof(SPoint));
@@ -338,7 +336,7 @@ spherecircle_center(PG_FUNCTION_ARGS)
 Datum
 spherecircle_radius(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(0);
 
 	PG_RETURN_FLOAT8(c->radius);
 }
@@ -347,7 +345,7 @@ Datum
 spherepoint_to_circle(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
-	SCIRCLE    *c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
+	SCIRCLE	   *c = (SCIRCLE *) palloc(sizeof(SCIRCLE));
 
 	memcpy((void *) &c->center, (void *) p, sizeof(SPoint));
 	c->radius = 0;
@@ -359,7 +357,7 @@ spherecircle_by_center(PG_FUNCTION_ARGS)
 {
 	SPoint	   *p = (SPoint *) PG_GETARG_POINTER(0);
 	float8		rad = PG_GETARG_FLOAT8(1);
-	SCIRCLE    *c;
+	SCIRCLE	   *c;
 
 	if (FPgt(rad, PIH) || FPlt(rad, 0.0))
 	{
@@ -375,7 +373,7 @@ spherecircle_by_center(PG_FUNCTION_ARGS)
 Datum
 spherecircle_area(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(0);
 
 	PG_RETURN_FLOAT8(PID * (1 - cos(c->radius)));
 }
@@ -383,7 +381,7 @@ spherecircle_area(PG_FUNCTION_ARGS)
 Datum
 spherecircle_circ(PG_FUNCTION_ARGS)
 {
-	SCIRCLE    *c = (SCIRCLE *) PG_GETARG_POINTER(0);
+	SCIRCLE	   *c = (SCIRCLE *) PG_GETARG_POINTER(0);
 
 	PG_RETURN_FLOAT8(PID * (sin(c->radius)));
 }

@@ -1,8 +1,6 @@
 #include "euler.h"
 
-/*
- * Euler transformation functions
- */
+/* Euler transformation functions */
 
 PG_FUNCTION_INFO_V1(spheretrans_in);
 PG_FUNCTION_INFO_V1(spheretrans_from_float8);
@@ -21,9 +19,9 @@ PG_FUNCTION_INFO_V1(spheretrans_trans_inv);
 PG_FUNCTION_INFO_V1(spheretrans_point);
 PG_FUNCTION_INFO_V1(spheretrans_point_inverse);
 
- /*
-  * Checks and modifies the Euler transformation
-  */
+/*
+ * Checks and modifies the Euler transformation.
+ */
 static void
 spheretrans_check(SEuler *e)
 {
@@ -110,8 +108,8 @@ spheretrans_from_float8_and_type(PG_FUNCTION_ARGS)
 	d[0] = PG_GETARG_DATUM(0);
 	d[1] = PG_GETARG_DATUM(1);
 	d[2] = PG_GETARG_DATUM(2);
-	se = (SEuler *) DatumGetPointer(DirectFunctionCall3(
-								 spheretrans_from_float8, d[0], d[1], d[2]));
+	se = (SEuler *) DatumGetPointer(DirectFunctionCall3(spheretrans_from_float8,
+														d[0], d[1], d[2]));
 
 	for (i = 0; i < 3; i++)
 	{
@@ -409,15 +407,14 @@ spheretrans_point_inverse(PG_FUNCTION_ARGS)
 	Datum		ret;
 
 	spheretrans_inverse(&tmp, se);
-	ret = DirectFunctionCall2(
-							  spheretrans_point,
+	ret = DirectFunctionCall2(spheretrans_point,
 							  sp, PointerGetDatum(&tmp));
 	PG_RETURN_DATUM(ret);
 }
 
  /*
   * Transforms a spherical vector from spb to spe into a inverse Euler
-  * transformation. Returns whether transformation was successful.
+  * transformation. Returns true if the transformation was successful.
   */
 static bool
 spherevector_to_euler_inv(SEuler *se, const SPoint *spb, const SPoint *spe)

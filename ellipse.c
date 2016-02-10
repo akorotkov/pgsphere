@@ -1,8 +1,6 @@
 #include "ellipse.h"
 
-/*
- * Ellipse functions
- */
+/* Ellipse functions */
 
 PG_FUNCTION_INFO_V1(sphereellipse_in);
 PG_FUNCTION_INFO_V1(sphereellipse_infunc);
@@ -51,9 +49,8 @@ PG_FUNCTION_INFO_V1(spheretrans_ellipse_inv);
 
 
 /*
- * This function returns the arccos of a value. If variable a is outside
- * the range between -1.00 and 1.00, the function returns corresponding PI/2
- * or 3*PI/2.
+ * This function returns the arccos of a value. If variable 'a' is outside
+ * the range (-1.00 .. 1.00), the function returns corresponding PI/2 or 3*PI/2.
  */
 static float8
 my_acos(float8 a)
@@ -103,7 +100,7 @@ sellipse_circle(SCIRCLE *sc, const SELLIPSE *e)
 }
 
 /*
- * Returns the an ellipse from axes, center and inclination. The largest axis
+ * Returns an ellipse from axes, center and inclination. The largest axis
  * length is chosen for large axis.
  */
 static SELLIPSE *
@@ -129,12 +126,12 @@ sellipse_in(float8 r1, float8 r2, const SPoint *c, float8 inc)
 	return e;
 }
 
-/*---
+/*
  * Returns the radius of an ellipse depending on position angle.
  *
- *     rada - major axis length
- *     radb - minor axis length
- *     ang  - position angle in radians
+ * rada - major axis length
+ * radb - minor axis length
+ * ang  - position angle in radians
  */
 static float8
 sellipse_dist(float8 rada, float8 radb, float8 ang)
@@ -146,7 +143,7 @@ sellipse_dist(float8 rada, float8 radb, float8 ang)
 }
 
 /*
- * Returns distance between ellipse and point.
+ * Returns distance between an ellipse and a point.
  */
 static float8
 sellipse_point_dist(const SELLIPSE *se, const SPoint *sp)
@@ -191,7 +188,7 @@ sellipse_point_dist(const SELLIPSE *se, const SPoint *sp)
 }
 
 /*
- * Does an Euler transformation of ellipse.
+ * Performs an Euler transformation of an ellipse.
  */
 static void
 euler_sellipse_trans(SELLIPSE *out, const SELLIPSE *in, const SEuler *se)
@@ -985,7 +982,6 @@ sellipse_circle_pos(const SELLIPSE *se, const SCIRCLE *sc)
 	}
 	return PGS_ELLIPSE_CIRCLE_AVOID;
 }
-
 
 
 Datum
