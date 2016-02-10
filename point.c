@@ -1,8 +1,6 @@
 #include "point.h"
 
-/*
- * This file contains definitions for spherical point functions.
- */
+/* This file contains definitions for spherical point functions. */
 
 PG_FUNCTION_INFO_V1(spherepoint_in);
 PG_FUNCTION_INFO_V1(spherepoint_from_long_lat);
@@ -26,13 +24,10 @@ spoint_eq(const SPoint *p1, const SPoint *p2)
 	return (vector3d_eq(&a, &b));
 }
 
-
 void
 spoint_check(SPoint *spoint)
 {
-	bool	lat_is_neg;
-
-	lat_is_neg = (spoint->lat < 0) ? true : false;
+	bool lat_is_neg = (spoint->lat < 0) ? true : false;
 
 	if (spoint->lng < 0 || spoint->lng > PID)
 		spoint->lng = spoint->lng - floor(spoint->lng / (PID)) * PID;
@@ -76,7 +71,7 @@ spoint_check(SPoint *spoint)
 void
 vector3d_spoint(SPoint *p, const Vector3D *v)
 {
-	double		rho = sqrt((v->x) * (v->x) + (v->y) * (v->y));
+	double rho = sqrt((v->x) * (v->x) + (v->y) * (v->y));
 
 	if (0.0 == rho)
 	{
@@ -150,7 +145,7 @@ spherepoint_in(PG_FUNCTION_ARGS)
 Datum
 spherepoint_from_long_lat(PG_FUNCTION_ARGS)
 {
-	SPoint	   *p = (SPoint *) palloc(sizeof(SPoint));
+	SPoint *p = (SPoint *) palloc(sizeof(SPoint));
 
 	p->lng = PG_GETARG_FLOAT8(0);
 	p->lat = PG_GETARG_FLOAT8(1);
@@ -167,13 +162,13 @@ norm2(double a, double b)
 float8
 spoint_dist(const SPoint *p1, const SPoint *p2)
 {
-	float8		dl = p1->lng - p2->lng;
+	float8	dl = p1->lng - p2->lng;
 	/* use Vincenty's formula for the inverse geodesic problem on the sphere */
-	float8 f = atan2(norm2(cos(p2->lat) * sin(dl),
-							 cos(p1->lat) * sin(p2->lat)
-						   - sin(p1->lat) * cos(p2->lat) * cos(dl)),
-					   sin(p1->lat) * sin(p2->lat)
-					 + cos(p1->lat) * cos(p2->lat) * cos(dl));
+	float8	f = atan2(norm2(cos(p2->lat) * sin(dl),
+							cos(p1->lat) * sin(p2->lat)
+								- sin(p1->lat) * cos(p2->lat) * cos(dl)),
+						sin(p1->lat) * sin(p2->lat)
+							+ cos(p1->lat) * cos(p2->lat) * cos(dl));
 	if (FPzero(f))
 	{
 		return 0.0;
