@@ -11,8 +11,8 @@
  */
 typedef struct
 {
-	float8	lng; /* longitude value in radians */
-	float8	lat; /* latitude value in radians */
+	float8	lng;	/* longitude value in radians */
+	float8	lat;	/* latitude value in radians */
 } SPoint;
 
 /*
@@ -31,12 +31,12 @@ bool	spoint_eq(const SPoint *p1, const SPoint *p2);
 void	spoint_check(SPoint *spoint);
 
 /*
- * Transforms a 3 dim.vector to a spherical point.
+ * Transforms a 3d vector into a spherical point.
  */
 void	vector3d_spoint(SPoint *p, const Vector3D *v);
 
 /*
- * Transforms a spherical point to a 3 dim.vector.
+ * Transforms a spherical point into a 3d vector.
  */
 void	spoint_vector3d(Vector3D *v, const SPoint *p);
 
