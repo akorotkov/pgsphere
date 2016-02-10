@@ -1,9 +1,7 @@
 #ifndef __PGS_TYPES_H__
 #define __PGS_TYPES_H__
 
-/*
- * Include this file if you want to have access to all data types.
- */
+/* Include this file if you want to have access to all data types. */
 
 /*
  * box was the last added data type
