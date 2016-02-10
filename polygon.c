@@ -93,10 +93,10 @@ spherepoly_center(Vector3D *v, const SPOLY *poly)
 }
 
 
- /*
-  * Checks crossing of line segments. "poly" is the pointer to a polygon.
-  * Returns true if crossing.
-  */
+/*
+ * Checks crossing of line segments. "poly" is the pointer to a polygon.
+ * Returns true if crossing.
+ */
 static bool
 spherepoly_check(const SPOLY *poly)
 {
@@ -153,11 +153,11 @@ spherepoly_check(const SPOLY *poly)
 }
 
 
- /*
-  * Converts an array of spherical points to SPOLY. "arr" is the pointer
-  * to the array of spherical point,s "nelem" is the number of the
-  * elements. Returns the pointer to the created spherical polygon.
-  */
+/*
+ * Converts an array of spherical points to SPOLY. "arr" is the pointer
+ * to the array of spherical point,s "nelem" is the number of the
+ * elements. Returns the pointer to the created spherical polygon.
+ */
 static SPOLY *
 spherepoly_from_array(SPoint *arr, int32 nelem)
 {
@@ -246,11 +246,11 @@ spherepoly_from_array(SPoint *arr, int32 nelem)
 }
 
 
- /*
-  * Performs a transform of a polygon using an Euler transformation.
-  * "se" is the pointer to the Euler transformation, "in" is the pointer
-  * to the polygon, "out" is the pointer to the transformed polygon.
-  */
+/*
+ * Performs a transform of a polygon using an Euler transformation.
+ * "se" is the pointer to the Euler transformation, "in" is the pointer
+ * to the polygon, "out" is the pointer to the transformed polygon.
+ */
 static void
 euler_spoly_trans(SPOLY *out, const SPOLY *in, const SEuler *se)
 {
@@ -263,11 +263,11 @@ euler_spoly_trans(SPOLY *out, const SPOLY *in, const SEuler *se)
 }
 
 
- /*
-  * Returns the relationship between polygon and circle as an int8 value.
-  * "circ" is the pointer to the circle, "poly" is the pointer to the
-  * polygon.
-  */
+/*
+ * Returns the relationship between polygon and circle as PGS_CIRCLE_POLY_REL
+ * int8 value. "circ" is the pointer to the circle, "poly" is the pointer to the
+ * polygon.
+ */
 static int8
 poly_circle_pos(const SPOLY *poly, const SCIRCLE *circ)
 {
@@ -332,11 +332,11 @@ poly_circle_pos(const SPOLY *poly, const SCIRCLE *circ)
 }
 
 
- /*
-  * Returns the relationship between a polygon and an ellipse
-  * as an int8 value. "ell" is the pointer to the ellipse,
-  * "poly" is the pointer to the polygon.
-  */
+/*
+ * Returns the relationship between a polygon and an ellipse
+ * as PGS_ELLIPSE_POLY_REL int8 value. "ell" is the pointer
+ * to the ellipse, "poly" is the pointer to the polygon.
+ */
 static int8
 poly_ellipse_pos(const SPOLY *poly, const SELLIPSE *ell)
 {
@@ -423,11 +423,11 @@ poly_ellipse_pos(const SPOLY *poly, const SELLIPSE *ell)
 }
 
 
- /*
-  * Returns the relationship between two polygons as an int8 value.
-  * "p1" is the pointer to the first polygon, "p2" is the pointer
-  * to the second polygon. If "recheck" is true, swaps p1 and p2.
-  */
+/*
+ * Returns the relationship between two polygons as PGS_POLY_REL int8 value.
+ * "p1" is the pointer to the first polygon, "p2" is the pointer
+ * to the second polygon. If "recheck" is true, swaps p1 and p2.
+ */
 static int8
 poly_poly_pos(const SPOLY *p1, const SPOLY *p2, bool recheck)
 {
@@ -694,10 +694,10 @@ spoly_contains_point(const SPOLY *pg, const SPoint *sp)
 	return res;
 }
 
- /*
-  * Returns the relationship between polygon and line. "line" is
-  * the pointer to line, "poly" is the pointer to polygon.
-  */
+/*
+ * Returns the relationship between polygon and line as PGS_LINE_POLY_REL
+ * int8 value. "line" is the pointer to line, "poly" is the pointer to polygon.
+ */
 int8
 poly_line_pos(const SPOLY *poly, const SLine *line)
 {
