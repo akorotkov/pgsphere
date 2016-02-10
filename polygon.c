@@ -3,8 +3,6 @@
 /* Polygon functions */
 
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-
 PG_FUNCTION_INFO_V1(spherepoly_in);
 PG_FUNCTION_INFO_V1(spherepoly_equal);
 PG_FUNCTION_INFO_V1(spherepoly_equal_neg);
@@ -57,8 +55,6 @@ PG_FUNCTION_INFO_V1(spheretrans_poly);
 PG_FUNCTION_INFO_V1(spheretrans_poly_inverse);
 PG_FUNCTION_INFO_V1(spherepoly_add_point);
 PG_FUNCTION_INFO_V1(spherepoly_add_points_finalize);
-
-#endif
 
 
  /*
@@ -487,10 +483,10 @@ spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir)
 	if (p1->npts == p2->npts)
 	{
 
-		int32		i,
-					k,
-					cntr,
-					shift;
+		int32	i,
+				k,
+				cntr,
+				shift;
 
 		for (shift = 0; shift < p1->npts; shift++)
 		{
