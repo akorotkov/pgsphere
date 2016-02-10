@@ -45,28 +45,38 @@ typedef struct
 	( (SPOLY  *) DatumGetPointer(PG_DETOAST_DATUM(PG_GETARG_DATUM(arg))) )
 
 /*
- * Checks whether two polygons are equal. "p1" is the pointer to the first
- * polygon, "p2" is the pointer to the second polygon. If "dir" is true,
- * check with reverse polygon of "p2".
+ * Checks whether two polygons are equal.
+ *
+ * p1 - pointer to the first polygon,
+ * p2 - pointer to the second polygon.
+ *
+ * If 'dir' is true, check with reverse polygon of 'p2'.
  */
 bool	spoly_eq(const SPOLY *p1, const SPOLY *p2, bool dir);
 
 /*
- * Returns the i-th line segment of a polygon. "sl" is the pointer to the
- * line segment, "poly" is the pointer to the polygon, "i" is the number of
- * the segment.
+ * Returns the i-th line segment of a polygon.
+ *
+ * sl   - pointer to the line segment,
+ * poly - pointer to the polygon,
+ * i    - number of the segment.
  */
 bool	spoly_segment(SLine *sl, const SPOLY *poly, int32 i);
 
 /*
- * Checks whether a polygon contains a point. "sp" is the pointer to the point,
- * "pg" is the pointer to the polygon.
+ * Checks whether a polygon contains a point.
+ *
+ * pg - pointer to the polygon.
+ * sp - pointer to the point,
  */
 bool	spoly_contains_point(const SPOLY *pg, const SPoint *sp);
 
 /*
- * Returns the relationship between a polygon and a line. "line" is the
- * pointer to the line, "poly" is the pointer to the polygon.
+ * Returns the relationship between a polygon and a line as
+ * PGS_LINE_POLY_REL int8 value.
+ *
+ * poly - pointer to the polygon.
+ * line - pointer to the line,
  */
 int8	poly_line_pos(const SPOLY *poly, const SLine *line);
 
