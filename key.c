@@ -4,12 +4,10 @@
 PG_MODULE_MAGIC;
 #endif
 
-/*
- * Functions to create the key values
- */
+/* Functions to create the key values */
 
 /*
- * Unions a key with the key value of a point.
+ * Unites a key with the key value of a point.
  */
 static void
 key_add_point(int32 *key, const SPoint *p)

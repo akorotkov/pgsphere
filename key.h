@@ -3,9 +3,7 @@
 
 #include "types.h"
 
-/*
- * Declarations of key build functions
- */
+/* Declarations of key build functions */
 
 #define KEYSIZE 24				/* the key size for one entry */
 #define BPCKSIZE (KEYSIZE/6)	/* the key size for one entry per coordinate */
@@ -13,21 +11,21 @@
 /*
  * The coordinate value has to be between -MAXCVALUE .. MAXCVALUE
  */
-#define MAXCVALUE ( ( 1 << ( 8*BPCKSIZE - 2 ) ) - 1 )
+#define MAXCVALUE ( (1 << (8 * BPCKSIZE - 2)) - 1 )
 
 typedef struct
 {
-	int32		vl_len_;
+	int32			vl_len_;
 	union
 	{
 		struct
 		{
-			float4		lat,
-						lng;
+			float4	lat,
+					lng;
 		};
 		struct
 		{
-			int32		k[6];
+			int32	k[6];
 		};
 	};
 } GiSTSPointKey;
@@ -45,129 +43,129 @@ typedef struct
 } while (0) ;
 
 /*
- * Union the both keys and returns it. Result is placed into kunion.
+ * Returns the union of two keys. Result is placed into 'kunion'.
  */
 void	spherekey_union_two(int32 *kunion, const int32 *key);
 
 /*
- * Intersect the both keys and returns it. Returns NULL if there is
- * no intersection. Result is placed into kinter.
+ * Returns the intersection of two keys. Returns NULL if there is
+ * no intersection. Result is placed into 'kinter'.
  */
 bool	spherekey_inter_two(int32 *kinter, const int32 *key);
 
 /*
- * Generate key value of spherical point and returns it. Result is placed
- * into k.
+ * Generates the key of a spherical point and returns it. Result is placed
+ * into 'k'.
  */
 void	spherepoint_gen_key(int32 *k, const SPoint *sp);
 
 /*
- * Generates circle's key and returns it. Result is placed into k.
+ * Generates the circle's key and returns it. Result is placed into 'k'.
  */
 void	spherecircle_gen_key(int32 *k, const SCIRCLE *c);
 
 /*
- * Returns the key of a spherical ellipse and returns it. Result is placed
- * into k.
+ * Generates the key of a spherical ellipse and returns it. Result is placed
+ * into 'k'.
  */
 void	sphereellipse_gen_key(int32 *k, const SELLIPSE *e);
 
 /*
- * Returns the key of a spherical line and returns it. Result is placed
- * into k.
+ * Generates the key of a spherical line and returns it. Result is placed
+ * into 'k'.
  */
 void	sphereline_gen_key(int32 *k, const SLine *sl);
 
 /*
- * Creates the key of polygon and returns it. Result is placed into "key".
+ * Generates the key of a polygon and returns it. Result is placed into 'k'.
  */
-void	spherepoly_gen_key(int32 *key, const SPOLY *sp);
+void	spherepoly_gen_key(int32 *k, const SPOLY *sp);
 
 /*
- * Creates the key of path and returns it. Result is placed into k.
+ * Generates the key of a path and returns it. Result is placed into 'k'.
  */
 void	spherepath_gen_key(int32 *k, const SPATH *sp);
 
 /*
- * Creates the key of box and returns it. Result is placed into k.
+ * Generates the key of a box and returns it. Result is placed into 'k'.
  */
 void	spherebox_gen_key(int32 *key, const SBOX *box);
 
 /*
- * Returns true, if first key is less than second key.
+ * Returns true if the first key is less than the second key.
  */
 Datum	spherekey_lt(PG_FUNCTION_ARGS);
 
 /*
- * Returns true, if first key is less or equal than second key.
+ * Returns true if the first key is less or equal than the second key.
  */
 Datum	spherekey_le(PG_FUNCTION_ARGS);
 
 /*
- * Returns true, if first keys are equal.
+ * Returns true if two keys are equal.
  */
 Datum	spherekey_eq(PG_FUNCTION_ARGS);
 
 /*
- * Returns true, if first keys are not equal.
+ * Returns true if two keys are not equal.
  */
 Datum	spherekey_eq_neg(PG_FUNCTION_ARGS);
 
 /*
- * Returns true, if first key is greater or equal than second key.
+ * Returns true if the first key is greater or equal than the second key.
  */
 Datum	spherekey_ge(PG_FUNCTION_ARGS);
 
 /*
- * Returns true, if first key is greater than second key.
+ * Returns true if the first key is greater than the second key.
  */
 Datum	spherekey_gt(PG_FUNCTION_ARGS);
 
 /*
  * Returns relationship of two keys.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two keys.
+ * Calls skey_cmp(const int32 *, const int32 *) for two keys.
  */
 Datum	spherekey_cmp(PG_FUNCTION_ARGS);
 
 /*
  * Returns relationship of keys of two spherical points.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two points.
+ * Calls skey_cmp(const int32 *, const int32 *) for two points.
  */
 Datum	spherepoint_cmp(PG_FUNCTION_ARGS);
 
 /*
  * Returns relationship of keys of two spherical circles.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two circles.
+ * Calls skey_cmp(const int32 *, const int32 *) for two circles.
  */
 Datum	spherecircle_cmp(PG_FUNCTION_ARGS);
 
 /*
  * Returns relationship of keys of two spherical ellipses.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two ellipses.
+ * Calls skey_cmp(const int32 *, const int32 *) for two ellipses.
  */
 Datum	sphereellipse_cmp(PG_FUNCTION_ARGS);
 
 /*
  * Returns relationship of keys of two spherical lines.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two lines.
+ * Calls skey_cmp(const int32 *, const int32 *) for two lines.
  */
 Datum	sphereline_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical pathes.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two pathes.
+ * Returns relationship of keys of two spherical paths.
+ * Calls skey_cmp(const int32 *, const int32 *) for two paths.
  */
 Datum	spherepath_cmp(PG_FUNCTION_ARGS);
 
 /*
  * Returns relationship of keys of two spherical polygons.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two polygons.
+ * Calls skey_cmp(const int32 *, const int32 *) for two polygons.
  */
 Datum	spherepoly_cmp(PG_FUNCTION_ARGS);
 
 /*
  * Returns relationship of keys of two spherical boxes.
- * ‘alls skey_cmp(const int32 *, const int32 *) for two boxes.
+ * Calls skey_cmp(const int32 *, const int32 *) for two boxes.
  */
 Datum	spherebox_cmp(PG_FUNCTION_ARGS);
 
