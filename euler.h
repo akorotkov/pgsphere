@@ -68,7 +68,7 @@ void	spheretrans_inv(SEuler *se);
 void	strans_zxz(SEuler *ret, const SEuler *se);
 
 /*
- * Transforms an Euler transformation 'in' into 'out' using se'. The result
+ * Transforms an Euler transformation 'in' into 'out' using 'se'. The result
  * is always a ZXZ-axis transformation. Returns the pointer to the transformed
  * transformation.
  */
@@ -123,8 +123,8 @@ Datum	spheretrans_zxz(PG_FUNCTION_ARGS);
 
 /*
  * This function creates an Euler transformation from 3 angle values in
- * radians and three letter code used for axes. A letter can be X,Y or Z
- * (not case sensitive).
+ * radians and three letter code used for axes. A letter can be X, Y or Z
+ * (case-insensitive).
  */
 Datum	spheretrans_from_float8_and_type(PG_FUNCTION_ARGS);
 
@@ -154,7 +154,7 @@ Datum	spheretrans_trans_inv(PG_FUNCTION_ARGS);
 Datum	spheretrans_point(PG_FUNCTION_ARGS);
 
 /*
- * Perform inverse transform of a spherical point.
+ * Perform inverse transformation of a spherical point.
  */
 Datum	spheretrans_point_inverse(PG_FUNCTION_ARGS);
 

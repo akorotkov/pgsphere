@@ -918,8 +918,10 @@ sellipse_circle_pos(const SELLIPSE *se, const SCIRCLE *sc)
 	}
 	else
 	{
-		/* now ellipse is a real ellipse and */
-		/* circle is a real circle */
+		/*
+		 * now ellipse is a real ellipse and
+		 * circle is a real circle
+		 */
 
 		float8	dist;
 		SPoint	c;

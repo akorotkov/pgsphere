@@ -108,8 +108,9 @@ spheretrans_from_float8_and_type(PG_FUNCTION_ARGS)
 	d[0] = PG_GETARG_DATUM(0);
 	d[1] = PG_GETARG_DATUM(1);
 	d[2] = PG_GETARG_DATUM(2);
-	se = (SEuler *) DatumGetPointer(DirectFunctionCall3(spheretrans_from_float8,
-														d[0], d[1], d[2]));
+	se = (SEuler *) DatumGetPointer(
+						DirectFunctionCall3(spheretrans_from_float8,
+											d[0], d[1], d[2]));
 
 	for (i = 0; i < 3; i++)
 	{

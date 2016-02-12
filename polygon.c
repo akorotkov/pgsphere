@@ -58,12 +58,10 @@ PG_FUNCTION_INFO_V1(spherepoly_add_points_finalize);
 
 
  /*
-  * "Center" of a polygon.
+  * Writes "center" of a polygon into 'v'.
   *
   * v    - pointer to the center of a polygon
   * poly - pointer to the polygon
-  *
-  * Returns true if crossing.
   */
 static void
 spherepoly_center(Vector3D *v, const SPOLY *poly)
@@ -97,11 +95,7 @@ spherepoly_center(Vector3D *v, const SPOLY *poly)
 
 
 /*
- * Checks crossing of line segments.
- *
- * poly - pointer to a polygon
- *
- * Returns true if crossing.
+ * Checks if line segments cross.
  */
 static bool
 spherepoly_check(const SPOLY *poly)
@@ -277,9 +271,6 @@ euler_spoly_trans(SPOLY *out, const SPOLY *in, const SEuler *se)
 /*
  * Returns the relationship between polygon and circle as
  * PGS_CIRCLE_POLY_REL int8 value.
- *
- * circ - pointer to the circle
- * poly - is the pointer to the polygon
  */
 static int8
 poly_circle_pos(const SPOLY *poly, const SCIRCLE *circ)
@@ -348,9 +339,6 @@ poly_circle_pos(const SPOLY *poly, const SCIRCLE *circ)
 /*
  * Returns the relationship between a polygon and an ellipse
  * as PGS_ELLIPSE_POLY_REL int8 value.
- *
- * ell  - pointer to the ellipse
- * poly - pointer to the polygon
  */
 static int8
 poly_ellipse_pos(const SPOLY *poly, const SELLIPSE *ell)
@@ -495,9 +483,6 @@ poly_poly_pos(const SPOLY *p1, const SPOLY *p2, bool recheck)
 
 /*
  * Checks whether two polygons are equal.
- *
- * p1 - pointer to the first polygon
- * p2 - pointer to the second polygon
  *
  * If 'dir' is true, check with reverse polygon of 'p2'.
  */

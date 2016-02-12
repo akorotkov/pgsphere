@@ -148,7 +148,7 @@ Datum	spherecircle_circ(PG_FUNCTION_ARGS);
 Datum	spheretrans_circle(PG_FUNCTION_ARGS);
 
 /*
- * Inverse transformation of a circle using Euler transformation.
+ * Inverse transformation of a circle using an Euler transformation.
  */
 Datum	spheretrans_circle_inverse(PG_FUNCTION_ARGS);
 
