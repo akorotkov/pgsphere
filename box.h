@@ -416,12 +416,12 @@ Datum	spherebox_cont_box_com(PG_FUNCTION_ARGS);
 Datum	spherebox_cont_box_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether boxes overlap.
+ * Checks whether two boxes overlap.
  */
 Datum	spherebox_overlap_box(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether boxes don't overlap.
+ * Checks whether two boxes don't overlap.
  */
 Datum	spherebox_overlap_box_neg(PG_FUNCTION_ARGS);
 

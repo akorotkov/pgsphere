@@ -417,8 +417,8 @@ sbox_line_pos(const SLine *sl, const SBOX *sb)
 }
 
 /*
- * Returns the relationship between a box and a path as PGS_BOX_PATH_REL int8
- * value.
+ * Returns the relationship between a box and a path as
+ * PGS_BOX_PATH_REL int8 value.
  */
 static int8
 sbox_path_pos(const SPATH *path, const SBOX *box)
@@ -474,8 +474,8 @@ sbox_path_pos(const SPATH *path, const SBOX *box)
 }
 
 /*
- * Returns the relationship between a polygon and a box as PGS_BOX_POLY_REL int8
- * value.
+ * Returns the relationship between a polygon and a box as
+ * PGS_BOX_POLY_REL int8 value.
  */
 static int8
 sbox_poly_pos(const SPOLY *poly, const SBOX *box)
@@ -822,8 +822,8 @@ sbox_eq(SBOX *b1, SBOX *b2)
 bool
 sbox_cont_point(const SBOX *b, const SPoint *p)
 {
-	if ((FPeq(p->lat, b->ne.lat) && FPeq(p->lat, PIH))
-			|| (FPeq(p->lat, b->sw.lat) && FPeq(p->lat, -PIH)))
+	if ((FPeq(p->lat, b->ne.lat) && FPeq(p->lat, PIH)) ||
+		(FPeq(p->lat, b->sw.lat) && FPeq(p->lat, -PIH)))
 	{
 		return true;
 	}
