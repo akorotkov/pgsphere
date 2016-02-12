@@ -122,49 +122,49 @@ Datum	spherekey_ge(PG_FUNCTION_ARGS);
 Datum	spherekey_gt(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of two keys.
+ * Returns relationship between the two keys.
  * Calls skey_cmp(const int32 *, const int32 *) for two keys.
  */
 Datum	spherekey_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical points.
+ * Returns relationship between the keys of two spherical points.
  * Calls skey_cmp(const int32 *, const int32 *) for two points.
  */
 Datum	spherepoint_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical circles.
+ * Returns relationship between the keys of two spherical circles.
  * Calls skey_cmp(const int32 *, const int32 *) for two circles.
  */
 Datum	spherecircle_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical ellipses.
+ * Returns relationship between the keys of two spherical ellipses.
  * Calls skey_cmp(const int32 *, const int32 *) for two ellipses.
  */
 Datum	sphereellipse_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical lines.
+ * Returns relationship between the keys of two spherical lines.
  * Calls skey_cmp(const int32 *, const int32 *) for two lines.
  */
 Datum	sphereline_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical paths.
+ * Returns relationship between the keys of two spherical paths.
  * Calls skey_cmp(const int32 *, const int32 *) for two paths.
  */
 Datum	spherepath_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical polygons.
+ * Returns relationship between the keys of two spherical polygons.
  * Calls skey_cmp(const int32 *, const int32 *) for two polygons.
  */
 Datum	spherepoly_cmp(PG_FUNCTION_ARGS);
 
 /*
- * Returns relationship of keys of two spherical boxes.
+ * Returns relationship between the keys of two spherical boxes.
  * Calls skey_cmp(const int32 *, const int32 *) for two boxes.
  */
 Datum	spherebox_cmp(PG_FUNCTION_ARGS);

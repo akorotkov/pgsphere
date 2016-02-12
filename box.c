@@ -97,7 +97,7 @@ sbox_check(SBOX *box)
 }
 
 /*
- * Puts the "center" of a box "b" into a point "c" and returns it.
+ * Puts the 'center' of a box b' into a point 'c' and returns it.
  */
 static void
 sbox_center(SPoint *c, const SBOX *b)

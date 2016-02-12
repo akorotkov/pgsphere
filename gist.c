@@ -32,7 +32,7 @@ PG_FUNCTION_INFO_V1(g_spherekey_penalty);
 PG_FUNCTION_INFO_V1(g_spherekey_picksplit);
 
  /*
-  * Returns the relationship of two keys as PGS_KEY_REL.
+  * Returns the relationship between two keys as PGS_KEY_REL.
   */
 uchar
 spherekey_interleave(const int32 *k1, const int32 *k2)
