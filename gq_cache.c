@@ -22,11 +22,14 @@ static bool res = false;
 /*
  * Depending on type of PGS_DATA_TYPES, compare current query and cached query.
  * If query cache and current query are equal, set ref to true.
-*/
-#define GQ_MEMCMP( type ) do { \
-  if ( keytype == PGS_TYPE_##type ){ \
-	if ( memcmp ( (void*)cquery , (void*)query , sizeof( type ) ) == 0	) res = true; \
-  } \
+ */
+#define GQ_MEMCMP(type) \
+do \
+{ \
+	if (keytype == PGS_TYPE_##type) \
+	{ \
+		if (memcmp((void *) cquery, (void *) query, sizeof(type)) == 0) res = true; \
+	} \
 } while(0);
 
 bool
@@ -60,16 +63,18 @@ gq_cache_get_value(unsigned pgstype, const void *query, int32 **key)
 			case PGS_TYPE_SPATH:
 				if (keytype == pgstype && ((SPATH *) query)->npts == npts)
 				{
-					if (memcmp((void *) cquery, (void *) &((SPATH *) query)->p,
-												((SPATH *) query)->size) == 0)
+					if (memcmp((void *) cquery,
+							   (void *) &((SPATH *) query)->p,
+							   ((SPATH *) query)->size) == 0)
 						res = true;
 				}
 				break;
 			case PGS_TYPE_SPOLY:
 				if (keytype == pgstype && ((SPOLY *) query)->npts == npts)
 				{
-					if (memcmp((void *) cquery, (void *) &((SPOLY *) query)->p,
-												((SPOLY *) query)->size) == 0)
+					if (memcmp((void *) cquery,
+							   (void *) &((SPOLY *) query)->p,
+							   ((SPOLY *) query)->size) == 0)
 						res = true;
 				}
 				break;
@@ -90,9 +95,11 @@ gq_cache_get_value(unsigned pgstype, const void *query, int32 **key)
 /*
  * Depending on type of PGS_DATA_TYPES, copy current query to cache.
  */
-#define GQ_MEMCPY( type ) do { \
-	cquery = ( void *) malloc ( sizeof( type ) ); \
-	memcpy( (void*)cquery , (void*)query , sizeof( type ) );   \
+#define GQ_MEMCPY(type) \
+do \
+{ \
+	cquery = (void *) malloc(sizeof(type)); \
+	memcpy((void *) cquery, (void *) query, sizeof(type)); \
 } while(0);
 
 
@@ -127,14 +134,16 @@ gq_cache_set_value(unsigned pgstype, const void *query, const int32 *key)
 		case PGS_TYPE_SPATH:
 			cquery = (void *) malloc(((SPATH *) query)->size);
 			npts = ((SPATH *) query)->npts;
-			memcpy((void *) cquery, (void *) &((SPATH *) query)->p,
-													((SPATH *) query)->size);
+			memcpy((void *) cquery,
+				   (void *) &((SPATH *) query)->p,
+				   ((SPATH *) query)->size);
 			break;
 		case PGS_TYPE_SPOLY:
 			cquery = (void *) malloc(((SPOLY *) query)->size);
 			npts = ((SPOLY *) query)->npts;
-			memcpy((void *) cquery, (void *) &((SPOLY *) query)->p,
-													((SPOLY *) query)->size);
+			memcpy((void *) cquery,
+				   (void *) &((SPOLY *) query)->p,
+				   ((SPOLY *) query)->size);
 			break;
 		default:
 			keytype = 0;
