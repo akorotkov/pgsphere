@@ -30,7 +30,7 @@ bool	spoint_in_circle(const SPoint *p, const SCIRCLE *c);
 void	euler_scircle_trans(SCIRCLE *out, const SCIRCLE *in, const SEuler *se);
 
 /*
- * Takes the input and stores it as spherical circle.
+ * Takes the input and stores it as a spherical circle.
  */
 Datum	spherecircle_in(PG_FUNCTION_ARGS);
 
@@ -45,13 +45,13 @@ Datum	spherecircle_equal(PG_FUNCTION_ARGS);
 Datum	spherecircle_equal_neg(PG_FUNCTION_ARGS);
 
 /*
- * Calculate the distance of two circles. If overlapping, this function
+ * Calculate the distance of two circles. If they overlap, this function
  * returns 0.0.
  */
 Datum	spherecircle_distance(PG_FUNCTION_ARGS);
 
 /*
- * Calculate the distance of circle and point. If a circle contains a point,
+ * Calculate the distance of a circle and a point. If a circle contains a point,
  * this function returns 0.0.
  */
 Datum	spherecircle_point_distance(PG_FUNCTION_ARGS);

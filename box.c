@@ -534,7 +534,7 @@ sbox_poly_pos(const SPOLY *poly, const SBOX *box)
 			return PGS_BOX_POLY_AVOID;
 		}
 	}
-	/* box and polygon are overlapping */
+	/* box and polygon overlap */
 	return PGS_BOX_POLY_OVER;
 }
 

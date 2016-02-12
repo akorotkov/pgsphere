@@ -172,22 +172,22 @@ Datum	spherecircle_cont_poly_com(PG_FUNCTION_ARGS);
 Datum	spherecircle_cont_poly_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a circle are overlapping.
+ * Checks whether a polygon and a circle overlap.
  */
 Datum	spherepoly_overlap_circle(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a circle aren't overlapping.
+ * Checks whether a polygon and a circle don't overlap.
  */
 Datum	spherepoly_overlap_circle_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a circle are overlapping.
+ * Checks whether a polygon and a circle overlap.
  */
 Datum	spherepoly_overlap_circle_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a circle aren't overlapping.
+ * Checks whether a polygon and a circle don't overlap.
  */
 Datum	spherepoly_overlap_circle_com_neg(PG_FUNCTION_ARGS);
 
@@ -212,22 +212,22 @@ Datum	spherepoly_cont_line_com(PG_FUNCTION_ARGS);
 Datum	spherepoly_cont_line_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a line are overlapping.
+ * Checks whether a polygon and a line overlap.
  */
 Datum	spherepoly_overlap_line(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a line aren't overlapping.
+ * Checks whether a polygon and a line don't overlap.
  */
 Datum	spherepoly_overlap_line_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a line are overlapping.
+ * Checks whether a polygon and a line overlap.
  */
 Datum	spherepoly_overlap_line_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a line aren't overlapping.
+ * Checks whether a polygon and a line don't overlap.
  */
 Datum	spherepoly_overlap_line_com_neg(PG_FUNCTION_ARGS);
 
@@ -252,12 +252,12 @@ Datum	spherepoly_cont_poly_com(PG_FUNCTION_ARGS);
 Datum	spherepoly_cont_poly_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two polygons are overlapping.
+ * Checks whether two polygons overlap.
  */
 Datum	spherepoly_overlap_poly(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two polygons are not overlapping.
+ * Checks whether two polygons don't overlap.
  */
 Datum	spherepoly_overlap_poly_neg(PG_FUNCTION_ARGS);
 
@@ -302,22 +302,22 @@ Datum	sphereellipse_cont_poly_com(PG_FUNCTION_ARGS);
 Datum	sphereellipse_cont_poly_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and an ellipse are overlapping.
+ * Checks whether a polygon and an ellipse overlap.
  */
 Datum	spherepoly_overlap_ellipse(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and an ellipse aren't overlapping.
+ * Checks whether a polygon and an ellipse don't overlap.
  */
 Datum	spherepoly_overlap_ellipse_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and an ellipse are overlapping.
+ * Checks whether a polygon and an ellipse overlap.
  */
 Datum	spherepoly_overlap_ellipse_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and an ellipse aren't overlapping.
+ * Checks whether a polygon and an ellipse don't overlap.
  */
 Datum	spherepoly_overlap_ellipse_com_neg(PG_FUNCTION_ARGS);
 

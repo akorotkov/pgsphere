@@ -39,22 +39,12 @@ typedef struct
 	( (SPATH *) DatumGetPointer(PG_DETOAST_DATUM(PG_GETARG_DATUM(arg))) )
 
 /*
- * Checks whether two pathes are equal.
- *
- * p1 - pointer to first path
- * p2 - pointer to second path
- *
- * Returns true if equal.
+ * Checks whether two paths are equal.
  */
 bool	spath_eq(const SPATH *p1, const SPATH *p2);
 
 /*
  * Checks whether a path contains a point.
- *
- * sp   - pointer to point
- * path - pointer to path
- *
- * Returns true if the path contains the point.
  */
 bool	spath_cont_point(const SPATH *path, const SPoint *sp);
 
@@ -135,22 +125,22 @@ Datum	spherepath_cont_point_com(PG_FUNCTION_ARGS);
 Datum	spherepath_cont_point_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a path and a line are overlapping.
+ * Checks whether a path and a line overlap.
  */
 Datum	spherepath_overlap_line(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a path and a line aren't overlapping.
+ * Checks whether a path and a line don't overlap.
  */
 Datum	spherepath_overlap_line_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether path and line are overlapping.
+ * Checks whether path and line overlap.
  */
 Datum	spherepath_overlap_line_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a path and a line aren't overlapping.
+ * Checks whether a path and a line don't overlap.
  */
 Datum	spherepath_overlap_line_com_neg(PG_FUNCTION_ARGS);
 
@@ -175,22 +165,22 @@ Datum	spherecircle_cont_path_com(PG_FUNCTION_ARGS);
 Datum	spherecircle_cont_path_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and a path are overlapping.
+ * Checks whether a circle and a path overlap.
  */
 Datum	spherecircle_overlap_path(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and a path aren't overlapping.
+ * Checks whether a circle and a path don't overlap.
  */
 Datum	spherecircle_overlap_path_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and a path are overlapping.
+ * Checks whether a circle and a path overlap.
  */
 Datum	spherecircle_overlap_path_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and a path aren't overlapping.
+ * Checks whether a circle and a path don't overlap.
  */
 Datum	spherecircle_overlap_path_com_neg(PG_FUNCTION_ARGS);
 
@@ -215,32 +205,32 @@ Datum	spherepoly_cont_path_com(PG_FUNCTION_ARGS);
 Datum	spherepoly_cont_path_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a path are overlapping.
+ * Checks whether a polygon and a path overlap.
  */
 Datum	spherepoly_overlap_path(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a path aren't overlapping.
+ * Checks whether a polygon and a path don't overlap.
  */
 Datum	spherepoly_overlap_path_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a path are overlapping.
+ * Checks whether a polygon and a path overlap.
  */
 Datum	spherepoly_overlap_path_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a polygon and a path aren't overlapping.
+ * Checks whether a polygon and a path don't overlap.
  */
 Datum	spherepoly_overlap_path_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two pathes are overlapping.
+ * Checks whether two paths overlap.
  */
 Datum	spherepath_overlap_path(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two pathes aren't overlapping.
+ * Checks whether two paths don't overlap.
  */
 Datum	spherepath_overlap_path_neg(PG_FUNCTION_ARGS);
 
@@ -265,22 +255,22 @@ Datum	sphereellipse_cont_path_com(PG_FUNCTION_ARGS);
 Datum	sphereellipse_cont_path_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether an ellipse and a path are overlapping.
+ * Checks whether an ellipse and a path overlap.
  */
 Datum	sphereellipse_overlap_path(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether an ellipse and a path aren't overlapping.
+ * Checks whether an ellipse and a path don't overlap.
  */
 Datum	sphereellipse_overlap_path_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether an ellipse and a path are overlapping.
+ * Checks whether an ellipse and a path overlap.
  */
 Datum	sphereellipse_overlap_path_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether ellipse and path aren't overlapping.
+ * Checks whether an ellipse and a path don't overlap.
  */
 Datum	sphereellipse_overlap_path_com_neg(PG_FUNCTION_ARGS);
 

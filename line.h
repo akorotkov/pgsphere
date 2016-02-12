@@ -80,9 +80,9 @@ bool	sline_eq(const SLine *l1, const SLine *l2);
 int8	sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc);
 
 /*
- * Assuming that a line and a circle are overlapping, this function returns true
- * if the line and the circle are touching. Make sure that the line and the circle
- * are overlapping before calling this function! Otherwise, the result will be
+ * Assuming that a line and a circle overlap, this function returns true
+ * if the line and the circle are touching. Make sure that the line and the
+ * circle overlap before calling this function! Otherwise, the result will be
  * undefined.
  *
  * See sphereline_circle_pos (const SLine *, const SCIRCLE *)
@@ -225,12 +225,12 @@ Datum	spherecircle_cont_line_com(PG_FUNCTION_ARGS);
 Datum	spherecircle_cont_line_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and a line are overlapping.
+ * Checks whether a circle and a line overlap.
  */
 Datum	sphereline_overlap_circle(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether circle and a line are not overlapping.
+ * Checks whether circle and a line don't overlap.
  */
 Datum	sphereline_overlap_circle_neg(PG_FUNCTION_ARGS);
 
@@ -240,7 +240,7 @@ Datum	sphereline_overlap_circle_neg(PG_FUNCTION_ARGS);
 Datum	sphereline_overlap_circle_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether circle and a line are not overlapping.
+ * Checks whether circle and a line don't overlap.
  */
 Datum	sphereline_overlap_circle_com_neg(PG_FUNCTION_ARGS);
 
@@ -265,12 +265,12 @@ Datum	sphereline_crosses(PG_FUNCTION_ARGS);
 Datum	sphereline_crosses_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two lines are overlapping.
+ * Checks whether two lines overlap.
  */
 Datum	sphereline_overlap(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two lines are not overlapping.
+ * Checks whether two lines are overlap.
  */
 Datum	sphereline_overlap_neg(PG_FUNCTION_ARGS);
 

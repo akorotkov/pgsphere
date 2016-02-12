@@ -154,9 +154,6 @@ euler_spath_trans(SPATH *out, const SPATH *in, const SEuler *se)
 /*
  * Returns the relationship between a path and a circle as
  * PGS_CIRCLE_PATH_REL int8 value.
- *
- * path - pointer to the path
- * circ - pointer to the circle
  */
 static int8
 path_circle_pos(const SPATH *path, const SCIRCLE *circ)
@@ -215,12 +212,7 @@ path_circle_pos(const SPATH *path, const SCIRCLE *circ)
 
 
 /*
- * Checks whether a path and a line are overlapping.
- *
- * line - pointer to the line
- * path - pointer to the path
- *
- * Returns true if overlapping.
+ * Checks whether a path and a line overlap.
  */
 static bool
 path_line_overlap(const SPATH *path, const SLine *line)
@@ -326,12 +318,7 @@ path_ellipse_pos(const SPATH *path, const SELLIPSE *ell)
 
 
 /*
- * Checks whether two pathes are overlapping.
- *
- * path1 - pointer to the first path
- * path2 - pointer to the second path
- *
- * Returns true if overlapping.
+ * Checks whether two paths overlap.
  */
 static bool
 path_overlap(const SPATH *path1, const SPATH *path2)
@@ -355,9 +342,6 @@ path_overlap(const SPATH *path1, const SPATH *path2)
 /*
  * Returns the relationship between a path and a polygon as
  * PGS_POLY_PATH_REL int8 value.
- *
- * path - pointer to the path
- * poly - pointer to the polygon
  */
 static int8
 path_poly_pos(const SPATH *path, const SPOLY *poly)
@@ -405,8 +389,6 @@ path_poly_pos(const SPATH *path, const SPOLY *poly)
   * path - pointer to the path
   * i    - number of the point
   *
-  * Returns pointer to result point.
-  *
   * See spath_point(SPoint * , SPATH *, float8)
   */
 static bool
@@ -427,8 +409,6 @@ spath_get_point(SPoint *sp, const SPATH *path, int32 i)
   * sp   - pointer to the result point
   * path - pointer to the path
   * f    - 'number' of the point
-  *
-  * Returns pointer to result point.
   *
   * See spherepath_point(PG_FUNCTION_ARGS)
   */
@@ -459,10 +439,7 @@ spath_point(SPoint *sp, const SPATH *path, float8 f)
 }
 
 /*
- * Checks whether two pathes are equal.
- *
- * p1 - pointer to the first path
- * p2 - pointer to the second path
+ * Checks whether two paths are equal.
  */
 bool
 spath_eq(const SPATH *p1, const SPATH *p2)

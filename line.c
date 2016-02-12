@@ -404,7 +404,7 @@ sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 bool
 sline_circle_touch(const SLine *sl, const SCIRCLE *sc)
 {
-	/* we assume here, line and circle are overlapping */
+	/* we assume here, line and circle overlap */
 	SEuler	se;
 	SCIRCLE	tc;
 

@@ -3,9 +3,7 @@
 
 #include "line.h"
 
-/*
- *  Ellipse declarations
- */
+/* Ellipse declarations */
 
 /*
  * Spherical ellipse data structure. A spherical ellipse is represented using
@@ -184,22 +182,22 @@ Datum	sphereellipse_cont_line_com(PG_FUNCTION_ARGS);
 Datum	sphereellipse_cont_line_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether an ellipse and a line are overlapping.
+ * Checks whether an ellipse and a line overlap.
  */
 Datum	sphereellipse_overlap_line(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether an ellipse and a line are not overlapping.
+ * Checks whether an ellipse and a line don't overlap.
  */
 Datum	sphereellipse_overlap_line_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether an ellipse and a line are overlapping.
+ * Checks whether an ellipse and a line overlap.
  */
 Datum	sphereellipse_overlap_line_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether an ellipse and a line are not overlapping.
+ * Checks whether an ellipse and a line don't overlap.
  */
 Datum	sphereellipse_overlap_line_com_neg(PG_FUNCTION_ARGS);
 
@@ -244,22 +242,22 @@ Datum	spherecircle_cont_ellipse_com(PG_FUNCTION_ARGS);
 Datum	spherecircle_cont_ellipse_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and an ellipse are overlapping.
+ * Checks whether a circle and an ellipse overlap.
  */
 Datum	sphereellipse_overlap_circle(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and an ellipse are not overlapping.
+ * Checks whether a circle and an ellipse don't overlap.
  */
 Datum	sphereellipse_overlap_circle_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and an ellipse are overlapping.
+ * Checks whether a circle and an ellipse overlap.
  */
 Datum	sphereellipse_overlap_circle_com(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether a circle and an ellipse are not overlapping.
+ * Checks whether a circle and an ellipse don't overlap.
  */
 Datum	sphereellipse_overlap_circle_com_neg(PG_FUNCTION_ARGS);
 
@@ -284,12 +282,12 @@ Datum	sphereellipse_cont_ellipse_com(PG_FUNCTION_ARGS);
 Datum	sphereellipse_cont_ellipse_com_neg(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two ellipses are overlapping.
+ * Checks whether two ellipses overlap.
  */
 Datum	sphereellipse_overlap_ellipse(PG_FUNCTION_ARGS);
 
 /*
- * Checks whether two ellipses are not overlapping.
+ * Checks whether two ellipses don't overlap.
  */
 Datum	sphereellipse_overlap_ellipse_neg(PG_FUNCTION_ARGS);
 
