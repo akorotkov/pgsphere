@@ -333,7 +333,7 @@ Datum	spheretrans_poly_inverse(PG_FUNCTION_ARGS);
 
 /*
  * State transition function for the aggregate function spoly(spoint). Never
- * call this function outside an aggregate function! Adds a point to polygon.
+ * call this function outside an aggregate function! Adds a point to a polygon.
  */
 Datum	spherepoly_add_point(PG_FUNCTION_ARGS);
 

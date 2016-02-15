@@ -1338,8 +1338,7 @@ spheretrans_poly_inverse(PG_FUNCTION_ARGS)
 	Datum		ret;
 
 	spheretrans_inverse(&tmp, se);
-	ret = DirectFunctionCall2(
-							  spheretrans_poly,
+	ret = DirectFunctionCall2(spheretrans_poly,
 							  sp, PointerGetDatum(&tmp));
 	PG_RETURN_DATUM(ret);
 }
