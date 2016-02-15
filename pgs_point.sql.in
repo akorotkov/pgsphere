@@ -4,85 +4,85 @@
 --
 -- **************************
 
-CREATE FUNCTION pg_sphere_version( )
+CREATE FUNCTION pg_sphere_version()
    RETURNS CSTRING
-   AS 'MODULE_PATHNAME' , 'pg_sphere_version'
+   AS 'MODULE_PATHNAME', 'pg_sphere_version'
    LANGUAGE 'c';
 
 CREATE FUNCTION spoint(FLOAT8, FLOAT8)
    RETURNS spoint
-   AS 'MODULE_PATHNAME' , 'spherepoint_from_long_lat'
+   AS 'MODULE_PATHNAME', 'spherepoint_from_long_lat'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-CREATE FUNCTION set_sphere_output_precision( INT4 )
+CREATE FUNCTION set_sphere_output_precision(INT4)
    RETURNS CSTRING
-   AS 'MODULE_PATHNAME' , 'set_sphere_output_precision'
+   AS 'MODULE_PATHNAME', 'set_sphere_output_precision'
    LANGUAGE 'c';
 
-CREATE FUNCTION set_sphere_output( CSTRING )
+CREATE FUNCTION set_sphere_output(CSTRING)
    RETURNS CSTRING
-   AS 'MODULE_PATHNAME' , 'set_sphere_output'
+   AS 'MODULE_PATHNAME', 'set_sphere_output'
    LANGUAGE 'c';
 
 COMMENT ON FUNCTION spoint(FLOAT8, FLOAT8) IS
-  'returns a spherical point from longitude ( arg1 ) , latitude ( arg2 )'; 
+  'returns a spherical point from longitude (arg1), latitude (arg2)';
 
 CREATE FUNCTION long(spoint)
    RETURNS FLOAT8
-   AS 'MODULE_PATHNAME' , 'spherepoint_long'
+   AS 'MODULE_PATHNAME', 'spherepoint_long'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION long(spoint) IS
-  'longitude of spherical point'; 
+  'longitude of spherical point';
 
 CREATE FUNCTION lat(spoint)
    RETURNS FLOAT8
-   AS 'MODULE_PATHNAME' , 'spherepoint_lat'
+   AS 'MODULE_PATHNAME', 'spherepoint_lat'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
-   
+   IMMUTABLE STRICT;
+
 COMMENT ON FUNCTION lat(spoint) IS
-  'latitude of spherical point'; 
+  'latitude of spherical point';
 
 CREATE FUNCTION x(spoint)
    RETURNS FLOAT8
-   AS 'MODULE_PATHNAME' , 'spherepoint_x'
+   AS 'MODULE_PATHNAME', 'spherepoint_x'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
-   
+   IMMUTABLE STRICT;
+
 COMMENT ON FUNCTION x(spoint) IS
-  'cartesian x value of spherical point'; 
+  'cartesian x value of spherical point';
 
 
 CREATE FUNCTION y(spoint)
    RETURNS FLOAT8
-   AS 'MODULE_PATHNAME' , 'spherepoint_y'
+   AS 'MODULE_PATHNAME', 'spherepoint_y'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
-   
+   IMMUTABLE STRICT;
+
 COMMENT ON FUNCTION y(spoint) IS
-  'cartesian y value of spherical point'; 
+  'cartesian y value of spherical point';
 
 CREATE FUNCTION xyz(spoint)
    RETURNS FLOAT8[]
-   AS 'MODULE_PATHNAME' , 'spherepoint_xyz'
+   AS 'MODULE_PATHNAME', 'spherepoint_xyz'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION xyz(spoint) IS
-  'cartesian values of spherical point'; 
+  'cartesian values of spherical point';
 
 
 CREATE FUNCTION z(spoint)
    RETURNS FLOAT8
-   AS 'MODULE_PATHNAME' , 'spherepoint_z'
+   AS 'MODULE_PATHNAME', 'spherepoint_z'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
-   
+   IMMUTABLE STRICT;
+
 COMMENT ON FUNCTION z(spoint) IS
-  'cartesian z value of spherical point'; 
+  'cartesian z value of spherical point';
 
 
 -- ***************************
@@ -95,14 +95,14 @@ COMMENT ON FUNCTION z(spoint) IS
 -- equal
 --
 
-CREATE FUNCTION spoint_equal(spoint,spoint)
+CREATE FUNCTION spoint_equal(spoint, spoint)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoint_equal'
+   AS 'MODULE_PATHNAME', 'spherepoint_equal'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoint_equal(spoint,spoint) IS
-  'returns true, if spherical points are equal'; 
+COMMENT ON FUNCTION spoint_equal(spoint, spoint) IS
+  'returns true, if spherical points are equal';
 
 CREATE OPERATOR  = (
    LEFTARG    = spoint,
@@ -111,24 +111,24 @@ CREATE OPERATOR  = (
    NEGATOR    = <>,
    PROCEDURE  = spoint_equal,
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR = ( spoint, spoint ) IS
-  'true, if spherical points are equal'; 
+COMMENT ON OPERATOR = (spoint, spoint) IS
+  'true, if spherical points are equal';
 
 --
 -- not equal
 --
 
-CREATE FUNCTION spoint_equal_neg (spoint,spoint)
+CREATE FUNCTION spoint_equal_neg (spoint, spoint)
    RETURNS BOOL
    AS 'SELECT NOT spoint_equal($1,$2);'
    LANGUAGE 'sql'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoint_equal_neg (spoint,spoint) IS
-  'returns true, if spherical points are not equal'; 
+COMMENT ON FUNCTION spoint_equal_neg (spoint, spoint) IS
+  'returns true, if spherical points are not equal';
 
 
 CREATE OPERATOR  <> (
@@ -136,26 +136,26 @@ CREATE OPERATOR  <> (
    RIGHTARG   = spoint,
    COMMUTATOR = <>,
    NEGATOR    = =,
-   PROCEDURE  = spoint_equal_neg ,
+   PROCEDURE  = spoint_equal_neg,
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR <> ( spoint, spoint ) IS
-  'true, if spherical points are not equal'; 
+COMMENT ON OPERATOR <> (spoint, spoint) IS
+  'true, if spherical points are not equal';
 
 --
 -- distance between points
 --
 
-CREATE FUNCTION dist(spoint,spoint)
+CREATE FUNCTION dist(spoint, spoint)
    RETURNS FLOAT8
-   AS 'MODULE_PATHNAME' , 'spherepoint_distance'
+   AS 'MODULE_PATHNAME', 'spherepoint_distance'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION dist(spoint,spoint) IS
-  'distance between spherical points'; 
+COMMENT ON FUNCTION dist(spoint, spoint) IS
+  'distance between spherical points';
 
 CREATE OPERATOR  <-> (
    LEFTARG    = spoint,
@@ -164,6 +164,6 @@ CREATE OPERATOR  <-> (
    PROCEDURE  = dist
 );
 
-COMMENT ON OPERATOR <-> ( spoint, spoint ) IS
-  'distance between spherical points'; 
+COMMENT ON OPERATOR <-> (spoint, spoint) IS
+  'distance between spherical points';
 

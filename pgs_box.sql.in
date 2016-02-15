@@ -6,56 +6,56 @@
 
 CREATE FUNCTION sbox(spoint, spoint)
    RETURNS sbox
-   AS 'MODULE_PATHNAME' , 'spherebox_in_from_points'
+   AS 'MODULE_PATHNAME', 'spherebox_in_from_points'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox(spoint, spoint) IS
-  'returns a spherical box from south-west corner( arg1 ) and north-east corner( arg2 )'; 
+  'returns a spherical box from south-west corner(arg1) and north-east corner(arg2)';
 
 CREATE FUNCTION sw(sbox)
    RETURNS spoint
-   AS 'MODULE_PATHNAME' , 'spherebox_sw'
+   AS 'MODULE_PATHNAME', 'spherebox_sw'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sw(sbox) IS
-  'south-west corner of spherical box'; 
+  'south-west corner of spherical box';
 
 CREATE FUNCTION se(sbox)
    RETURNS spoint
-   AS 'MODULE_PATHNAME' , 'spherebox_se'
+   AS 'MODULE_PATHNAME', 'spherebox_se'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION se(sbox) IS
-  'south-east corner of spherical box'; 
+  'south-east corner of spherical box';
 
 
 CREATE FUNCTION nw(sbox)
    RETURNS spoint
-   AS 'MODULE_PATHNAME' , 'spherebox_nw'
+   AS 'MODULE_PATHNAME', 'spherebox_nw'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION nw(sbox) IS
-  'north-west corner of spherical box'; 
+  'north-west corner of spherical box';
 
 CREATE FUNCTION ne(sbox)
    RETURNS spoint
-   AS 'MODULE_PATHNAME' , 'spherebox_ne'
+   AS 'MODULE_PATHNAME', 'spherebox_ne'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION ne(sbox) IS
-  'north-east corner of spherical box'; 
+  'north-east corner of spherical box';
 
 
 CREATE FUNCTION area(sbox)
    RETURNS FLOAT8
    AS 'MODULE_PATHNAME', 'spherebox_area'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION area(sbox) IS
   'area of a spherical box';
@@ -69,17 +69,17 @@ CREATE FUNCTION circum(sbox)
    RETURNS FLOAT8
    AS 'MODULE_PATHNAME', 'spherebox_circ'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION circum(sbox) IS
-  'circumference of spherical box'; 
+  'circumference of spherical box';
 
 CREATE OPERATOR @-@ (
    RIGHTARG   = sbox,
    PROCEDURE  = circum
 );
 
-COMMENT ON OPERATOR @-@ ( NONE , sbox ) IS
+COMMENT ON OPERATOR @-@ (NONE, sbox) IS
   'circumference of spherical box';
 
 
@@ -87,13 +87,13 @@ COMMENT ON OPERATOR @-@ ( NONE , sbox ) IS
 -- equal
 --
 
-CREATE FUNCTION sbox_equal(sbox,sbox)
+CREATE FUNCTION sbox_equal(sbox, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_equal'
+   AS 'MODULE_PATHNAME', 'spherebox_equal'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_equal(sbox,sbox) IS
+COMMENT ON FUNCTION sbox_equal(sbox, sbox) IS
   'returns true, if spherical boxes are equal';
 
 CREATE OPERATOR  = (
@@ -106,48 +106,48 @@ CREATE OPERATOR  = (
    JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR = ( sbox, sbox ) IS
+COMMENT ON OPERATOR = (sbox, sbox) IS
   'true, if spherical boxes are equal';
 
 --
 -- not equal
 --
-  
-CREATE FUNCTION sbox_equal_neg (sbox,sbox)
-   RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_equal_neg'
-   LANGUAGE 'c'
-   IMMUTABLE STRICT ;
 
-COMMENT ON FUNCTION sbox_equal_neg (sbox,sbox) IS
-  'returns true, if spherical boxes are not equal';   
+CREATE FUNCTION sbox_equal_neg (sbox, sbox)
+   RETURNS BOOL
+   AS 'MODULE_PATHNAME', 'spherebox_equal_neg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sbox_equal_neg (sbox, sbox) IS
+  'returns true, if spherical boxes are not equal';
 
 
 CREATE OPERATOR  <> (
    LEFTARG    = sbox,
    RIGHTARG   = sbox,
    COMMUTATOR = <>,
-   NEGATOR    = =, 
-   PROCEDURE  = sbox_equal_neg ,
+   NEGATOR    = =,
+   PROCEDURE  = sbox_equal_neg,
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR <> ( sbox, sbox ) IS
+COMMENT ON OPERATOR <> (sbox, sbox) IS
   'true, if spherical boxes are not equal';
 
 --
 -- box contains box
 --
 
-CREATE FUNCTION sbox_contains_box(sbox,sbox)
+CREATE FUNCTION sbox_contains_box(sbox, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_box'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_box'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_box(sbox,sbox) IS
-  'true if spherical box contains spherical box '; 
+COMMENT ON FUNCTION sbox_contains_box(sbox, sbox) IS
+  'true if spherical box contains spherical box';
 
 
 --
@@ -156,26 +156,26 @@ COMMENT ON FUNCTION sbox_contains_box(sbox,sbox) IS
 
 CREATE FUNCTION sbox_contains_box_com(sbox, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_box_com'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_box_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_box_com(sbox, sbox) IS
-  'true if spherical box contains spherical box '; 
+  'true if spherical box contains spherical box';
 
 
 --
 -- box does not contain box
 --
 
-CREATE FUNCTION sbox_contains_box_neg(sbox,sbox)
+CREATE FUNCTION sbox_contains_box_neg(sbox, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_box_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_box_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_box_neg(sbox,sbox) IS
-  'true if spherical box does not contain spherical box '; 
+COMMENT ON FUNCTION sbox_contains_box_neg(sbox, sbox) IS
+  'true if spherical box does not contain spherical box';
 
 
 --
@@ -184,26 +184,26 @@ COMMENT ON FUNCTION sbox_contains_box_neg(sbox,sbox) IS
 
 CREATE FUNCTION sbox_contains_box_com_neg(sbox, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_box_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_box_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_box_com_neg(sbox, sbox) IS
-  'true if spherical box does not contain spherical box '; 
+  'true if spherical box does not contain spherical box';
 
 
 --
 -- box overlaps box
 --
 
-CREATE FUNCTION sbox_overlap_box(sbox,sbox)
+CREATE FUNCTION sbox_overlap_box(sbox, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_box'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_box'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_overlap_box(sbox,sbox) IS
-  'true if spherical box overlap spherical box '; 
+COMMENT ON FUNCTION sbox_overlap_box(sbox, sbox) IS
+  'true if spherical box overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -213,24 +213,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sbox, sbox ) IS
-  'true if spherical box overlap spherical box'; 
+COMMENT ON OPERATOR && (sbox, sbox) IS
+  'true if spherical box overlap spherical box';
 
 --
 -- box does not overlap box
 --
 
-CREATE FUNCTION sbox_overlap_box_neg(sbox,sbox)
+CREATE FUNCTION sbox_overlap_box_neg(sbox, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_box_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_box_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_box_neg(sbox,sbox) IS
-  'true if spherical box does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_box_neg(sbox, sbox) IS
+  'true if spherical box does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -240,80 +240,80 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sbox, sbox ) IS
-  'true if spherical box does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sbox, sbox) IS
+  'true if spherical box does not overlap spherical box';
 
 --
 -- point is contained by box
 --
 
-CREATE FUNCTION sbox_cont_point_com(spoint,sbox)
+CREATE FUNCTION sbox_cont_point_com(spoint, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_point_com'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_point_com'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
-   
-COMMENT ON FUNCTION sbox_cont_point_com(spoint,sbox) IS
-  'true if spherical point is contained by spherical box'; 
+   IMMUTABLE STRICT;
+
+COMMENT ON FUNCTION sbox_cont_point_com(spoint, sbox) IS
+  'true if spherical point is contained by spherical box';
 
 
 --
 -- point is not contained by box
 --
 
-CREATE FUNCTION sbox_cont_point_com_neg(spoint,sbox)
+CREATE FUNCTION sbox_cont_point_com_neg(spoint, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_point_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_point_com_neg'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_cont_point_com_neg (spoint,sbox) IS
-  'true if spherical point is not contained by spherical box '; 
+COMMENT ON FUNCTION sbox_cont_point_com_neg (spoint, sbox) IS
+  'true if spherical point is not contained by spherical box';
 
 
 --
 -- box contains point
 --
 
-CREATE FUNCTION sbox_cont_point(sbox,spoint)
+CREATE FUNCTION sbox_cont_point(sbox, spoint)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_point'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_point'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_cont_point (sbox,spoint) IS
-  'true if spherical box contains spherical point '; 
+COMMENT ON FUNCTION sbox_cont_point (sbox, spoint) IS
+  'true if spherical box contains spherical point';
 
 
 --
 -- box does not contain point
 --
 
-CREATE FUNCTION sbox_cont_point_neg(sbox,spoint)
+CREATE FUNCTION sbox_cont_point_neg(sbox, spoint)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_point_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_point_neg'
    LANGUAGE 'c'
-   IMMUTABLE STRICT ;
+   IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_cont_point_neg (sbox,spoint) IS
-  'true if spherical box does not contain spherical point '; 
+COMMENT ON FUNCTION sbox_cont_point_neg (sbox, spoint) IS
+  'true if spherical box does not contain spherical point';
 
 
 --
 -- box contains circle
 --
 
-CREATE FUNCTION sbox_contains_circle(sbox,scircle)
+CREATE FUNCTION sbox_contains_circle(sbox, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_circle'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_circle'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_circle(sbox,scircle) IS
-  'true if spherical box contains spherical circle '; 
+COMMENT ON FUNCTION sbox_contains_circle(sbox, scircle) IS
+  'true if spherical box contains spherical circle';
 
 
 --
@@ -322,26 +322,26 @@ COMMENT ON FUNCTION sbox_contains_circle(sbox,scircle) IS
 
 CREATE FUNCTION sbox_contains_circle_com(scircle, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_circle_com'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_circle_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_circle_com(scircle, sbox) IS
-  'true if spherical box contains spherical circle '; 
+  'true if spherical box contains spherical circle';
 
 
 --
 -- box does not contain circle
 --
 
-CREATE FUNCTION sbox_contains_circle_neg(sbox,scircle)
+CREATE FUNCTION sbox_contains_circle_neg(sbox, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_circle_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_circle_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_circle_neg(sbox,scircle) IS
-  'true if spherical box does not contain spherical circle '; 
+COMMENT ON FUNCTION sbox_contains_circle_neg(sbox, scircle) IS
+  'true if spherical box does not contain spherical circle';
 
 
 --
@@ -350,26 +350,26 @@ COMMENT ON FUNCTION sbox_contains_circle_neg(sbox,scircle) IS
 
 CREATE FUNCTION sbox_contains_circle_com_neg(scircle, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_circle_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_circle_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_circle_com_neg(scircle, sbox) IS
-  'true if spherical box does not contain spherical circle '; 
+  'true if spherical box does not contain spherical circle';
 
 
 --
 -- circle contains box
 --
 
-CREATE FUNCTION scircle_contains_box(scircle,sbox)
+CREATE FUNCTION scircle_contains_box(scircle, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_box'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_box'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_box(scircle,sbox) IS
-  'true if spherical circle contains spherical box '; 
+COMMENT ON FUNCTION scircle_contains_box(scircle, sbox) IS
+  'true if spherical circle contains spherical box';
 
 
 --
@@ -378,26 +378,26 @@ COMMENT ON FUNCTION scircle_contains_box(scircle,sbox) IS
 
 CREATE FUNCTION scircle_contains_box_com(sbox, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_box_com'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_box_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION scircle_contains_box_com(sbox, scircle) IS
-  'true if spherical circle contains spherical box '; 
+  'true if spherical circle contains spherical box';
 
 
 --
 -- circle does not contain box
 --
 
-CREATE FUNCTION scircle_contains_box_neg(scircle,sbox)
+CREATE FUNCTION scircle_contains_box_neg(scircle, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_box_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_box_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_box_neg(scircle,sbox) IS
-  'true if spherical circle does not contain spherical box '; 
+COMMENT ON FUNCTION scircle_contains_box_neg(scircle, sbox) IS
+  'true if spherical circle does not contain spherical box';
 
 
 --
@@ -406,26 +406,26 @@ COMMENT ON FUNCTION scircle_contains_box_neg(scircle,sbox) IS
 
 CREATE FUNCTION scircle_contains_box_com_neg(sbox, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_box_com_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_box_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION scircle_contains_box_com_neg(sbox, scircle) IS
-  'true if spherical circle does not contain spherical box '; 
+  'true if spherical circle does not contain spherical box';
 
 
 --
 -- circle overlaps box
 --
 
-CREATE FUNCTION sbox_overlap_circle(sbox,scircle)
+CREATE FUNCTION sbox_overlap_circle(sbox, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_circle'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_circle'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_overlap_circle(sbox,scircle) IS
-  'true if spherical circle overlap spherical box '; 
+COMMENT ON FUNCTION sbox_overlap_circle(sbox, scircle) IS
+  'true if spherical circle overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -435,24 +435,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sbox, scircle ) IS
-  'true if spherical circle overlap spherical box'; 
+COMMENT ON OPERATOR && (sbox, scircle) IS
+  'true if spherical circle overlap spherical box';
 
 --
 -- box overlaps circle
 --
 
-CREATE FUNCTION sbox_overlap_circle_com(scircle,sbox)
+CREATE FUNCTION sbox_overlap_circle_com(scircle, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_circle_com'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_circle_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_circle_com(scircle,sbox) IS
-  'true if spherical circle overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_circle_com(scircle, sbox) IS
+  'true if spherical circle overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -462,25 +462,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( scircle, sbox ) IS
-  'true if spherical circle overlap spherical box'; 
+COMMENT ON OPERATOR && (scircle, sbox) IS
+  'true if spherical circle overlap spherical box';
 
 
 --
 -- circle does not overlap box
 --
 
-CREATE FUNCTION sbox_overlap_circle_neg(sbox,scircle)
+CREATE FUNCTION sbox_overlap_circle_neg(sbox, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_circle_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_circle_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_circle_neg(sbox,scircle) IS
-  'true if spherical circle does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_circle_neg(sbox, scircle) IS
+  'true if spherical circle does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -490,24 +490,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sbox, scircle ) IS
-  'true if spherical circle does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sbox, scircle) IS
+  'true if spherical circle does not overlap spherical box';
 
 --
 -- box does not overlap circle
 --
 
-CREATE FUNCTION sbox_overlap_circle_com_neg(scircle,sbox)
+CREATE FUNCTION sbox_overlap_circle_com_neg(scircle, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_circle_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_circle_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_circle_com_neg(scircle,sbox) IS
-  'true if spherical circle does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_circle_com_neg(scircle, sbox) IS
+  'true if spherical circle does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -517,25 +517,25 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( scircle, sbox ) IS
-  'true if spherical circle does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (scircle, sbox) IS
+  'true if spherical circle does not overlap spherical box';
 
 
 --
 -- box contains line
 --
 
-CREATE FUNCTION sbox_contains_line(sbox,sline)
+CREATE FUNCTION sbox_contains_line(sbox, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_line'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_line'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_line(sbox,sline) IS
-  'true if spherical box contains spherical line '; 
+COMMENT ON FUNCTION sbox_contains_line(sbox, sline) IS
+  'true if spherical box contains spherical line';
 
 
 --
@@ -544,26 +544,26 @@ COMMENT ON FUNCTION sbox_contains_line(sbox,sline) IS
 
 CREATE FUNCTION sbox_contains_line_com(sline, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_line_com'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_line_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_line_com(sline, sbox) IS
-  'true if spherical box contains spherical line '; 
+  'true if spherical box contains spherical line';
 
 
 --
 -- box does not contain line
 --
 
-CREATE FUNCTION sbox_contains_line_neg(sbox,sline)
+CREATE FUNCTION sbox_contains_line_neg(sbox, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_line_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_line_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_line_neg(sbox,sline) IS
-  'true if spherical box does not contain spherical line '; 
+COMMENT ON FUNCTION sbox_contains_line_neg(sbox, sline) IS
+  'true if spherical box does not contain spherical line';
 
 
 --
@@ -572,26 +572,26 @@ COMMENT ON FUNCTION sbox_contains_line_neg(sbox,sline) IS
 
 CREATE FUNCTION sbox_contains_line_com_neg(sline, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_line_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_line_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_line_com_neg(sline, sbox) IS
-  'true if spherical box does not contain spherical line '; 
+  'true if spherical box does not contain spherical line';
 
 
 --
 -- line overlaps box
 --
 
-CREATE FUNCTION sbox_overlap_line(sbox,sline)
+CREATE FUNCTION sbox_overlap_line(sbox, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_line'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_line'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_overlap_line(sbox,sline) IS
-  'true if spherical line overlap spherical box '; 
+COMMENT ON FUNCTION sbox_overlap_line(sbox, sline) IS
+  'true if spherical line overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -601,24 +601,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sbox, sline ) IS
-  'true if spherical line overlap spherical box'; 
+COMMENT ON OPERATOR && (sbox, sline) IS
+  'true if spherical line overlap spherical box';
 
 --
 -- box overlaps line
 --
 
-CREATE FUNCTION sbox_overlap_line_com(sline,sbox)
+CREATE FUNCTION sbox_overlap_line_com(sline, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_line_com'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_line_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_line_com(sline,sbox) IS
-  'true if spherical line overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_line_com(sline, sbox) IS
+  'true if spherical line overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -628,25 +628,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sline, sbox ) IS
-  'true if spherical line overlap spherical box'; 
+COMMENT ON OPERATOR && (sline, sbox) IS
+  'true if spherical line overlap spherical box';
 
 
 --
 -- line does not overlap box
 --
 
-CREATE FUNCTION sbox_overlap_line_neg(sbox,sline)
+CREATE FUNCTION sbox_overlap_line_neg(sbox, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_line_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_line_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_line_neg(sbox,sline) IS
-  'true if spherical line does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_line_neg(sbox, sline) IS
+  'true if spherical line does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -656,24 +656,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sbox, sline ) IS
-  'true if spherical line does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sbox, sline) IS
+  'true if spherical line does not overlap spherical box';
 
 --
 -- box does not overlap line
 --
 
-CREATE FUNCTION sbox_overlap_line_com_neg(sline,sbox)
+CREATE FUNCTION sbox_overlap_line_com_neg(sline, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_line_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_line_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_line_com_neg(sline,sbox) IS
-  'true if spherical line does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_line_com_neg(sline, sbox) IS
+  'true if spherical line does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -683,25 +683,25 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sline, sbox ) IS
-  'true if spherical line does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sline, sbox) IS
+  'true if spherical line does not overlap spherical box';
 
 
 --
 -- box contains ellipse
 --
 
-CREATE FUNCTION sbox_contains_ellipse(sbox,sellipse)
+CREATE FUNCTION sbox_contains_ellipse(sbox, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_ellipse'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_ellipse'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_ellipse(sbox,sellipse) IS
-  'true if spherical box contains spherical ellipse '; 
+COMMENT ON FUNCTION sbox_contains_ellipse(sbox, sellipse) IS
+  'true if spherical box contains spherical ellipse';
 
 
 --
@@ -710,26 +710,26 @@ COMMENT ON FUNCTION sbox_contains_ellipse(sbox,sellipse) IS
 
 CREATE FUNCTION sbox_contains_ellipse_com(sellipse, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_ellipse_com'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_ellipse_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_ellipse_com(sellipse, sbox) IS
-  'true if spherical box contains spherical ellipse '; 
+  'true if spherical box contains spherical ellipse';
 
 
 --
 -- box does not contain ellipse
 --
 
-CREATE FUNCTION sbox_contains_ellipse_neg(sbox,sellipse)
+CREATE FUNCTION sbox_contains_ellipse_neg(sbox, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_ellipse_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_ellipse_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_ellipse_neg(sbox,sellipse) IS
-  'true if spherical box does not contain spherical ellipse '; 
+COMMENT ON FUNCTION sbox_contains_ellipse_neg(sbox, sellipse) IS
+  'true if spherical box does not contain spherical ellipse';
 
 
 --
@@ -738,26 +738,26 @@ COMMENT ON FUNCTION sbox_contains_ellipse_neg(sbox,sellipse) IS
 
 CREATE FUNCTION sbox_contains_ellipse_com_neg(sellipse, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_ellipse_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_ellipse_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_ellipse_com_neg(sellipse, sbox) IS
-  'true if spherical box does not contain spherical ellipse '; 
+  'true if spherical box does not contain spherical ellipse';
 
 
 --
 -- ellipse contains box
 --
 
-CREATE FUNCTION sellipse_contains_box(sellipse,sbox)
+CREATE FUNCTION sellipse_contains_box(sellipse, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_box'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_box'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_box(sellipse,sbox) IS
-  'true if spherical ellipse contains spherical box '; 
+COMMENT ON FUNCTION sellipse_contains_box(sellipse, sbox) IS
+  'true if spherical ellipse contains spherical box';
 
 
 --
@@ -766,26 +766,26 @@ COMMENT ON FUNCTION sellipse_contains_box(sellipse,sbox) IS
 
 CREATE FUNCTION sellipse_contains_box_com(sbox, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_box_com'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_box_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sellipse_contains_box_com(sbox, sellipse) IS
-  'true if spherical ellipse contains spherical box '; 
+  'true if spherical ellipse contains spherical box';
 
 
 --
 -- ellipse does not contain box
 --
 
-CREATE FUNCTION sellipse_contains_box_neg(sellipse,sbox)
+CREATE FUNCTION sellipse_contains_box_neg(sellipse, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_box_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_box_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_box_neg(sellipse,sbox) IS
-  'true if spherical ellipse does not contain spherical box '; 
+COMMENT ON FUNCTION sellipse_contains_box_neg(sellipse, sbox) IS
+  'true if spherical ellipse does not contain spherical box';
 
 
 --
@@ -794,26 +794,26 @@ COMMENT ON FUNCTION sellipse_contains_box_neg(sellipse,sbox) IS
 
 CREATE FUNCTION sellipse_contains_box_com_neg(sbox, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_box_com_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_box_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sellipse_contains_box_com_neg(sbox, sellipse) IS
-  'true if spherical ellipse does not contain spherical box '; 
+  'true if spherical ellipse does not contain spherical box';
 
 
 --
 -- ellipse overlaps box
 --
 
-CREATE FUNCTION sbox_overlap_ellipse(sbox,sellipse)
+CREATE FUNCTION sbox_overlap_ellipse(sbox, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_ellipse'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_ellipse'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_overlap_ellipse(sbox,sellipse) IS
-  'true if spherical ellipse overlap spherical box '; 
+COMMENT ON FUNCTION sbox_overlap_ellipse(sbox, sellipse) IS
+  'true if spherical ellipse overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -823,24 +823,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sbox, sellipse ) IS
-  'true if spherical ellipse overlap spherical box'; 
+COMMENT ON OPERATOR && (sbox, sellipse) IS
+  'true if spherical ellipse overlap spherical box';
 
 --
 -- box overlaps ellipse
 --
 
-CREATE FUNCTION sbox_overlap_ellipse_com(sellipse,sbox)
+CREATE FUNCTION sbox_overlap_ellipse_com(sellipse, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_ellipse_com'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_ellipse_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_ellipse_com(sellipse,sbox) IS
-  'true if spherical ellipse overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_ellipse_com(sellipse, sbox) IS
+  'true if spherical ellipse overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -850,25 +850,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sellipse, sbox ) IS
-  'true if spherical ellipse overlap spherical box'; 
+COMMENT ON OPERATOR && (sellipse, sbox) IS
+  'true if spherical ellipse overlap spherical box';
 
 
 --
 -- ellipse does not overlap box
 --
 
-CREATE FUNCTION sbox_overlap_ellipse_neg(sbox,sellipse)
+CREATE FUNCTION sbox_overlap_ellipse_neg(sbox, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_ellipse_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_ellipse_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_ellipse_neg(sbox,sellipse) IS
-  'true if spherical ellipse does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_ellipse_neg(sbox, sellipse) IS
+  'true if spherical ellipse does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -878,24 +878,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sbox, sellipse ) IS
-  'true if spherical ellipse does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sbox, sellipse) IS
+  'true if spherical ellipse does not overlap spherical box';
 
 --
 -- box does not overlap ellipse
 --
 
-CREATE FUNCTION sbox_overlap_ellipse_com_neg(sellipse,sbox)
+CREATE FUNCTION sbox_overlap_ellipse_com_neg(sellipse, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_ellipse_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_ellipse_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_ellipse_com_neg(sellipse,sbox) IS
-  'true if spherical ellipse does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_ellipse_com_neg(sellipse, sbox) IS
+  'true if spherical ellipse does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -905,11 +905,11 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sellipse, sbox ) IS
-  'true if spherical ellipse does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sellipse, sbox) IS
+  'true if spherical ellipse does not overlap spherical box';
 
 
 
@@ -917,14 +917,14 @@ COMMENT ON OPERATOR !&& ( sellipse, sbox ) IS
 -- box contains polygon
 --
 
-CREATE FUNCTION sbox_contains_poly(sbox,spoly)
+CREATE FUNCTION sbox_contains_poly(sbox, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_poly'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_poly'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_poly(sbox,spoly) IS
-  'true if spherical box contains spherical polygon '; 
+COMMENT ON FUNCTION sbox_contains_poly(sbox, spoly) IS
+  'true if spherical box contains spherical polygon';
 
 
 --
@@ -933,26 +933,26 @@ COMMENT ON FUNCTION sbox_contains_poly(sbox,spoly) IS
 
 CREATE FUNCTION sbox_contains_poly_com(spoly, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_poly_com'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_poly_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_poly_com(spoly, sbox) IS
-  'true if spherical box contains spherical polygon '; 
+  'true if spherical box contains spherical polygon';
 
 
 --
 -- box does not contain polygon
 --
 
-CREATE FUNCTION sbox_contains_poly_neg(sbox,spoly)
+CREATE FUNCTION sbox_contains_poly_neg(sbox, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_poly_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_poly_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_poly_neg(sbox,spoly) IS
-  'true if spherical box does not contain spherical polygon '; 
+COMMENT ON FUNCTION sbox_contains_poly_neg(sbox, spoly) IS
+  'true if spherical box does not contain spherical polygon';
 
 
 --
@@ -961,26 +961,26 @@ COMMENT ON FUNCTION sbox_contains_poly_neg(sbox,spoly) IS
 
 CREATE FUNCTION sbox_contains_poly_com_neg(spoly, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_poly_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_poly_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_poly_com_neg(spoly, sbox) IS
-  'true if spherical box does not contain spherical polygon '; 
+  'true if spherical box does not contain spherical polygon';
 
 
 --
 -- polygon contains box
 --
 
-CREATE FUNCTION spoly_contains_box(spoly,sbox)
+CREATE FUNCTION spoly_contains_box(spoly, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_box'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_box'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_box(spoly,sbox) IS
-  'true if spherical polygon contains spherical box '; 
+COMMENT ON FUNCTION spoly_contains_box(spoly, sbox) IS
+  'true if spherical polygon contains spherical box';
 
 
 --
@@ -989,26 +989,26 @@ COMMENT ON FUNCTION spoly_contains_box(spoly,sbox) IS
 
 CREATE FUNCTION spoly_contains_box_com(sbox, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_box_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_box_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_box_com(sbox, spoly) IS
-  'true if spherical polygon contains spherical box '; 
+  'true if spherical polygon contains spherical box';
 
 
 --
 -- polygon does not contain box
 --
 
-CREATE FUNCTION spoly_contains_box_neg(spoly,sbox)
+CREATE FUNCTION spoly_contains_box_neg(spoly, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_box_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_box_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_box_neg(spoly,sbox) IS
-  'true if spherical polygon does not contain spherical box '; 
+COMMENT ON FUNCTION spoly_contains_box_neg(spoly, sbox) IS
+  'true if spherical polygon does not contain spherical box';
 
 
 --
@@ -1017,26 +1017,26 @@ COMMENT ON FUNCTION spoly_contains_box_neg(spoly,sbox) IS
 
 CREATE FUNCTION spoly_contains_box_com_neg(sbox, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_box_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_box_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_box_com_neg(sbox, spoly) IS
-  'true if spherical polygon does not contain spherical box '; 
+  'true if spherical polygon does not contain spherical box';
 
 
 --
 -- polygon overlaps box
 --
 
-CREATE FUNCTION sbox_overlap_poly(sbox,spoly)
+CREATE FUNCTION sbox_overlap_poly(sbox, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_poly'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_poly'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_overlap_poly(sbox,spoly) IS
-  'true if spherical polygon overlap spherical box '; 
+COMMENT ON FUNCTION sbox_overlap_poly(sbox, spoly) IS
+  'true if spherical polygon overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -1046,24 +1046,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sbox, spoly ) IS
-  'true if spherical polygon overlap spherical box'; 
+COMMENT ON OPERATOR && (sbox, spoly) IS
+  'true if spherical polygon overlap spherical box';
 
 --
 -- box overlaps polygon
 --
 
-CREATE FUNCTION sbox_overlap_poly_com(spoly,sbox)
+CREATE FUNCTION sbox_overlap_poly_com(spoly, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_poly_com'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_poly_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_poly_com(spoly,sbox) IS
-  'true if spherical polygon overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_poly_com(spoly, sbox) IS
+  'true if spherical polygon overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -1073,25 +1073,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spoly, sbox ) IS
-  'true if spherical polygon overlap spherical box'; 
+COMMENT ON OPERATOR && (spoly, sbox) IS
+  'true if spherical polygon overlap spherical box';
 
 
 --
 -- polygon does not overlap box
 --
 
-CREATE FUNCTION sbox_overlap_poly_neg(sbox,spoly)
+CREATE FUNCTION sbox_overlap_poly_neg(sbox, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_poly_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_poly_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_poly_neg(sbox,spoly) IS
-  'true if spherical polygon does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_poly_neg(sbox, spoly) IS
+  'true if spherical polygon does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -1101,24 +1101,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sbox, spoly ) IS
-  'true if spherical polygon does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sbox, spoly) IS
+  'true if spherical polygon does not overlap spherical box';
 
 --
 -- box does not overlap polygon
 --
 
-CREATE FUNCTION sbox_overlap_poly_com_neg(spoly,sbox)
+CREATE FUNCTION sbox_overlap_poly_com_neg(spoly, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_poly_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_poly_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_poly_com_neg(spoly,sbox) IS
-  'true if spherical polygon does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_poly_com_neg(spoly, sbox) IS
+  'true if spherical polygon does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -1128,11 +1128,11 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spoly, sbox ) IS
-  'true if spherical polygon does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (spoly, sbox) IS
+  'true if spherical polygon does not overlap spherical box';
 
 
 
@@ -1140,14 +1140,14 @@ COMMENT ON OPERATOR !&& ( spoly, sbox ) IS
 -- box contains path
 --
 
-CREATE FUNCTION sbox_contains_path(sbox,spath)
+CREATE FUNCTION sbox_contains_path(sbox, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_path'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_path(sbox,spath) IS
-  'true if spherical box contains spherical path '; 
+COMMENT ON FUNCTION sbox_contains_path(sbox, spath) IS
+  'true if spherical box contains spherical path';
 
 
 --
@@ -1156,26 +1156,26 @@ COMMENT ON FUNCTION sbox_contains_path(sbox,spath) IS
 
 CREATE FUNCTION sbox_contains_path_com(spath, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_path_com'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_path_com(spath, sbox) IS
-  'true if spherical box contains spherical path '; 
+  'true if spherical box contains spherical path';
 
 
 --
 -- box does not contain path
 --
 
-CREATE FUNCTION sbox_contains_path_neg(sbox,spath)
+CREATE FUNCTION sbox_contains_path_neg(sbox, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_path_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_contains_path_neg(sbox,spath) IS
-  'true if spherical box does not contain spherical path '; 
+COMMENT ON FUNCTION sbox_contains_path_neg(sbox, spath) IS
+  'true if spherical box does not contain spherical path';
 
 
 --
@@ -1184,26 +1184,26 @@ COMMENT ON FUNCTION sbox_contains_path_neg(sbox,spath) IS
 
 CREATE FUNCTION sbox_contains_path_com_neg(spath, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_cont_path_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_cont_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sbox_contains_path_com_neg(spath, sbox) IS
-  'true if spherical box does not contain spherical path '; 
+  'true if spherical box does not contain spherical path';
 
 
 --
 -- path overlaps box
 --
 
-CREATE FUNCTION sbox_overlap_path(sbox,spath)
+CREATE FUNCTION sbox_overlap_path(sbox, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_path'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sbox_overlap_path(sbox,spath) IS
-  'true if spherical path overlap spherical box '; 
+COMMENT ON FUNCTION sbox_overlap_path(sbox, spath) IS
+  'true if spherical path overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -1213,24 +1213,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sbox, spath ) IS
-  'true if spherical path overlap spherical box'; 
+COMMENT ON OPERATOR && (sbox, spath) IS
+  'true if spherical path overlap spherical box';
 
 --
 -- box overlaps path
 --
 
-CREATE FUNCTION sbox_overlap_path_com(spath,sbox)
+CREATE FUNCTION sbox_overlap_path_com(spath, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_path_com'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_path_com(spath,sbox) IS
-  'true if spherical path overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_path_com(spath, sbox) IS
+  'true if spherical path overlap spherical box';
 
 
 CREATE OPERATOR && (
@@ -1240,25 +1240,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spath, sbox ) IS
-  'true if spherical path overlap spherical box'; 
+COMMENT ON OPERATOR && (spath, sbox) IS
+  'true if spherical path overlap spherical box';
 
 
 --
 -- path does not overlap box
 --
 
-CREATE FUNCTION sbox_overlap_path_neg(sbox,spath)
+CREATE FUNCTION sbox_overlap_path_neg(sbox, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_path_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_path_neg(sbox,spath) IS
-  'true if spherical path does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_path_neg(sbox, spath) IS
+  'true if spherical path does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -1268,24 +1268,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sbox, spath ) IS
-  'true if spherical path does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (sbox, spath) IS
+  'true if spherical path does not overlap spherical box';
 
 --
 -- box does not overlap path
 --
 
-CREATE FUNCTION sbox_overlap_path_com_neg(spath,sbox)
+CREATE FUNCTION sbox_overlap_path_com_neg(spath, sbox)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherebox_overlap_path_com_neg'
+   AS 'MODULE_PATHNAME', 'spherebox_overlap_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sbox_overlap_path_com_neg(spath,sbox) IS
-  'true if spherical path does not overlap spherical box '; 
+COMMENT ON FUNCTION  sbox_overlap_path_com_neg(spath, sbox) IS
+  'true if spherical path does not overlap spherical box';
 
 
 CREATE OPERATOR !&& (
@@ -1295,9 +1295,9 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spath, sbox ) IS
-  'true if spherical path does not overlap spherical box'; 
+COMMENT ON OPERATOR !&& (spath, sbox) IS
+  'true if spherical path does not overlap spherical box';
 

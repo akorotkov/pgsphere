@@ -9,7 +9,7 @@ CREATE FUNCTION npoints(spoly)
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION  npoints(spoly) IS
-  'returns number of points of spherical polygon'; 
+  'returns number of points of spherical polygon';
 
 CREATE FUNCTION area(spoly)
    RETURNS FLOAT8
@@ -18,7 +18,7 @@ CREATE FUNCTION area(spoly)
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION  area(spoly) IS
-  'returns area of spherical polygon'; 
+  'returns area of spherical polygon';
 
 
 
@@ -33,14 +33,14 @@ COMMENT ON FUNCTION  area(spoly) IS
 -- equal
 --
 
-CREATE FUNCTION spoly_equal(spoly,spoly)
+CREATE FUNCTION spoly_equal(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_equal'
+   AS 'MODULE_PATHNAME', 'spherepoly_equal'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_equal(spoly,spoly) IS
-  'returns true, if spherical polygons are equal'; 
+COMMENT ON FUNCTION spoly_equal(spoly, spoly) IS
+  'returns true, if spherical polygons are equal';
 
 
 CREATE OPERATOR  = (
@@ -50,37 +50,37 @@ CREATE OPERATOR  = (
    NEGATOR    = <>,
    PROCEDURE  = spoly_equal,
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR = ( spoly, spoly ) IS
-  'true, if spherical polygons are equal'; 
+COMMENT ON OPERATOR = (spoly, spoly) IS
+  'true, if spherical polygons are equal';
 
 --
 -- not equal
 --
 
-CREATE FUNCTION spoly_not_equal(spoly,spoly)
+CREATE FUNCTION spoly_not_equal(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_equal_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_equal_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_not_equal(spoly,spoly) IS
-  'returns true, if spherical polygons are not equal'; 
+COMMENT ON FUNCTION spoly_not_equal(spoly, spoly) IS
+  'returns true, if spherical polygons are not equal';
 
 CREATE OPERATOR  <> (
    LEFTARG    = spoly,
    RIGHTARG   = spoly,
    COMMUTATOR = <>,
-   NEGATOR    = = ,
+   NEGATOR    = =,
    PROCEDURE  = spoly_not_equal,
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR <> ( spoly, spoly ) IS
-  'true, if spherical polygons are not equal'; 
+COMMENT ON OPERATOR <> (spoly, spoly) IS
+  'true, if spherical polygons are not equal';
 
 --
 -- circumference
@@ -93,29 +93,29 @@ CREATE FUNCTION circum(spoly)
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION  circum(spoly) IS
-  'returns circumference of spherical polygon'; 
+  'returns circumference of spherical polygon';
 
 CREATE OPERATOR  @-@ (
    RIGHTARG   = spoly,
    PROCEDURE  = circum
 );
 
-COMMENT ON OPERATOR @-@ ( NONE, spoly ) IS
-  'returns circumference of spherical polygon'; 
+COMMENT ON OPERATOR @-@ (NONE, spoly) IS
+  'returns circumference of spherical polygon';
 
 
 --
 -- polygon contains polygon
 --
 
-CREATE FUNCTION spoly_contains_polygon(spoly,spoly)
+CREATE FUNCTION spoly_contains_polygon(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_poly'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_poly'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_polygon(spoly,spoly) IS
-  'true if spherical polygon contains spherical polygon '; 
+COMMENT ON FUNCTION spoly_contains_polygon(spoly, spoly) IS
+  'true if spherical polygon contains spherical polygon';
 
 
 --
@@ -124,26 +124,26 @@ COMMENT ON FUNCTION spoly_contains_polygon(spoly,spoly) IS
 
 CREATE FUNCTION spoly_contains_polygon_com(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_poly_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_poly_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_polygon_com(spoly, spoly) IS
-  'true if spherical polygon is contained by spherical polygon '; 
+  'true if spherical polygon is contained by spherical polygon';
 
 
 --
 -- polygon does not contain polygon
 --
 
-CREATE FUNCTION spoly_contains_polygon_neg(spoly,spoly)
+CREATE FUNCTION spoly_contains_polygon_neg(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_poly_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_poly_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_polygon_neg(spoly,spoly) IS
-  'true if spherical polygon does not contain spherical polygon '; 
+COMMENT ON FUNCTION spoly_contains_polygon_neg(spoly, spoly) IS
+  'true if spherical polygon does not contain spherical polygon';
 
 
 --
@@ -152,26 +152,26 @@ COMMENT ON FUNCTION spoly_contains_polygon_neg(spoly,spoly) IS
 
 CREATE FUNCTION spoly_contains_polygon_com_neg(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_poly_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_poly_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_polygon_com_neg(spoly, spoly) IS
-  'true if spherical polygon is not contained by spherical polygon '; 
+  'true if spherical polygon is not contained by spherical polygon';
 
 
 --
 -- polygons overlap
 --
 
-CREATE FUNCTION spoly_overlap_polygon(spoly,spoly)
+CREATE FUNCTION spoly_overlap_polygon(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_poly'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_poly'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_polygon(spoly,spoly) IS
-  'true if spherical polygon overlaps spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_polygon(spoly, spoly) IS
+  'true if spherical polygon overlaps spherical polygon';
 
 
 CREATE OPERATOR && (
@@ -181,24 +181,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spoly, spoly ) IS
-  'true if spherical polygons overlap '; 
+COMMENT ON OPERATOR && (spoly, spoly) IS
+  'true if spherical polygons overlap';
 
 --
 -- polygons do not overlap
 --
 
-CREATE FUNCTION spoly_overlap_polygon_neg(spoly,spoly)
+CREATE FUNCTION spoly_overlap_polygon_neg(spoly, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_poly_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_poly_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_polygon_neg(spoly,spoly) IS
-  'true if spherical polygon does not overlap spherical polygon'; 
+COMMENT ON FUNCTION  spoly_overlap_polygon_neg(spoly, spoly) IS
+  'true if spherical polygon does not overlap spherical polygon';
 
 
 CREATE OPERATOR !&& (
@@ -208,77 +208,77 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spoly, spoly ) IS
-  'true if spherical polygon does not overlap spherical polygon'; 
+COMMENT ON OPERATOR !&& (spoly, spoly) IS
+  'true if spherical polygon does not overlap spherical polygon';
 
 
 --
 -- polygon contains point
 --
 
-CREATE FUNCTION spoly_contains_point(spoly,spoint)
+CREATE FUNCTION spoly_contains_point(spoly, spoint)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_point'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_point'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_point(spoly,spoint) IS
-  'true if spherical polygon contains spherical point '; 
+COMMENT ON FUNCTION spoly_contains_point(spoly, spoint) IS
+  'true if spherical polygon contains spherical point';
 
 --
 -- point is contained by polygon
 --
 
-CREATE FUNCTION spoly_contains_point_com(spoint,spoly)
+CREATE FUNCTION spoly_contains_point_com(spoint, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_point_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_point_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_point_com(spoint,spoly) IS
-  'true if spherical polygon contains spherical point '; 
+COMMENT ON FUNCTION spoly_contains_point_com(spoint, spoly) IS
+  'true if spherical polygon contains spherical point';
 
 --
 -- polygon does not contain point
 --
 
-CREATE FUNCTION spoly_contains_point_neg(spoly,spoint)
+CREATE FUNCTION spoly_contains_point_neg(spoly, spoint)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_point_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_point_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_point_neg(spoly,spoint) IS
-  'true if spherical polygon does not contain spherical point '; 
+COMMENT ON FUNCTION spoly_contains_point_neg(spoly, spoint) IS
+  'true if spherical polygon does not contain spherical point';
 
 --
 -- point is not contained by polygon
 --
 
-CREATE FUNCTION spoly_contains_point_com_neg(spoint,spoly)
+CREATE FUNCTION spoly_contains_point_com_neg(spoint, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_point_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_point_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_point_com_neg(spoint,spoly) IS
-  'true if spherical polygon does not contain spherical point '; 
+COMMENT ON FUNCTION spoly_contains_point_com_neg(spoint, spoly) IS
+  'true if spherical polygon does not contain spherical point';
 
 --
 -- Transformation of polygon
 --
 
-CREATE FUNCTION strans_poly( spoly, strans )
+CREATE FUNCTION strans_poly(spoly, strans)
    RETURNS spoly
-   AS 'MODULE_PATHNAME' , 'spheretrans_poly'
+   AS 'MODULE_PATHNAME', 'spheretrans_poly'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
-COMMENT ON FUNCTION strans_poly ( spoly, strans ) IS
-  'returns a transformated spherical polygon'; 
+COMMENT ON FUNCTION strans_poly (spoly, strans) IS
+  'returns a transformated spherical polygon';
 
 CREATE OPERATOR + (
    LEFTARG    = spoly,
@@ -286,17 +286,17 @@ CREATE OPERATOR + (
    PROCEDURE  = strans_poly
 );
 
-COMMENT ON OPERATOR + ( spoly, strans ) IS
-  'transforms a spherical polygon '; 
+COMMENT ON OPERATOR + (spoly, strans) IS
+  'transforms a spherical polygon';
 
-CREATE FUNCTION strans_poly_inverse( spoly, strans )
+CREATE FUNCTION strans_poly_inverse(spoly, strans)
    RETURNS spoly
-   AS 'MODULE_PATHNAME' , 'spheretrans_poly_inverse'
+   AS 'MODULE_PATHNAME', 'spheretrans_poly_inverse'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
-COMMENT ON FUNCTION strans_poly_inverse ( spoly, strans ) IS
-  'returns a inverse transformated spherical polygon'; 
+COMMENT ON FUNCTION strans_poly_inverse (spoly, strans) IS
+  'returns a inverse transformated spherical polygon';
 
 CREATE OPERATOR - (
    LEFTARG    = spoly,
@@ -304,22 +304,22 @@ CREATE OPERATOR - (
    PROCEDURE  = strans_poly_inverse
 );
 
-COMMENT ON OPERATOR - ( spoly, strans ) IS
-  'transforms inverse a spherical polygon ';
+COMMENT ON OPERATOR - (spoly, strans) IS
+  'transforms inverse a spherical polygon';
 
 
 --
 -- polygon contains circle
 --
 
-CREATE FUNCTION spoly_contains_circle(spoly,scircle)
+CREATE FUNCTION spoly_contains_circle(spoly, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_circle'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_circle'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_circle(spoly,scircle) IS
-  'true if spherical polygon contains spherical circle '; 
+COMMENT ON FUNCTION spoly_contains_circle(spoly, scircle) IS
+  'true if spherical polygon contains spherical circle';
 
 
 --
@@ -328,26 +328,26 @@ COMMENT ON FUNCTION spoly_contains_circle(spoly,scircle) IS
 
 CREATE FUNCTION spoly_contains_circle_com(scircle, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_circle_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_circle_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_circle_com(scircle, spoly) IS
-  'true if spherical polygon contains spherical circle '; 
+  'true if spherical polygon contains spherical circle';
 
 
 --
 -- polygon does not contain circle
 --
 
-CREATE FUNCTION spoly_contains_circle_neg(spoly,scircle)
+CREATE FUNCTION spoly_contains_circle_neg(spoly, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_circle_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_circle_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_circle_neg(spoly,scircle) IS
-  'true if spherical polygon does not contain spherical circle '; 
+COMMENT ON FUNCTION spoly_contains_circle_neg(spoly, scircle) IS
+  'true if spherical polygon does not contain spherical circle';
 
 
 --
@@ -356,26 +356,26 @@ COMMENT ON FUNCTION spoly_contains_circle_neg(spoly,scircle) IS
 
 CREATE FUNCTION spoly_contains_circle_com_neg(scircle, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_circle_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_circle_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_circle_com_neg(scircle, spoly) IS
-  'true if spherical polygon does not contain spherical circle '; 
+  'true if spherical polygon does not contain spherical circle';
 
 
 --
 -- circle contains polygon
 --
 
-CREATE FUNCTION scircle_contains_polygon(scircle,spoly)
+CREATE FUNCTION scircle_contains_polygon(scircle, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_poly'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_poly'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_polygon(scircle,spoly) IS
-  'true if spherical circle contains spherical polygon '; 
+COMMENT ON FUNCTION scircle_contains_polygon(scircle, spoly) IS
+  'true if spherical circle contains spherical polygon';
 
 
 --
@@ -384,26 +384,26 @@ COMMENT ON FUNCTION scircle_contains_polygon(scircle,spoly) IS
 
 CREATE FUNCTION scircle_contains_polygon_com(spoly, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_poly_com'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_poly_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION scircle_contains_polygon_com(spoly, scircle) IS
-  'true if spherical circle contains spherical polygon '; 
+  'true if spherical circle contains spherical polygon';
 
 
 --
 -- circle does not contain polygon
 --
 
-CREATE FUNCTION scircle_contains_polygon_neg(scircle,spoly)
+CREATE FUNCTION scircle_contains_polygon_neg(scircle, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_poly_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_poly_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_polygon_neg(scircle,spoly) IS
-  'true if spherical circle does not contain spherical polygon '; 
+COMMENT ON FUNCTION scircle_contains_polygon_neg(scircle, spoly) IS
+  'true if spherical circle does not contain spherical polygon';
 
 
 --
@@ -412,26 +412,26 @@ COMMENT ON FUNCTION scircle_contains_polygon_neg(scircle,spoly) IS
 
 CREATE FUNCTION scircle_contains_polygon_com_neg(spoly, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_poly_com_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_poly_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION scircle_contains_polygon_com_neg(spoly, scircle) IS
-  'true if spherical circle does not contain spherical polygon '; 
+  'true if spherical circle does not contain spherical polygon';
 
 
 --
 -- circle overlaps polygon
 --
 
-CREATE FUNCTION spoly_overlap_circle(spoly,scircle)
+CREATE FUNCTION spoly_overlap_circle(spoly, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_circle'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_circle'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_overlap_circle(spoly,scircle) IS
-  'true if spherical circle overlap spherical polygon '; 
+COMMENT ON FUNCTION spoly_overlap_circle(spoly, scircle) IS
+  'true if spherical circle overlap spherical polygon';
 
 
 CREATE OPERATOR && (
@@ -441,24 +441,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spoly, scircle ) IS
-  'true if spherical circle overlap spherical polygon'; 
+COMMENT ON OPERATOR && (spoly, scircle) IS
+  'true if spherical circle overlap spherical polygon';
 
 --
 -- polygon overlaps circle
 --
 
-CREATE FUNCTION spoly_overlap_circle_com(scircle,spoly)
+CREATE FUNCTION spoly_overlap_circle_com(scircle, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_circle_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_circle_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_circle_com(scircle,spoly) IS
-  'true if spherical circle overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_circle_com(scircle, spoly) IS
+  'true if spherical circle overlap spherical polygon';
 
 
 CREATE OPERATOR && (
@@ -468,25 +468,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( scircle, spoly ) IS
-  'true if spherical circle overlap spherical polygon'; 
+COMMENT ON OPERATOR && (scircle, spoly) IS
+  'true if spherical circle overlap spherical polygon';
 
 
 --
 -- circle does not overlap polygon
 --
 
-CREATE FUNCTION spoly_overlap_circle_neg(spoly,scircle)
+CREATE FUNCTION spoly_overlap_circle_neg(spoly, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_circle_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_circle_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_circle_neg(spoly,scircle) IS
-  'true if spherical circle does not overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_circle_neg(spoly, scircle) IS
+  'true if spherical circle does not overlap spherical polygon';
 
 
 CREATE OPERATOR !&& (
@@ -496,24 +496,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spoly, scircle ) IS
-  'true if spherical circle does not overlap spherical polygon'; 
+COMMENT ON OPERATOR !&& (spoly, scircle) IS
+  'true if spherical circle does not overlap spherical polygon';
 
 --
 -- polygon does not overlap circle
 --
 
-CREATE FUNCTION spoly_overlap_circle_com_neg(scircle,spoly)
+CREATE FUNCTION spoly_overlap_circle_com_neg(scircle, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_circle_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_circle_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_circle_com_neg(scircle,spoly) IS
-  'true if spherical circle does not overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_circle_com_neg(scircle, spoly) IS
+  'true if spherical circle does not overlap spherical polygon';
 
 
 CREATE OPERATOR !&& (
@@ -523,77 +523,77 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( scircle, spoly ) IS
-  'true if spherical circle does not overlap spherical polygon'; 
+COMMENT ON OPERATOR !&& (scircle, spoly) IS
+  'true if spherical circle does not overlap spherical polygon';
 
 
 --
 -- polygon contains line
 --
 
-CREATE FUNCTION spoly_contains_line(spoly,sline)
+CREATE FUNCTION spoly_contains_line(spoly, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_line'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_line'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_line(spoly,sline) IS
-  'true if spherical polygon contains spherical line '; 
+COMMENT ON FUNCTION spoly_contains_line(spoly, sline) IS
+  'true if spherical polygon contains spherical line';
 
 --
 -- line is contained by polygon
 --
 
-CREATE FUNCTION spoly_contains_line_com(sline,spoly)
+CREATE FUNCTION spoly_contains_line_com(sline, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_line_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_line_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_line_com(sline,spoly) IS
-  'true if spherical polygon contains spherical line '; 
+COMMENT ON FUNCTION spoly_contains_line_com(sline, spoly) IS
+  'true if spherical polygon contains spherical line';
 
 --
 -- polygon does not contain line
 --
 
-CREATE FUNCTION spoly_contains_line_neg(spoly,sline)
+CREATE FUNCTION spoly_contains_line_neg(spoly, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_line_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_line_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_line_neg(spoly,sline) IS
-  'true if spherical polygon does not contain spherical line '; 
+COMMENT ON FUNCTION spoly_contains_line_neg(spoly, sline) IS
+  'true if spherical polygon does not contain spherical line';
 
 --
 -- line is not contained by polygon
 --
 
-CREATE FUNCTION spoly_contains_line_com_neg(sline,spoly)
+CREATE FUNCTION spoly_contains_line_com_neg(sline, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_line_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_line_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_line_com_neg(sline,spoly) IS
-  'true if spherical polygon does not contain spherical line '; 
+COMMENT ON FUNCTION spoly_contains_line_com_neg(sline, spoly) IS
+  'true if spherical polygon does not contain spherical line';
 
 --
 -- line overlaps polygon
 --
 
-CREATE FUNCTION spoly_overlap_line(spoly,sline)
+CREATE FUNCTION spoly_overlap_line(spoly, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_line'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_line'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_overlap_line(spoly,sline) IS
-  'true if spherical line overlap spherical polygon '; 
+COMMENT ON FUNCTION spoly_overlap_line(spoly, sline) IS
+  'true if spherical line overlap spherical polygon';
 
 
 CREATE OPERATOR && (
@@ -603,24 +603,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spoly, sline ) IS
-  'true if spherical line overlap spherical polygon'; 
+COMMENT ON OPERATOR && (spoly, sline) IS
+  'true if spherical line overlap spherical polygon';
 
 --
 -- polygon overlaps line
 --
 
-CREATE FUNCTION spoly_overlap_line_com(sline,spoly)
+CREATE FUNCTION spoly_overlap_line_com(sline, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_line_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_line_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_line_com(sline,spoly) IS
-  'true if spherical line overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_line_com(sline, spoly) IS
+  'true if spherical line overlap spherical polygon';
 
 
 CREATE OPERATOR && (
@@ -630,25 +630,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sline, spoly ) IS
-  'true if spherical line overlap spherical polygon'; 
+COMMENT ON OPERATOR && (sline, spoly) IS
+  'true if spherical line overlap spherical polygon';
 
 
 --
 -- line does not overlap polygon
 --
 
-CREATE FUNCTION spoly_overlap_line_neg(spoly,sline)
+CREATE FUNCTION spoly_overlap_line_neg(spoly, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_line_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_line_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_line_neg(spoly,sline) IS
-  'true if spherical line does not overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_line_neg(spoly, sline) IS
+  'true if spherical line does not overlap spherical polygon';
 
 
 CREATE OPERATOR !&& (
@@ -658,24 +658,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spoly, sline ) IS
-  'true if spherical line does not overlap spherical polygon'; 
+COMMENT ON OPERATOR !&& (spoly, sline) IS
+  'true if spherical line does not overlap spherical polygon';
 
 --
 -- polygon does not overlap line
 --
 
-CREATE FUNCTION spoly_overlap_line_com_neg(sline,spoly)
+CREATE FUNCTION spoly_overlap_line_com_neg(sline, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_line_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_line_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_line_com_neg(sline,spoly) IS
-  'true if spherical line does not overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_line_com_neg(sline, spoly) IS
+  'true if spherical line does not overlap spherical polygon';
 
 
 CREATE OPERATOR !&& (
@@ -685,11 +685,11 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sline, spoly ) IS
-  'true if spherical line does not overlap spherical polygon'; 
+COMMENT ON OPERATOR !&& (sline, spoly) IS
+  'true if spherical line does not overlap spherical polygon';
 
 
 
@@ -697,14 +697,14 @@ COMMENT ON OPERATOR !&& ( sline, spoly ) IS
 -- polygon contains ellipse
 --
 
-CREATE FUNCTION spoly_contains_ellipse(spoly,sellipse)
+CREATE FUNCTION spoly_contains_ellipse(spoly, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_ellipse'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_ellipse'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_ellipse(spoly,sellipse) IS
-  'true if spherical polygon contains spherical ellipse '; 
+COMMENT ON FUNCTION spoly_contains_ellipse(spoly, sellipse) IS
+  'true if spherical polygon contains spherical ellipse';
 
 
 --
@@ -713,26 +713,26 @@ COMMENT ON FUNCTION spoly_contains_ellipse(spoly,sellipse) IS
 
 CREATE FUNCTION spoly_contains_ellipse_com(sellipse, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_ellipse_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_ellipse_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_ellipse_com(sellipse, spoly) IS
-  'true if spherical polygon contains spherical ellipse '; 
+  'true if spherical polygon contains spherical ellipse';
 
 
 --
 -- polygon does not contain ellipse
 --
 
-CREATE FUNCTION spoly_contains_ellipse_neg(spoly,sellipse)
+CREATE FUNCTION spoly_contains_ellipse_neg(spoly, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_ellipse_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_ellipse_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_ellipse_neg(spoly,sellipse) IS
-  'true if spherical polygon does not contain spherical ellipse '; 
+COMMENT ON FUNCTION spoly_contains_ellipse_neg(spoly, sellipse) IS
+  'true if spherical polygon does not contain spherical ellipse';
 
 
 --
@@ -741,26 +741,26 @@ COMMENT ON FUNCTION spoly_contains_ellipse_neg(spoly,sellipse) IS
 
 CREATE FUNCTION spoly_contains_ellipse_com_neg(sellipse, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_ellipse_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_ellipse_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION spoly_contains_ellipse_com_neg(sellipse, spoly) IS
-  'true if spherical polygon does not contain spherical ellipse '; 
+  'true if spherical polygon does not contain spherical ellipse';
 
 
 --
 -- ellipse contains polygon
 --
 
-CREATE FUNCTION sellipse_contains_polygon(sellipse,spoly)
+CREATE FUNCTION sellipse_contains_polygon(sellipse, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_poly'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_poly'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_polygon(sellipse,spoly) IS
-  'true if spherical ellipse contains spherical polygon '; 
+COMMENT ON FUNCTION sellipse_contains_polygon(sellipse, spoly) IS
+  'true if spherical ellipse contains spherical polygon';
 
 
 --
@@ -769,26 +769,26 @@ COMMENT ON FUNCTION sellipse_contains_polygon(sellipse,spoly) IS
 
 CREATE FUNCTION sellipse_contains_polygon_com(spoly, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_poly_com'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_poly_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sellipse_contains_polygon_com(spoly, sellipse) IS
-  'true if spherical ellipse contains spherical polygon '; 
+  'true if spherical ellipse contains spherical polygon';
 
 
 --
 -- ellipse does not contain polygon
 --
 
-CREATE FUNCTION sellipse_contains_polygon_neg(sellipse,spoly)
+CREATE FUNCTION sellipse_contains_polygon_neg(sellipse, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_poly_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_poly_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_polygon_neg(sellipse,spoly) IS
-  'true if spherical ellipse does not contain spherical polygon '; 
+COMMENT ON FUNCTION sellipse_contains_polygon_neg(sellipse, spoly) IS
+  'true if spherical ellipse does not contain spherical polygon';
 
 
 --
@@ -797,26 +797,26 @@ COMMENT ON FUNCTION sellipse_contains_polygon_neg(sellipse,spoly) IS
 
 CREATE FUNCTION sellipse_contains_polygon_com_neg(spoly, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_poly_com_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_poly_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sellipse_contains_polygon_com_neg(spoly, sellipse) IS
-  'true if spherical ellipse does not contain spherical polygon '; 
+  'true if spherical ellipse does not contain spherical polygon';
 
 
 --
 -- ellipse overlaps polygon
 --
 
-CREATE FUNCTION spoly_overlap_ellipse(spoly,sellipse)
+CREATE FUNCTION spoly_overlap_ellipse(spoly, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_ellipse'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_ellipse'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_overlap_ellipse(spoly,sellipse) IS
-  'true if spherical ellipse overlap spherical polygon '; 
+COMMENT ON FUNCTION spoly_overlap_ellipse(spoly, sellipse) IS
+  'true if spherical ellipse overlap spherical polygon';
 
 
 CREATE OPERATOR && (
@@ -826,24 +826,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spoly, sellipse ) IS
-  'true if spherical ellipse overlap spherical polygon'; 
+COMMENT ON OPERATOR && (spoly, sellipse) IS
+  'true if spherical ellipse overlap spherical polygon';
 
 --
 -- polygon overlaps ellipse
 --
 
-CREATE FUNCTION spoly_overlap_ellipse_com(sellipse,spoly)
+CREATE FUNCTION spoly_overlap_ellipse_com(sellipse, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_ellipse_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_ellipse_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_ellipse_com(sellipse,spoly) IS
-  'true if spherical ellipse overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_ellipse_com(sellipse, spoly) IS
+  'true if spherical ellipse overlap spherical polygon';
 
 
 CREATE OPERATOR && (
@@ -853,25 +853,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sellipse, spoly ) IS
-  'true if spherical ellipse overlap spherical polygon'; 
+COMMENT ON OPERATOR && (sellipse, spoly) IS
+  'true if spherical ellipse overlap spherical polygon';
 
 
 --
 -- ellipse does not overlap polygon
 --
 
-CREATE FUNCTION spoly_overlap_ellipse_neg(spoly,sellipse)
+CREATE FUNCTION spoly_overlap_ellipse_neg(spoly, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_ellipse_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_ellipse_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_ellipse_neg(spoly,sellipse) IS
-  'true if spherical ellipse does not overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_ellipse_neg(spoly, sellipse) IS
+  'true if spherical ellipse does not overlap spherical polygon';
 
 
 CREATE OPERATOR !&& (
@@ -881,24 +881,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spoly, sellipse ) IS
-  'true if spherical ellipse does not overlap spherical polygon'; 
+COMMENT ON OPERATOR !&& (spoly, sellipse) IS
+  'true if spherical ellipse does not overlap spherical polygon';
 
 --
 -- polygon does not overlap ellipse
 --
 
-CREATE FUNCTION spoly_overlap_ellipse_com_neg(sellipse,spoly)
+CREATE FUNCTION spoly_overlap_ellipse_com_neg(sellipse, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_ellipse_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_ellipse_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_ellipse_com_neg(sellipse,spoly) IS
-  'true if spherical ellipse does not overlap spherical polygon '; 
+COMMENT ON FUNCTION  spoly_overlap_ellipse_com_neg(sellipse, spoly) IS
+  'true if spherical ellipse does not overlap spherical polygon';
 
 
 CREATE OPERATOR !&& (
@@ -908,34 +908,34 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sellipse, spoly ) IS
-  'true if spherical ellipse does not overlap spherical polygon'; 
+COMMENT ON OPERATOR !&& (sellipse, spoly) IS
+  'true if spherical ellipse does not overlap spherical polygon';
 
 
 --
 -- Aggregate functions to add points to polygon
 --
 
-CREATE FUNCTION spoly_add_point_aggr ( spoly, spoint )
+CREATE FUNCTION spoly_add_point_aggr (spoly, spoint)
   RETURNS spoly
-  AS 'MODULE_PATHNAME' , 'spherepoly_add_point'
+  AS 'MODULE_PATHNAME', 'spherepoly_add_point'
   LANGUAGE 'c'
   IMMUTABLE;
 
-COMMENT ON FUNCTION  spoly_add_point_aggr ( spoly, spoint ) IS
-  'adds a spherical point to spherical polygon. Do not use it standalone!'; 
+COMMENT ON FUNCTION  spoly_add_point_aggr (spoly, spoint) IS
+  'adds a spherical point to spherical polygon. Do not use it standalone!';
 
-CREATE FUNCTION spoly_add_points_fin_aggr ( spoly )
+CREATE FUNCTION spoly_add_points_fin_aggr (spoly)
   RETURNS spoly
-  AS 'MODULE_PATHNAME' , 'spherepoly_add_points_finalize'
+  AS 'MODULE_PATHNAME', 'spherepoly_add_points_finalize'
   LANGUAGE 'c'
   IMMUTABLE STRICT ;
 
-COMMENT ON FUNCTION  spoly_add_points_fin_aggr ( spoly ) IS
-  'Finalize spherical point adding to spherical polygon. Do not use it standalone!'; 
+COMMENT ON FUNCTION  spoly_add_points_fin_aggr (spoly) IS
+  'Finalize spherical point adding to spherical polygon. Do not use it standalone!';
 
 CREATE AGGREGATE spoly (
     sfunc     = spoly_add_point_aggr,

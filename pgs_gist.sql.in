@@ -4,15 +4,15 @@
 CREATE FUNCTION spherekey_in(CSTRING)
    RETURNS spherekey
    AS 'MODULE_PATHNAME'
-   LANGUAGE 'c'     
-   WITH (isstrict,iscachable);
+   LANGUAGE 'c'
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION spherekey_out(spherekey)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME'
-   LANGUAGE 'c'   
-   WITH (isstrict,iscachable);
+   LANGUAGE 'c'
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE spherekey (
@@ -25,33 +25,33 @@ CREATE TYPE spherekey (
 CREATE FUNCTION pointkey_in(CSTRING)
    RETURNS pointkey
    AS 'MODULE_PATHNAME', 'pointkey_in'
-   LANGUAGE 'c'     
-   WITH (isstrict,iscachable);
+   LANGUAGE 'c'
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION pointkey_out(pointkey)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'pointkey_out'
-   LANGUAGE 'c'   
-   WITH (isstrict,iscachable);
+   LANGUAGE 'c'
+   WITH (isstrict, iscachable);
 
 CREATE FUNCTION pointkey_volume(pointkey)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'pointkey_volume'
-   LANGUAGE 'c'   
-   WITH (isstrict,iscachable);
+   LANGUAGE 'c'
+   WITH (isstrict, iscachable);
 
 CREATE FUNCTION pointkey_area(pointkey)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'pointkey_area'
-   LANGUAGE 'c'   
-   WITH (isstrict,iscachable);
+   LANGUAGE 'c'
+   WITH (isstrict, iscachable);
 
 CREATE FUNCTION pointkey_perimeter(pointkey)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'pointkey_perimeter'
-   LANGUAGE 'c'   
-   WITH (isstrict,iscachable);
+   LANGUAGE 'c'
+   WITH (isstrict, iscachable);
 
 CREATE TYPE pointkey (
    input = pointkey_in,
@@ -65,27 +65,27 @@ CREATE TYPE pointkey (
 
 CREATE FUNCTION g_spherekey_decompress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spherekey_decompress'
-   LANGUAGE 'c';   
+   AS 'MODULE_PATHNAME', 'g_spherekey_decompress'
+   LANGUAGE 'c';
 
 CREATE FUNCTION g_spherekey_union(bytea, internal)
    RETURNS spherekey
-   AS 'MODULE_PATHNAME' , 'g_spherekey_union'
-   LANGUAGE 'c';   
+   AS 'MODULE_PATHNAME', 'g_spherekey_union'
+   LANGUAGE 'c';
 
-CREATE FUNCTION g_spherekey_penalty (internal,internal,internal)
+CREATE FUNCTION g_spherekey_penalty (internal, internal, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spherekey_penalty'
+   AS 'MODULE_PATHNAME', 'g_spherekey_penalty'
    LANGUAGE 'c' with (isstrict);
 
 CREATE FUNCTION g_spherekey_picksplit(internal, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spherekey_picksplit'
+   AS 'MODULE_PATHNAME', 'g_spherekey_picksplit'
    LANGUAGE 'c';
 
-CREATE FUNCTION g_spherekey_same (spherekey,spherekey,internal)
+CREATE FUNCTION g_spherekey_same (spherekey, spherekey, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spherekey_same'
+   AS 'MODULE_PATHNAME', 'g_spherekey_same'
    LANGUAGE 'c';
 
 
@@ -94,14 +94,14 @@ CREATE FUNCTION g_spherekey_same (spherekey,spherekey,internal)
 
 CREATE FUNCTION g_spoint_compress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spoint_compress'
-   LANGUAGE 'c';   
+   AS 'MODULE_PATHNAME', 'g_spoint_compress'
+   LANGUAGE 'c';
 
 
 CREATE FUNCTION g_spoint_consistent(internal, internal, int4, oid, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spoint_consistent'
-   LANGUAGE 'c';   
+   AS 'MODULE_PATHNAME', 'g_spoint_consistent'
+   LANGUAGE 'c';
 
 
 CREATE OPERATOR CLASS spoint
@@ -132,14 +132,14 @@ CREATE OPERATOR CLASS spoint
 
 CREATE FUNCTION g_scircle_compress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_scircle_compress'
-   LANGUAGE 'c';   
+   AS 'MODULE_PATHNAME', 'g_scircle_compress'
+   LANGUAGE 'c';
 
 
 CREATE FUNCTION g_scircle_consistent(internal, internal, int4, oid, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_scircle_consistent'
-   LANGUAGE 'c';   
+   AS 'MODULE_PATHNAME', 'g_scircle_consistent'
+   LANGUAGE 'c';
 
 CREATE OPERATOR CLASS scircle
    DEFAULT FOR TYPE scircle USING gist AS
@@ -187,12 +187,12 @@ CREATE OPERATOR CLASS scircle
 
 CREATE FUNCTION g_sline_compress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_sline_compress'
-   LANGUAGE 'c';   
+   AS 'MODULE_PATHNAME', 'g_sline_compress'
+   LANGUAGE 'c';
 
 CREATE FUNCTION g_sline_consistent(internal, internal, int4, oid, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_sline_consistent'
+   AS 'MODULE_PATHNAME', 'g_sline_consistent'
    LANGUAGE 'c';
 
 
@@ -226,17 +226,17 @@ CREATE OPERATOR CLASS sline
    STORAGE   spherekey;
 
  -- create the operator class for spherical ellipse
- 
+
 CREATE FUNCTION g_sellipse_compress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_sellipse_compress'
-   LANGUAGE 'c';   
- 
+   AS 'MODULE_PATHNAME', 'g_sellipse_compress'
+   LANGUAGE 'c';
+
  CREATE FUNCTION g_sellipse_consistent(internal, internal, int4, oid, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_sellipse_consistent'
+   AS 'MODULE_PATHNAME', 'g_sellipse_consistent'
    LANGUAGE 'c';
- 
+
 CREATE OPERATOR CLASS sellipse
    DEFAULT FOR TYPE sellipse USING gist AS
    OPERATOR   1 =  (sellipse, sellipse),
@@ -278,18 +278,18 @@ CREATE OPERATOR CLASS sellipse
    STORAGE   spherekey;
 
  -- create the operator class for spherical polygon
- 
+
 CREATE FUNCTION g_spoly_compress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spoly_compress'
-   LANGUAGE 'c';   
- 
+   AS 'MODULE_PATHNAME', 'g_spoly_compress'
+   LANGUAGE 'c';
+
 CREATE FUNCTION g_spoly_consistent(internal, internal, int4, oid, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spoly_consistent'
+   AS 'MODULE_PATHNAME', 'g_spoly_consistent'
    LANGUAGE 'c';
- 
- 
+
+
 CREATE OPERATOR CLASS spoly
    DEFAULT FOR TYPE spoly USING gist AS
    OPERATOR   1 =  (spoly, spoly),
@@ -332,18 +332,18 @@ CREATE OPERATOR CLASS spoly
 
 
  -- create the operator class for spherical path
- 
+
 CREATE FUNCTION g_spath_compress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spath_compress'
-   LANGUAGE 'c';   
- 
+   AS 'MODULE_PATHNAME', 'g_spath_compress'
+   LANGUAGE 'c';
+
 CREATE FUNCTION g_spath_consistent(internal, internal, int4, oid, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_spath_consistent'
+   AS 'MODULE_PATHNAME', 'g_spath_consistent'
    LANGUAGE 'c';
- 
- 
+
+
 CREATE OPERATOR CLASS spath
    DEFAULT FOR TYPE spath USING gist AS
    OPERATOR   1 =  (spath, spath),
@@ -374,17 +374,17 @@ CREATE OPERATOR CLASS spath
 
 
  -- create the operator class for spherical box
- 
+
 CREATE FUNCTION g_sbox_compress(internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_sbox_compress'
+   AS 'MODULE_PATHNAME', 'g_sbox_compress'
    LANGUAGE 'c';
- 
+
 CREATE FUNCTION g_sbox_consistent(internal, internal, int4, oid, internal)
    RETURNS internal
-   AS 'MODULE_PATHNAME' , 'g_sbox_consistent'
+   AS 'MODULE_PATHNAME', 'g_sbox_consistent'
    LANGUAGE 'c';
- 
+
 CREATE OPERATOR CLASS sbox
    DEFAULT FOR TYPE sbox USING gist AS
    OPERATOR   1 =  (sbox, sbox),

@@ -4,16 +4,16 @@
 
 CREATE FUNCTION spoint_in(CSTRING)
    RETURNS spoint
-   AS 'MODULE_PATHNAME' , 'spherepoint_in'
+   AS 'MODULE_PATHNAME', 'spherepoint_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION spoint_out(spoint)
    RETURNS CSTRING
-   AS 'MODULE_PATHNAME' , 'spherepoint_out'
+   AS 'MODULE_PATHNAME', 'spherepoint_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE spoint (
@@ -29,14 +29,14 @@ CREATE FUNCTION strans_in(CSTRING)
    RETURNS strans
    AS 'MODULE_PATHNAME', 'spheretrans_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION strans_out(strans)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'spheretrans_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE strans (
@@ -52,14 +52,14 @@ CREATE FUNCTION scircle_in(CSTRING)
    RETURNS scircle
    AS 'MODULE_PATHNAME', 'spherecircle_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION scircle_out(scircle)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'spherecircle_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE scircle (
@@ -75,14 +75,14 @@ CREATE FUNCTION sline_in(CSTRING)
    RETURNS sline
    AS 'MODULE_PATHNAME', 'sphereline_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION sline_out(sline)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'sphereline_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE sline (
@@ -98,14 +98,14 @@ CREATE FUNCTION sellipse_in(CSTRING)
    RETURNS sellipse
    AS 'MODULE_PATHNAME', 'sphereellipse_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION sellipse_out(sellipse)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'sphereellipse_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE sellipse (
@@ -123,14 +123,14 @@ CREATE FUNCTION spoly_in(CSTRING)
    RETURNS spoly
    AS 'MODULE_PATHNAME', 'spherepoly_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION spoly_out(spoly)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'spherepoly_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE spoly (
@@ -149,14 +149,14 @@ CREATE FUNCTION spath_in(CSTRING)
    RETURNS spath
    AS 'MODULE_PATHNAME', 'spherepath_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION spath_out(spath)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'spherepath_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE spath (
@@ -173,16 +173,16 @@ CREATE TYPE spath (
 
 CREATE FUNCTION sbox_in(CSTRING)
    RETURNS sbox
-   AS 'MODULE_PATHNAME' , 'spherebox_in'
+   AS 'MODULE_PATHNAME', 'spherebox_in'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE FUNCTION sbox_out(sbox)
    RETURNS CSTRING
-   AS 'MODULE_PATHNAME' , 'spherebox_out'
+   AS 'MODULE_PATHNAME', 'spherebox_out'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
 
 CREATE TYPE sbox (
