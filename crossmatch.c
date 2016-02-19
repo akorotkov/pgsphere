@@ -34,6 +34,9 @@
 #if PG_VERSION_NUM >= 90300
 #include "access/htup_details.h"
 #endif
+#if PG_VERSION_NUM >= 90600
+#include "catalog/pg_am.h"
+#endif
 #include "catalog/namespace.h"
 #include "funcapi.h"
 #include "nodes/pg_list.h"
@@ -106,7 +109,11 @@ PG_FUNCTION_INFO_V1(crossmatch);
 static Relation
 checkOpenedRelation(Relation r, Oid PgAmOid)
 {
+#if PG_VERSION_NUM >= 90600
+	if (r->rd_amroutine == NULL)
+#else
 	if (r->rd_am == NULL)
+#endif
 		elog(ERROR, "Relation %s.%s is not an index",
 			 get_namespace_name(RelationGetNamespace(r)),
 			 RelationGetRelationName(r));
