@@ -11,10 +11,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( scircle, scircle ) IS 'true if spherical circle (LHS) contains spherical circle (RHS)'; 
+COMMENT ON OPERATOR ~ (scircle, scircle) IS 'true if spherical circle (LHS) contains spherical circle (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = scircle,
@@ -23,10 +23,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( scircle, scircle ) IS 'true if spherical circle (LHS) is contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR @ (scircle, scircle) IS 'true if spherical circle (LHS) is contained by spherical circle (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = scircle,
@@ -35,10 +35,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( scircle, scircle ) IS 'true if spherical circle (LHS) does not contain spherical circle (RHS)'; 
+COMMENT ON OPERATOR !~ (scircle, scircle) IS 'true if spherical circle (LHS) does not contain spherical circle (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = scircle,
@@ -47,10 +47,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( scircle, scircle ) IS 'true if spherical circle (LHS) is not contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR !@ (scircle, scircle) IS 'true if spherical circle (LHS) is not contained by spherical circle (RHS)';
 
 --- spoint vs scircle
 
@@ -61,10 +61,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( scircle, spoint ) IS 'true if spherical circle (LHS) contains spherical point (RHS)'; 
+COMMENT ON OPERATOR ~ (scircle, spoint) IS 'true if spherical circle (LHS) contains spherical point (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoint,
@@ -73,10 +73,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoint, scircle ) IS 'true if spherical point (LHS) is contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR @ (spoint, scircle) IS 'true if spherical point (LHS) is contained by spherical circle (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = scircle,
@@ -85,10 +85,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( scircle, spoint ) IS 'true if spherical circle (LHS) does not contain spherical point (RHS)'; 
+COMMENT ON OPERATOR !~ (scircle, spoint) IS 'true if spherical circle (LHS) does not contain spherical point (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoint,
@@ -97,13 +97,13 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoint, scircle ) IS 'true if spherical point (LHS) is not contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR !@ (spoint, scircle) IS 'true if spherical point (LHS) is not contained by spherical circle (RHS)';
 
 --- spoly vs spoly
-  
+
 CREATE OPERATOR ~ (
    LEFTARG    = spoly,
    RIGHTARG   = spoly,
@@ -111,10 +111,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spoly, spoly ) IS 'true if spherical polygon (LHS) contains spherical polygon (RHS)'; 
+COMMENT ON OPERATOR ~ (spoly, spoly) IS 'true if spherical polygon (LHS) contains spherical polygon (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoly,
@@ -123,10 +123,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoly, spoly ) IS 'true if spherical polygon (LHS) is contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR @ (spoly, spoly) IS 'true if spherical polygon (LHS) is contained by spherical polygon (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spoly,
@@ -135,10 +135,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spoly, spoly ) IS 'true if spherical polygon (LHS) does not contain spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !~ (spoly, spoly) IS 'true if spherical polygon (LHS) does not contain spherical polygon (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoly,
@@ -147,10 +147,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoly, spoly ) IS 'true if spherical polygon (LHS) is not contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !@ (spoly, spoly) IS 'true if spherical polygon (LHS) is not contained by spherical polygon (RHS)';
 
 --  spoly vs spoint
 
@@ -161,11 +161,11 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spoly, spoint ) IS 'true if spherical polygon (LHS) contains spherical point (RHS)'; 
-  
+COMMENT ON OPERATOR ~ (spoly, spoint) IS 'true if spherical polygon (LHS) contains spherical point (RHS)';
+
 CREATE OPERATOR @ (
    LEFTARG    = spoint,
    RIGHTARG   = spoly,
@@ -173,10 +173,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoint, spoly ) IS 'true if spherical point (LHS) is contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR @ (spoint, spoly) IS 'true if spherical point (LHS) is contained by spherical polygon (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spoly,
@@ -185,10 +185,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spoly, spoint ) IS 'true if spherical polygon (LHS) does not contain spherical point (RHS)'; 
+COMMENT ON OPERATOR !~ (spoly, spoint) IS 'true if spherical polygon (LHS) does not contain spherical point (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoint,
@@ -197,10 +197,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoint, spoly ) IS 'true if spherical point (LHS) is not contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !@ (spoint, spoly) IS 'true if spherical point (LHS) is not contained by spherical polygon (RHS)';
 
 
 --- scircle vs spoly
@@ -212,10 +212,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( scircle, spoly ) IS 'true if spherical circle (LHS) contains spherical polygon (RHS)'; 
+COMMENT ON OPERATOR ~ (scircle, spoly) IS 'true if spherical circle (LHS) contains spherical polygon (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoly,
@@ -224,10 +224,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoly, scircle ) IS 'true if spherical polygon (LHS) is contained by spherical circle (LHS)'; 
+COMMENT ON OPERATOR @ (spoly, scircle) IS 'true if spherical polygon (LHS) is contained by spherical circle (LHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = scircle,
@@ -236,10 +236,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( scircle, spoly ) IS 'true if spherical circle (LHS) does not contain spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !~ (scircle, spoly) IS 'true if spherical circle (LHS) does not contain spherical polygon (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoly,
@@ -248,10 +248,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoly, scircle ) IS 'true if spherical polygon (LHS) is not contained spherical circle (RHS)'; 
+COMMENT ON OPERATOR !@ (spoly, scircle) IS 'true if spherical polygon (LHS) is not contained spherical circle (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = spoly,
@@ -260,10 +260,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spoly, scircle ) IS 'true if spherical polygon (LHS) contains spherical circle (RHS)'; 
+COMMENT ON OPERATOR ~ (spoly, scircle) IS 'true if spherical polygon (LHS) contains spherical circle (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = scircle,
@@ -272,10 +272,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( scircle, spoly ) IS 'true if spherical circle (LHS) is contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR @ (scircle, spoly) IS 'true if spherical circle (LHS) is contained by spherical polygon (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spoly,
@@ -284,10 +284,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spoly, scircle ) IS 'true if spherical polygon (LHS) does not contain spherical circle (RHS)'; 
+COMMENT ON OPERATOR !~ (spoly, scircle) IS 'true if spherical polygon (LHS) does not contain spherical circle (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = scircle,
@@ -296,10 +296,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( scircle, spoly ) IS 'true if spherical circle (LHS) is not contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !@ (scircle, spoly) IS 'true if spherical circle (LHS) is not contained by spherical polygon (RHS)';
 
 
 --- sbox vs sbox
@@ -311,10 +311,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sbox, sbox ) IS 'true if spherical box (LHS) contains spherical box (RHS)'; 
+COMMENT ON OPERATOR ~ (sbox, sbox) IS 'true if spherical box (LHS) contains spherical box (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sbox,
@@ -323,10 +323,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sbox, sbox ) IS 'true if spherical box (LHS) is contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR @ (sbox, sbox) IS 'true if spherical box (LHS) is contained by spherical box (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sbox,
@@ -335,10 +335,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sbox, sbox ) IS 'true if spherical box (LHS) does not contain spherical box (RHS)'; 
+COMMENT ON OPERATOR !~ (sbox, sbox) IS 'true if spherical box (LHS) does not contain spherical box (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sbox,
@@ -347,10 +347,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sbox, sbox ) IS 'true if spherical box (LHS) is not contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR !@ (sbox, sbox) IS 'true if spherical box (LHS) is not contained by spherical box (RHS)';
 
 --- sbox vs spoint
 
@@ -361,10 +361,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sbox, spoint ) IS 'true if spherical box (LHS) contains spherical point (RHS)'; 
+COMMENT ON OPERATOR ~ (sbox, spoint) IS 'true if spherical box (LHS) contains spherical point (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoint,
@@ -373,10 +373,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoint, sbox ) IS 'true if spherical point (LHS) is contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR @ (spoint, sbox) IS 'true if spherical point (LHS) is contained by spherical box (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sbox,
@@ -385,10 +385,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sbox, spoint ) IS 'true if spherical box (LHS) does not contain spherical point (RHS)'; 
+COMMENT ON OPERATOR !~ (sbox, spoint) IS 'true if spherical box (LHS) does not contain spherical point (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoint,
@@ -397,10 +397,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoint, sbox ) IS 'true if spherical point (LHS) is not contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR !@ (spoint, sbox) IS 'true if spherical point (LHS) is not contained by spherical box (RHS)';
 
 --- scircle vs sbox
 
@@ -411,10 +411,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( scircle, sbox ) IS 'true if spherical circle (LHS) contains spherical box (RHS)'; 
+COMMENT ON OPERATOR ~ (scircle, sbox) IS 'true if spherical circle (LHS) contains spherical box (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sbox,
@@ -423,10 +423,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sbox, scircle ) IS 'true if spherical box (LHS) is contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR @ (sbox, scircle) IS 'true if spherical box (LHS) is contained by spherical circle (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = scircle,
@@ -435,10 +435,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( scircle, sbox ) IS 'true if spherical circle (LHS) does not contain spherical box (RHS)'; 
+COMMENT ON OPERATOR !~ (scircle, sbox) IS 'true if spherical circle (LHS) does not contain spherical box (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sbox,
@@ -447,10 +447,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sbox, scircle ) IS 'true if spherical box (LHS) is not contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR !@ (sbox, scircle) IS 'true if spherical box (LHS) is not contained by spherical circle (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sbox,
@@ -459,10 +459,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sbox, scircle ) IS 'true if spherical box (LHS) contains spherical circle (RHS)'; 
+COMMENT ON OPERATOR ~ (sbox, scircle) IS 'true if spherical box (LHS) contains spherical circle (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = scircle,
@@ -471,10 +471,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( scircle, sbox ) IS 'true if spherical circle (LHS) contains spherical box (RHS)'; 
+COMMENT ON OPERATOR @ (scircle, sbox) IS 'true if spherical circle (LHS) contains spherical box (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sbox,
@@ -483,10 +483,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sbox, scircle ) IS 'true if spherical box (LHS) does not contain spherical circle (RHS)'; 
+COMMENT ON OPERATOR !~ (sbox, scircle) IS 'true if spherical box (LHS) does not contain spherical circle (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = scircle,
@@ -495,10 +495,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( scircle, sbox ) IS 'true if spherical circle (LHS) is not contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR !@ (scircle, sbox) IS 'true if spherical circle (LHS) is not contained by spherical box (RHS)';
 
 
 --- sbox vs spoly
@@ -510,10 +510,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spoly, sbox ) IS 'true if spherical polygon (LHS) contains spherical box (RHS)'; 
+COMMENT ON OPERATOR ~ (spoly, sbox) IS 'true if spherical polygon (LHS) contains spherical box (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sbox,
@@ -522,10 +522,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sbox, spoly ) IS 'true if spherical box (LHS) is contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR @ (sbox, spoly) IS 'true if spherical box (LHS) is contained by spherical polygon (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spoly,
@@ -534,10 +534,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spoly, sbox ) IS 'true if spherical polygon (LHS) does not contain spherical box (RHS)'; 
+COMMENT ON OPERATOR !~ (spoly, sbox) IS 'true if spherical polygon (LHS) does not contain spherical box (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sbox,
@@ -546,10 +546,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sbox, spoly ) IS 'true if spherical box (LHS) is not contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !@ (sbox, spoly) IS 'true if spherical box (LHS) is not contained by spherical polygon (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sbox,
@@ -558,10 +558,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sbox, spoly ) IS 'true if spherical box (LHS) contains spherical polygon (RHS)'; 
+COMMENT ON OPERATOR ~ (sbox, spoly) IS 'true if spherical box (LHS) contains spherical polygon (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoly,
@@ -570,10 +570,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoly, sbox ) IS 'true if spherical polygon (LHS) is contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR @ (spoly, sbox) IS 'true if spherical polygon (LHS) is contained by spherical box (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sbox,
@@ -582,10 +582,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sbox, spoly ) IS 'true if spherical box (LHS) does not contain spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !~ (sbox, spoly) IS 'true if spherical box (LHS) does not contain spherical polygon (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoly,
@@ -594,10 +594,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoly, sbox ) IS 'true if spherical polygon (LHS) is not contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR !@ (spoly, sbox) IS 'true if spherical polygon (LHS) is not contained by spherical box (RHS)';
 
 -- new stuff --
 
@@ -608,10 +608,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoint, sline ) IS 'true if spherical point (LHS) is contained by spherical line (RHS)'; 
+COMMENT ON OPERATOR @ (spoint, sline) IS 'true if spherical point (LHS) is contained by spherical line (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sline,
@@ -620,10 +620,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sline, spoint ) IS 'true if spherical line (LHS) contains the spherical point (RHS)'; 
+COMMENT ON OPERATOR ~ (sline, spoint) IS 'true if spherical line (LHS) contains the spherical point (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sline,
@@ -632,11 +632,11 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sline, spoint ) IS 'true if spherical line (LHS) does not contain spherical point (RHS)'; 
-  
+COMMENT ON OPERATOR !~ (sline, spoint) IS 'true if spherical line (LHS) does not contain spherical point (RHS)';
+
 CREATE OPERATOR !@ (
    LEFTARG    = spoint,
    RIGHTARG   = sline,
@@ -644,10 +644,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoint, sline ) IS 'true if spherical point (LHS) is not contained by spherical line (RHS)'; 
+COMMENT ON OPERATOR !@ (spoint, sline) IS 'true if spherical point (LHS) is not contained by spherical line (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = scircle,
@@ -656,10 +656,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( scircle, sline ) IS 'true if spherical circle (LHS) contains spherical line (RHS)'; 
+COMMENT ON OPERATOR ~ (scircle, sline) IS 'true if spherical circle (LHS) contains spherical line (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sline,
@@ -668,10 +668,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sline, scircle ) IS 'true if spherical line (LHS) is contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR @ (sline, scircle) IS 'true if spherical line (LHS) is contained by spherical circle (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = scircle,
@@ -680,10 +680,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( scircle, sline ) IS 'true if spherical circle (LHS) does not contain spherical line (RHS)'; 
+COMMENT ON OPERATOR !~ (scircle, sline) IS 'true if spherical circle (LHS) does not contain spherical line (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sline,
@@ -692,10 +692,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sline, scircle ) IS 'true if spherical line (LHS) is not contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR !@ (sline, scircle) IS 'true if spherical line (LHS) is not contained by spherical circle (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = spoly,
@@ -704,10 +704,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spoly, sline ) IS 'true if spherical polygon (LHS) contains spherical line (RHS)'; 
+COMMENT ON OPERATOR ~ (spoly, sline) IS 'true if spherical polygon (LHS) contains spherical line (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sline,
@@ -716,10 +716,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sline, spoly ) IS 'true if spherical line (LHS) is contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR @ (sline, spoly) IS 'true if spherical line (LHS) is contained by spherical polygon (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spoly,
@@ -728,10 +728,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spoly, sline ) IS 'true if spherical polygon (LHS) does not contain spherical line (RHS)'; 
+COMMENT ON OPERATOR !~ (spoly, sline) IS 'true if spherical polygon (LHS) does not contain spherical line (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sline,
@@ -740,10 +740,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sline, spoly ) IS 'true if spherical line (LHS) is not contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !@ (sline, spoly) IS 'true if spherical line (LHS) is not contained by spherical polygon (RHS)';
 
 
 
@@ -754,10 +754,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sellipse, sellipse ) IS 'true if spherical ellipse (LHS) contains spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR ~ (sellipse, sellipse) IS 'true if spherical ellipse (LHS) contains spherical ellipse (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sellipse,
@@ -766,10 +766,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sellipse, sellipse ) IS 'true if spherical ellipse (LHS) is contained by spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR @ (sellipse, sellipse) IS 'true if spherical ellipse (LHS) is contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sellipse,
@@ -778,10 +778,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sellipse, sellipse ) IS 'true if spherical ellipse (LHS) does not contain spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR !~ (sellipse, sellipse) IS 'true if spherical ellipse (LHS) does not contain spherical ellipse (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sellipse,
@@ -790,10 +790,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sellipse, sellipse ) IS 'true if spherical ellipse (LHS) is not contained by spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR !@ (sellipse, sellipse) IS 'true if spherical ellipse (LHS) is not contained by spherical ellipse (RHS)';
 
 
 CREATE OPERATOR ~ (
@@ -803,10 +803,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sellipse, spoint ) IS 'true if spherical ellipse (LHS) contains spherical point (RHS)'; 
+COMMENT ON OPERATOR ~ (sellipse, spoint) IS 'true if spherical ellipse (LHS) contains spherical point (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoint,
@@ -815,10 +815,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoint, sellipse ) IS 'true if spherical point (LHS) is contained by spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR @ (spoint, sellipse) IS 'true if spherical point (LHS) is contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sellipse,
@@ -827,10 +827,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sellipse, spoint ) IS 'true if spherical ellipse (LHS) does not contain spherical point (RHS)'; 
+COMMENT ON OPERATOR !~ (sellipse, spoint) IS 'true if spherical ellipse (LHS) does not contain spherical point (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoint,
@@ -839,10 +839,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoint, sellipse ) IS 'true if spherical point (LHS) is not contained by spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR !@ (spoint, sellipse) IS 'true if spherical point (LHS) is not contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sbox,
@@ -851,10 +851,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sbox, sellipse ) IS 'true if spherical box (LHS) contains spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR ~ (sbox, sellipse) IS 'true if spherical box (LHS) contains spherical ellipse (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sellipse,
@@ -863,11 +863,11 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sellipse, sbox ) IS
-  'true if spherical ellipse (LHS) is contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR @ (sellipse, sbox) IS
+  'true if spherical ellipse (LHS) is contained by spherical box (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sbox,
@@ -876,10 +876,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sbox, sellipse ) IS 'true if spherical box (LHS) does not contain spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR !~ (sbox, sellipse) IS 'true if spherical box (LHS) does not contain spherical ellipse (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sellipse,
@@ -888,10 +888,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sellipse, sbox ) IS 'true if spherical ellipse (LHS) is not contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR !@ (sellipse, sbox) IS 'true if spherical ellipse (LHS) is not contained by spherical box (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sellipse,
@@ -900,10 +900,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sellipse, sbox ) IS 'true if spherical ellipse (LHS) contains spherical box (RHS)'; 
+COMMENT ON OPERATOR ~ (sellipse, sbox) IS 'true if spherical ellipse (LHS) contains spherical box (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sbox,
@@ -912,10 +912,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sbox, sellipse ) IS 'true if spherical box (LHS) is contained by spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR @ (sbox, sellipse) IS 'true if spherical box (LHS) is contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sellipse,
@@ -924,10 +924,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sellipse, sbox ) IS 'true if spherical ellipse (LHS) does not contain spherical box (RHS)'; 
+COMMENT ON OPERATOR !~ (sellipse, sbox) IS 'true if spherical ellipse (LHS) does not contain spherical box (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sbox,
@@ -936,34 +936,34 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
-);
-
-COMMENT ON OPERATOR !@ ( sbox, sellipse ) IS 'true if spherical box (LHS) is not containe by spherical ellipse (RHS)'; 
-
-CREATE OPERATOR ~ (    
-   LEFTARG    = sellipse,  
-   RIGHTARG   = scircle,
-   PROCEDURE  = sellipse_contains_circle,
-   COMMUTATOR = '@',       
-   NEGATOR    = '!~',     
-   RESTRICT   = contsel,   
    JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sellipse, scircle ) IS 'true if spherical ellipse (LHS) contains spherical circle (RHS)';
+COMMENT ON OPERATOR !@ (sbox, sellipse) IS 'true if spherical box (LHS) is not containe by spherical ellipse (RHS)';
+
+CREATE OPERATOR ~ (
+   LEFTARG    = sellipse,
+   RIGHTARG   = scircle,
+   PROCEDURE  = sellipse_contains_circle,
+   COMMUTATOR = '@',
+   NEGATOR    = '!~',
+   RESTRICT   = contsel,
+   JOIN       = contjoinsel
+);
+
+COMMENT ON OPERATOR ~ (sellipse, scircle) IS 'true if spherical ellipse (LHS) contains spherical circle (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = scircle,
-   RIGHTARG   = sellipse,  
+   RIGHTARG   = sellipse,
    PROCEDURE  = sellipse_contains_circle_com,
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
-  
-COMMENT ON OPERATOR @ ( scircle, sellipse ) IS 'true if spherical circle (LHS) is contained by spherical ellipse (RHS)';
+
+COMMENT ON OPERATOR @ (scircle, sellipse) IS 'true if spherical circle (LHS) is contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sellipse,
@@ -974,32 +974,32 @@ CREATE OPERATOR !~ (
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
-  
-COMMENT ON OPERATOR !~ ( sellipse, scircle ) IS 'true if spherical ellipse (LHS) does not contain spherical circle (RHS)';
+
+COMMENT ON OPERATOR !~ (sellipse, scircle) IS 'true if spherical ellipse (LHS) does not contain spherical circle (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = scircle,
-   RIGHTARG   = sellipse,  
+   RIGHTARG   = sellipse,
    PROCEDURE  = sellipse_contains_circle_com_neg,
    COMMUTATOR = '!~',
-   NEGATOR    = '@',  
+   NEGATOR    = '@',
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
-  
-COMMENT ON OPERATOR !@ ( scircle, sellipse ) IS 'true if spherical circle (LHS) is not contained by spherical ellipse (RHS)';
+
+COMMENT ON OPERATOR !@ (scircle, sellipse) IS 'true if spherical circle (LHS) is not contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = scircle,
-   RIGHTARG   = sellipse,  
+   RIGHTARG   = sellipse,
    PROCEDURE  = scircle_contains_ellipse,
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
-  
-COMMENT ON OPERATOR ~ ( scircle, sellipse ) IS 'true if spherical circle (LHS) contains spherical ellipse (RHS)';
+
+COMMENT ON OPERATOR ~ (scircle, sellipse) IS 'true if spherical circle (LHS) contains spherical ellipse (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sellipse,
@@ -1010,8 +1010,8 @@ CREATE OPERATOR @ (
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
-  
-COMMENT ON OPERATOR @ ( sellipse, scircle ) IS 'true if spherical ellipse (LHS) is contained by spherical circle (RHS)';
+
+COMMENT ON OPERATOR @ (sellipse, scircle) IS 'true if spherical ellipse (LHS) is contained by spherical circle (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = scircle,
@@ -1022,8 +1022,8 @@ CREATE OPERATOR !~ (
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
-  
-COMMENT ON OPERATOR !~ ( scircle, sellipse ) IS 'true if spherical circle (LHS) does not contain spherical ellipse (RHS)';
+
+COMMENT ON OPERATOR !~ (scircle, sellipse) IS 'true if spherical circle (LHS) does not contain spherical ellipse (RHS)';
 
 
 CREATE OPERATOR !@ (
@@ -1031,12 +1031,12 @@ CREATE OPERATOR !@ (
    RIGHTARG   = scircle,
    PROCEDURE  = scircle_contains_ellipse_com_neg,
    COMMUTATOR = '!~',
-   NEGATOR    = '@',  
+   NEGATOR    = '@',
    RESTRICT   = contsel,
    JOIN       = contjoinsel
 );
-  
-COMMENT ON OPERATOR !@ ( sellipse, scircle ) IS 'true if spherical ellipse (LHS) is not contained by spherical circle (RHS)';
+
+COMMENT ON OPERATOR !@ (sellipse, scircle) IS 'true if spherical ellipse (LHS) is not contained by spherical circle (RHS)';
 
 
 CREATE OPERATOR ~ (
@@ -1046,10 +1046,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sellipse, sline ) IS 'true if spherical ellipse (LHS) contains spherical line (RHS)'; 
+COMMENT ON OPERATOR ~ (sellipse, sline) IS 'true if spherical ellipse (LHS) contains spherical line (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sline,
@@ -1058,10 +1058,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sline, sellipse ) IS 'true if spherical line is contained by spherical ellipse'; 
+COMMENT ON OPERATOR @ (sline, sellipse) IS 'true if spherical line is contained by spherical ellipse';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sellipse,
@@ -1070,11 +1070,11 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sellipse, sline ) IS 'true if spherical ellipse (LHS) does not contain spherical line (RHS)'; 
-  
+COMMENT ON OPERATOR !~ (sellipse, sline) IS 'true if spherical ellipse (LHS) does not contain spherical line (RHS)';
+
 CREATE OPERATOR !@ (
    LEFTARG    = sline,
    RIGHTARG   = sellipse,
@@ -1082,10 +1082,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sline, sellipse ) IS 'true if spherical line (LHS) is not contained by spherical line (RHS)'; 
+COMMENT ON OPERATOR !@ (sline, sellipse) IS 'true if spherical line (LHS) is not contained by spherical line (RHS)';
 
 
 CREATE OPERATOR ~ (
@@ -1095,10 +1095,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spoly, sellipse ) IS 'true if spherical polygon (LHS) contains spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR ~ (spoly, sellipse) IS 'true if spherical polygon (LHS) contains spherical ellipse (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sellipse,
@@ -1107,10 +1107,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sellipse, spoly ) IS 'true if spherical ellipse (LHS) is contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR @ (sellipse, spoly) IS 'true if spherical ellipse (LHS) is contained by spherical polygon (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spoly,
@@ -1119,10 +1119,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!>@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spoly, sellipse ) IS 'true if spherical polygon (LHS) does not contain spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR !~ (spoly, sellipse) IS 'true if spherical polygon (LHS) does not contain spherical ellipse (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sellipse,
@@ -1131,10 +1131,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sellipse, spoly ) IS 'true if spherical ellipse (LHS) is not contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !@ (sellipse, spoly) IS 'true if spherical ellipse (LHS) is not contained by spherical polygon (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sellipse,
@@ -1143,10 +1143,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sellipse, spoly ) IS 'true if spherical ellipse (LHS) contains spherical polygon (RHS)'; 
+COMMENT ON OPERATOR ~ (sellipse, spoly) IS 'true if spherical ellipse (LHS) contains spherical polygon (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoly,
@@ -1155,10 +1155,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoly, sellipse ) IS 'true if spherical polygon (LHS) is contained by spherical elli[pse (RHS)'; 
+COMMENT ON OPERATOR @ (spoly, sellipse) IS 'true if spherical polygon (LHS) is contained by spherical elli[pse (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sellipse,
@@ -1167,10 +1167,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sellipse, spoly ) IS 'true if spherical ellipse (LHS) does not contain spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !~ (sellipse, spoly) IS 'true if spherical ellipse (LHS) does not contain spherical polygon (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoly,
@@ -1179,10 +1179,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoly, sellipse ) IS 'true if spherical polygon (LHS) is not contained by spherical elli[pse (RHS)'; 
+COMMENT ON OPERATOR !@ (spoly, sellipse) IS 'true if spherical polygon (LHS) is not contained by spherical elli[pse (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = spath,
@@ -1191,10 +1191,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spath, spoint ) IS 'true if spherical path (LHS) contains spherical point (RHS)'; 
+COMMENT ON OPERATOR ~ (spath, spoint) IS 'true if spherical path (LHS) contains spherical point (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spoint,
@@ -1203,10 +1203,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spoint, spath ) IS 'true if spherical point (LHS) is contained by spherical path (RHS)'; 
+COMMENT ON OPERATOR @ (spoint, spath) IS 'true if spherical point (LHS) is contained by spherical path (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spath,
@@ -1215,10 +1215,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spath, spoint ) IS 'true if spherical path (LHS) does not contain spherical point (RHS)'; 
+COMMENT ON OPERATOR !~ (spath, spoint) IS 'true if spherical path (LHS) does not contain spherical point (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spoint,
@@ -1227,10 +1227,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spoint, spath ) IS 'true if spherical point (LHS) is not contained by spherical path (RHS)'; 
+COMMENT ON OPERATOR !@ (spoint, spath) IS 'true if spherical point (LHS) is not contained by spherical path (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sbox,
@@ -1239,10 +1239,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sbox, spath ) IS 'true if spherical box (LHS) contains spherical path (RHS)'; 
+COMMENT ON OPERATOR ~ (sbox, spath) IS 'true if spherical box (LHS) contains spherical path (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spath,
@@ -1251,10 +1251,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spath, sbox ) IS 'true if spherical path is contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR @ (spath, sbox) IS 'true if spherical path is contained by spherical box (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sbox,
@@ -1263,10 +1263,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sbox, spath ) IS 'true if spherical box (LHS) does not contain spherical path (RHS)'; 
+COMMENT ON OPERATOR !~ (sbox, spath) IS 'true if spherical box (LHS) does not contain spherical path (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spath,
@@ -1275,11 +1275,11 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spath, sbox ) IS
-  'true if spherical path (LHS) is not contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR !@ (spath, sbox) IS
+  'true if spherical path (LHS) is not contained by spherical box (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = scircle,
@@ -1288,10 +1288,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( scircle, spath ) IS 'true if spherical circle (LHS) contains spherical path (RHS)'; 
+COMMENT ON OPERATOR ~ (scircle, spath) IS 'true if spherical circle (LHS) contains spherical path (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spath,
@@ -1300,10 +1300,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spath, scircle ) IS 'true if spherical path (LHS) is contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR @ (spath, scircle) IS 'true if spherical path (LHS) is contained by spherical circle (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = scircle,
@@ -1312,10 +1312,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( scircle, spath ) IS 'true if spherical circle (LHS) does not contain spherical path (RHS)'; 
+COMMENT ON OPERATOR !~ (scircle, spath) IS 'true if spherical circle (LHS) does not contain spherical path (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spath,
@@ -1324,10 +1324,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spath, scircle ) IS 'true if spherical path (LHS) is not contained by spherical circle (RHS)'; 
+COMMENT ON OPERATOR !@ (spath, scircle) IS 'true if spherical path (LHS) is not contained by spherical circle (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sellipse,
@@ -1336,10 +1336,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sellipse, spath ) IS 'true if spherical ellipse (LHS) contains spherical path (RHS)'; 
+COMMENT ON OPERATOR ~ (sellipse, spath) IS 'true if spherical ellipse (LHS) contains spherical path (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spath,
@@ -1348,10 +1348,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spath, sellipse ) IS 'true if spherical path (LHS) is contained by spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR @ (spath, sellipse) IS 'true if spherical path (LHS) is contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sellipse,
@@ -1360,10 +1360,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sellipse, spath ) IS 'true if spherical ellipse (LHS) does not contain spherical path (RHS)'; 
+COMMENT ON OPERATOR !~ (sellipse, spath) IS 'true if spherical ellipse (LHS) does not contain spherical path (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spath,
@@ -1372,10 +1372,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spath, sellipse ) IS 'true if spherical path is not contained by spherical ellipse (RHS)'; 
+COMMENT ON OPERATOR !@ (spath, sellipse) IS 'true if spherical path is not contained by spherical ellipse (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = spoly,
@@ -1384,10 +1384,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( spoly, spath ) IS 'true if spherical polygon (LHS) contains spherical path (RHS)'; 
+COMMENT ON OPERATOR ~ (spoly, spath) IS 'true if spherical polygon (LHS) contains spherical path (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = spath,
@@ -1396,10 +1396,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( spath, spoly ) IS 'true if spherical path (LHS) is contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR @ (spath, spoly) IS 'true if spherical path (LHS) is contained by spherical polygon (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = spoly,
@@ -1408,10 +1408,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( spoly, spath ) IS 'true if spherical polygon (LHS) does not contain spherical path (RHS)'; 
+COMMENT ON OPERATOR !~ (spoly, spath) IS 'true if spherical polygon (LHS) does not contain spherical path (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = spath,
@@ -1420,10 +1420,10 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( spath, spoly ) IS 'true if spherical path (LHS) is not contained by spherical polygon (RHS)'; 
+COMMENT ON OPERATOR !@ (spath, spoly) IS 'true if spherical path (LHS) is not contained by spherical polygon (RHS)';
 
 CREATE OPERATOR ~ (
    LEFTARG    = sbox,
@@ -1432,10 +1432,10 @@ CREATE OPERATOR ~ (
    COMMUTATOR = '@',
    NEGATOR    = '!~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR ~ ( sbox, sline ) IS 'true if spherical box (LHS) contains spherical line (RHS)'; 
+COMMENT ON OPERATOR ~ (sbox, sline) IS 'true if spherical box (LHS) contains spherical line (RHS)';
 
 CREATE OPERATOR @ (
    LEFTARG    = sline,
@@ -1444,10 +1444,10 @@ CREATE OPERATOR @ (
    COMMUTATOR = '~',
    NEGATOR    = '!@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR @ ( sline, sbox ) IS 'true if spherical line (LHS) is contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR @ (sline, sbox) IS 'true if spherical line (LHS) is contained by spherical box (RHS)';
 
 CREATE OPERATOR !~ (
    LEFTARG    = sbox,
@@ -1456,10 +1456,10 @@ CREATE OPERATOR !~ (
    COMMUTATOR = '!@',
    NEGATOR    = '~',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !~ ( sbox, sline ) IS 'true if spherical box (LHS) does not contain spherical line (RHS)'; 
+COMMENT ON OPERATOR !~ (sbox, sline) IS 'true if spherical box (LHS) does not contain spherical line (RHS)';
 
 CREATE OPERATOR !@ (
    LEFTARG    = sline,
@@ -1468,7 +1468,7 @@ CREATE OPERATOR !@ (
    COMMUTATOR = '!~',
    NEGATOR    = '@',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !@ ( sline, sbox ) IS 'true if spherical line (LHS) is not contained by spherical box (RHS)'; 
+COMMENT ON OPERATOR !@ (sline, sbox) IS 'true if spherical line (LHS) is not contained by spherical box (RHS)';

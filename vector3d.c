@@ -1,8 +1,6 @@
 #include "vector3d.h"
 
-/*
- * Vector functions
- */
+/* Vector functions */
 
 bool
 vector3d_eq(const Vector3D *v1, const Vector3D *v2)
@@ -23,7 +21,7 @@ vector3d_cross(Vector3D *out, const Vector3D *v1, const Vector3D *v2)
 float8
 vector3d_scalar(Vector3D *v1, Vector3D *v2)
 {
-	float8		out = 0;
+	float8 out = 0;
 
 	out += v1->x * v2->x;
 	out += v1->y * v2->y;

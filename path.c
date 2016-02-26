@@ -53,14 +53,17 @@ PG_FUNCTION_INFO_V1(spherepath_add_points_finalize);
 
 
 /*
- * ! \brief Converts an array of spherical points to SPATH \param arr pointer
- * to array of spherical points \param nelem count of elements \return
- * pointer to created spherical polygon
+ * Converts an array of spherical points to SPATH.
+ *
+ * arr   - pointer to the array of spherical points
+ * nelem - count of elements
+ *
+ * Returns pointer to created spherical polygon.
  */
 static SPATH *
 spherepath_from_array(SPoint *arr, int32 nelem)
 {
-	SPATH	   *path = NULL;
+	SPATH *path = NULL;
 
 	if (nelem < 2)
 	{
@@ -89,7 +92,9 @@ spherepath_from_array(SPoint *arr, int32 nelem)
 			{
 				if (i < (nelem - 2))
 				{
-					memmove((void *) &arr[i + 1], (void *) &arr[i + 2], (nelem - i - 2) * sizeof(SPoint));
+					memmove((void *) &arr[i + 1],
+							(void *) &arr[i + 2],
+							(nelem - i - 2) * sizeof(SPoint));
 				}
 				nelem--;
 				continue;
@@ -127,14 +132,18 @@ spherepath_from_array(SPoint *arr, int32 nelem)
 }
 
 /*
- * ! \brief Does an Euler transformation on a path \param out pointer to
- * result path \param in  pointer to input path \param se	pointer to Euler
- * transformation \return pointer to result path
+ * Performs an Euler transformation on a path.
+ *
+ * out - pointer to the result path
+ * in  - pointer to the input path
+ * se  - pointer to the Euler transformation
+ *
+ * Returns the pointer to the result path.
  */
 static void
 euler_spath_trans(SPATH *out, const SPATH *in, const SEuler *se)
 {
-	int32		i;
+	int32 i;
 
 	out->size = in->size;
 	out->npts = in->npts;
@@ -143,9 +152,8 @@ euler_spath_trans(SPATH *out, const SPATH *in, const SEuler *se)
 }
 
 /*
- * ! \brief Returns the relationship between path and circle \param path
- * pointer to path \param circ pointer to circle \return relationship as a
- * \link PGS_CIRCLE_PATH_REL int8 value \endlink (\ref PGS_CIRCLE_PATH_REL )
+ * Returns the relationship between a path and a circle as
+ * PGS_CIRCLE_PATH_REL int8 value.
  */
 static int8
 path_circle_pos(const SPATH *path, const SCIRCLE *circ)
@@ -204,8 +212,7 @@ path_circle_pos(const SPATH *path, const SCIRCLE *circ)
 
 
 /*
- * ! \brief Checks, whether path and line are overlapping \param line pointer
- * to a line \param path pointer to a path \return true, if overlapping
+ * Checks whether a path and a line overlap.
  */
 static bool
 path_line_overlap(const SPATH *path, const SLine *line)
@@ -229,10 +236,11 @@ path_line_overlap(const SPATH *path, const SLine *line)
 
 
 /*
- * ! \brief Returns the relationship between path and circle \param path
- * pointer to path \param ell	pointer to ellipse \return relationship as a
- * \link PGS_ELLIPSE_PATH_REL int8 value \endlink (\ref PGS_ELLIPSE_PATH_REL
- * )
+ * Returns the relationship between a path and a circle as
+ * PGS_ELLIPSE_PATH_REL int8 value.
+ *
+ * path - pointer to the path
+ * ell  - pointer to the ellipse
  */
 static int8
 path_ellipse_pos(const SPATH *path, const SELLIPSE *ell)
@@ -310,9 +318,7 @@ path_ellipse_pos(const SPATH *path, const SELLIPSE *ell)
 
 
 /*
- * ! \brief Checks, whether two pathes are overlapping \param path1 pointer
- * to first path \param path2 pointer to second path \return true, if
- * overlapping
+ * Checks whether two paths overlap.
  */
 static bool
 path_overlap(const SPATH *path1, const SPATH *path2)
@@ -334,9 +340,8 @@ path_overlap(const SPATH *path1, const SPATH *path2)
 
 
 /*
- * ! \brief Returns the relationship between path and polygon \param path
- * pointer to path \param poly pointer to polygon \return relationship as a
- * \link PGS_POLY_PATH_REL int8 value \endlink (\ref PGS_POLY_PATH_REL )
+ * Returns the relationship between a path and a polygon as
+ * PGS_POLY_PATH_REL int8 value.
  */
 static int8
 path_poly_pos(const SPATH *path, const SPOLY *poly)
@@ -378,9 +383,13 @@ path_poly_pos(const SPATH *path, const SPOLY *poly)
 
 
  /*
-  * ! \brief Returns the i-th point of a path \param sp   pointer to result
-  * point \param path pointer to path \param i	  number of point \return
-  * pointer to result point \see spath_point ( SPoint * , SPATH *, float8 )
+  * Returns the i-th point of a path.
+  *
+  * sp   - pointer to the result point
+  * path - pointer to the path
+  * i    - number of the point
+  *
+  * See spath_point(SPoint * , SPATH *, float8)
   */
 static bool
 spath_get_point(SPoint *sp, const SPATH *path, int32 i)
@@ -394,10 +403,14 @@ spath_get_point(SPoint *sp, const SPATH *path, int32 i)
 }
 
  /*
-  * ! This function interpolates between points. \brief Returns the f-th point
-  * of a path \param sp   pointer to result point \param path pointer to path
-  * \param f	"number" of point \return pointer to result point \see
-  * spherepath_point(PG_FUNCTION_ARGS)
+  * This function interpolates between points. Returns the f-th point
+  * of a path.
+  *
+  * sp   - pointer to the result point
+  * path - pointer to the path
+  * f    - 'number' of the point
+  *
+  * See spherepath_point(PG_FUNCTION_ARGS)
   */
 static bool
 spath_point(SPoint *sp, const SPATH *path, float8 f)
@@ -426,8 +439,7 @@ spath_point(SPoint *sp, const SPATH *path, float8 f)
 }
 
 /*
- * ! \brief Checks whether two pathes are equal \param p1	pointer to first
- * path \param p2	pointer to secondpath \return true, if equal
+ * Checks whether two paths are equal.
  */
 bool
 spath_eq(const SPATH *p1, const SPATH *p2)

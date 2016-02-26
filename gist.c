@@ -32,7 +32,7 @@ PG_FUNCTION_INFO_V1(g_spherekey_penalty);
 PG_FUNCTION_INFO_V1(g_spherekey_picksplit);
 
  /*
-  * Returns the relationship of two keys as PGS_KEY_REL.
+  * Returns the relationship between two keys as PGS_KEY_REL.
   */
 uchar
 spherekey_interleave(const int32 *k1, const int32 *k2)
@@ -277,11 +277,14 @@ g_spherekey_union(PG_FUNCTION_ARGS)
 	int32			   *ret = (int32 *) palloc(KEYSIZE);
 
 	numranges = entryvec->n;
-	memcpy((void *) ret, (void *) DatumGetPointer(entryvec->vector[0].key), KEYSIZE);
+	memcpy((void *) ret,
+		   (void *) DatumGetPointer(entryvec->vector[0].key),
+		   KEYSIZE);
 
 	for (i = 1; i < numranges; i++)
 	{
-		spherekey_union_two(ret, (int32 *) DatumGetPointer(entryvec->vector[i].key));
+		spherekey_union_two(ret,
+							(int32 *) DatumGetPointer(entryvec->vector[i].key));
 	}
 	*sizep = KEYSIZE;
 	PG_RETURN_POINTER(ret);
@@ -1285,9 +1288,14 @@ sizeBox3D(Box3D *b)
 static inline double
 unionSizeBox3D(Box3D *a, Box3D *b)
 {
-	return (double) ((int64) Max(a->high.coord[0], b->high.coord[0]) - (int64) Min(a->low.coord[0], b->low.coord[0])) / MAXCVALUE
-		 * (double) ((int64) Max(a->high.coord[1], b->high.coord[1]) - (int64) Min(a->low.coord[1], b->low.coord[1])) / MAXCVALUE
-		 * (double) ((int64) Max(a->high.coord[2], b->high.coord[2]) - (int64) Min(a->low.coord[2], b->low.coord[2])) / MAXCVALUE;
+	return (double) ((int64) Max(a->high.coord[0], b->high.coord[0]) -
+						(int64) Min(a->low.coord[0], b->low.coord[0])) / MAXCVALUE
+
+		 * (double) ((int64) Max(a->high.coord[1], b->high.coord[1]) -
+						(int64) Min(a->low.coord[1], b->low.coord[1])) / MAXCVALUE
+
+		 * (double) ((int64) Max(a->high.coord[2], b->high.coord[2]) -
+						(int64) Min(a->low.coord[2], b->low.coord[2])) / MAXCVALUE;
 }
 
 /*
@@ -1297,10 +1305,10 @@ unionSizeBox3D(Box3D *a, Box3D *b)
 static void
 fallbackSplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
 {
-	OffsetNumber i;
-	Box3D	   *unionL = NULL,
-			   *unionR = NULL;
-	int			nbytes;
+	OffsetNumber	i;
+	Box3D		   *unionL = NULL,
+				   *unionR = NULL;
+	int				nbytes;
 
 	nbytes = (maxoff + 2) * sizeof(OffsetNumber);
 	v->spl_left = (OffsetNumber *) palloc(nbytes);
@@ -1309,7 +1317,7 @@ fallbackSplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
 
 	for (i = FirstOffsetNumber; i <= maxoff; i = OffsetNumberNext(i))
 	{
-		Box3D	   *cur = &boxes[i];
+		Box3D *cur = &boxes[i];
 
 		if (i <= (maxoff - FirstOffsetNumber + 1) / 2)
 		{
@@ -1888,7 +1896,10 @@ do_picksplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
 		 * Sort "common entries" by calculated deltas in order to distribute
 		 * the most ambiguous entries first.
 		 */
-		qsort(commonEntries, commonEntriesCount, sizeof(CommonEntry), common_entry_cmp);
+		qsort(commonEntries,
+			  commonEntriesCount,
+			  sizeof(CommonEntry),
+			  common_entry_cmp);
 
 		/*
 		 * Distribute "common entries" between groups.
@@ -1914,7 +1925,8 @@ do_picksplit(Box3D *boxes, OffsetNumber maxoff, GIST_SPLITVEC *v)
 			else
 			{
 				/* Otherwise select the group by minimal penalty */
-				if (unionSizeBox3D(leftBox, box) - leftBoxSize < unionSizeBox3D(rightBox, box) - rightBoxSize)
+				if (unionSizeBox3D(leftBox, box) - leftBoxSize <
+						unionSizeBox3D(rightBox, box) - rightBoxSize)
 				{
 					PLACE_LEFT(box, commonEntries[i].index);
 					/* checkBox3D(leftBox); */
@@ -1971,12 +1983,18 @@ g_spherekey_penalty(PG_FUNCTION_ARGS)
 	{
 		Box3D	   *n = (Box3D *) DatumGetPointer(newentry->key);
 
-		*result = (float) (((uint64) (Max(o->high.coord[0], n->high.coord[0]) - Min(o->low.coord[0], n->low.coord[0])) >> 10)
-						   * ((uint64) (Max(o->high.coord[1], n->high.coord[1]) - Min(o->low.coord[1], n->low.coord[1])) >> 10)
-						   * ((uint64) (Max(o->high.coord[2], n->high.coord[2]) - Min(o->low.coord[2], n->low.coord[2])) >> 10)
-					  - ((uint64) (o->high.coord[0] - o->low.coord[0]) >> 10)
-					  * ((uint64) (o->high.coord[1] - o->low.coord[1]) >> 10)
-					* ((uint64) (o->high.coord[2] - o->low.coord[2]) >> 10));
+		*result = (float) (((uint64) (Max(o->high.coord[0], n->high.coord[0]) -
+											Min(o->low.coord[0], n->low.coord[0])) >> 10)
+
+						   * ((uint64) (Max(o->high.coord[1], n->high.coord[1]) -
+											Min(o->low.coord[1], n->low.coord[1])) >> 10)
+
+						   * ((uint64) (Max(o->high.coord[2], n->high.coord[2]) -
+											Min(o->low.coord[2], n->low.coord[2])) >> 10)
+
+						- ((uint64) (o->high.coord[0] - o->low.coord[0]) >> 10)
+							* ((uint64) (o->high.coord[1] - o->low.coord[1]) >> 10)
+							* ((uint64) (o->high.coord[2] - o->low.coord[2]) >> 10));
 		PG_RETURN_POINTER(result);
 	}
 	else

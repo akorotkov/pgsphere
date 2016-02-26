@@ -1,8 +1,6 @@
 #include "line.h"
 
-/*
- * Line functions
- */
+/* Line functions */
 
 PG_FUNCTION_INFO_V1(sphereline_in);
 PG_FUNCTION_INFO_V1(sphereline_from_point);
@@ -37,8 +35,7 @@ PG_FUNCTION_INFO_V1(spheretrans_line);
 PG_FUNCTION_INFO_V1(spheretrans_line_inverse);
 
 /*
- * Swaps begin and end of the line. "out" is pointer to the result spherical
- * line. "in" is pointer to the input spherical line.
+ * Swaps the beginning and ending of the line.
  */
 static void
 sline_swap_beg_end(SLine *out, const SLine *in)
@@ -190,7 +187,6 @@ sline_min_max_lat(const SLine *sl, float8 *minlat, float8 *maxlat)
 	}
 	else
 	{
-
 		SEuler		se;
 		SLine		nl;
 		SPoint		tp;
@@ -386,7 +382,8 @@ sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 		}
 		else if (FPle(((c.center.lat < 0) ? (-c.center.lat) : (c.center.lat)),
 					  c.radius) &&
-				 FPge(c.center.lng, p[0].lng) && FPle(c.center.lng, p[1].lng))
+				 FPge(c.center.lng, p[0].lng) &&
+				 FPle(c.center.lng, p[1].lng))
 		{
 			return PGS_CIRCLE_LINE_OVER;
 		}
@@ -407,7 +404,7 @@ sphereline_circle_pos(const SLine *sl, const SCIRCLE *sc)
 bool
 sline_circle_touch(const SLine *sl, const SCIRCLE *sc)
 {
-	/* we assume here, line and circle are overlapping */
+	/* we assume here, line and circle overlap */
 	SEuler	se;
 	SCIRCLE	tc;
 
@@ -500,8 +497,8 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	/* Check, sl2 is at equator */
 	if (FPzero(p[2].lat) && FPzero(p[3].lat))
 	{
-		bool		a1 = spoint_at_sline(&p[2], &sl1);
-		bool		a2 = spoint_at_sline(&p[3], &sl1);
+		bool	a1 = spoint_at_sline(&p[2], &sl1);
+		bool	a2 = spoint_at_sline(&p[3], &sl1);
 
 		if (a1 && a2)
 		{
@@ -648,15 +645,15 @@ sline_center(SPoint *c, const SLine *sl)
 Datum
 sphereline_in(PG_FUNCTION_ARGS)
 {
-	SLine	   *sl = (SLine *) palloc(sizeof(SLine));
-	char	   *c = PG_GETARG_CSTRING(0);
+	SLine		   *sl = (SLine *) palloc(sizeof(SLine));
+	char		   *c = PG_GETARG_CSTRING(0);
 	unsigned char	etype[3];
 	float8			eang[3],
 					length;
 	SEuler			se,
-				stmp,
-				so;
-	int			i;
+					stmp,
+					so;
+	int				i;
 
 	void		sphere_yyparse(void);
 
@@ -1039,8 +1036,7 @@ spheretrans_line_inverse(PG_FUNCTION_ARGS)
 	Datum		ret;
 
 	spheretrans_inverse(&tmp, se);
-	ret = DirectFunctionCall2(
-							  spheretrans_line,
+	ret = DirectFunctionCall2(spheretrans_line,
 							  sl, PointerGetDatum(&tmp));
 	PG_RETURN_DATUM(ret);
 

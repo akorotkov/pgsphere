@@ -1,9 +1,7 @@
 #ifndef __PGS_SBUFFER_H__
 #define __PGS_SBUFFER_H__
 
-/*
- * Parser buffer declarations
- */
+/* Parser buffer declarations */
 
 #define STYPE_UNKNOWN 0	/* unknown type */
 #define STYPE_POINT   1	/* input is spherical type */
@@ -19,139 +17,132 @@
 #define EULER_AXIS_Y 2	/* y - axis for Euler transformation */
 #define EULER_AXIS_Z 3	/* z - axis for Euler transformation */
 
-int			sphere_yylex();
-void		sphere_yyerror(const char *str);
-void		sphere_flush_scanner_buffer(void);
+int		sphere_yylex();
+void	sphere_yyerror(const char *str);
+void	sphere_flush_scanner_buffer(void);
+
+/* Sets the data type */
+void	set_spheretype(unsigned char st);
+
+/* Initialize the input buffer */
+void	init_buffer(char *buffer);
+
+/* Resets the input buffer */
+void	reset_buffer(void);
 
 /*
- * Sets the data type
+ * Read the "offset" number of bytes from "buf" buffer.
+ * Returns the number of read bytes.
  */
-void		set_spheretype(unsigned char st);
+int		get_buffer(char *buf, int offset);
 
 /*
- * Initialize the input buffer
+ * Input of an angle. When is_deg > 0 then "a" is in degrees,
+ * otherwise it's in radians. Returns the unique ID (position) of the angle.
  */
-void		init_buffer(char *buffer);
+int		set_angle(unsigned char is_deg, double a);
 
 /*
- * Resets the input buffer
+ * Set the sign of an angle. "apos" is the angle. "s" is a sign of the angle
+ * ( < 0 .. - , > 0 .. + ). Returns the unique ID (position) of the angle.
  */
-void		reset_buffer(void);
+int		set_angle_sign(int apos, int s);
 
 /*
- * Read the "offset" number of bytes from "buf" buffer. Returns count of read
- * bytes.
- */
-int			get_buffer(char *buf, int offset);
-
-/*
- * Input of a angle. When is_deg > 0 then "a" is in degrees otherwise it's in
- * radians. Returns an unique ID (position) of angle.
- */
-int			set_angle(unsigned char is_deg, double a);
-
-/*
- * Set the sign of an angle. "apos" is the angle. "s" is sign of angle
- * ( < 0 .. - , > 0 .. + ). Returns the unique ID (position) of angle.
- */
-int			set_angle_sign(int apos, int s);
-
-/*
- * Creates a spherical point. "lngpos" is the ID of longitude angle, "latpos"
- * is the ID of latitude angle. Returns the unique ID (position) of spherical
+ * Creates a spherical point. "lngpos" is the ID of a longitude angle, "latpos"
+ * is the ID of a latitude angle. Returns the unique ID (position) of the spherical
  * point.
  */
-int			set_point(int lngpos, int latpos);
+int		set_point(int lngpos, int latpos);
 
 /*
- * Creates a spherical circle. "spos" is the ID of spherical point. "rpos"
- * is the ID of radius angle.
+ * Creates a spherical circle. "spos" is the ID of a spherical point, "rpos"
+ * is the ID of a radius angle.
  */
-void		set_circle(int spos, int rpos);
+void	set_circle(int spos, int rpos);
 
 /*
- * Sets the length of spherical line \param length the ID of length
- * angle
+ * Sets the length of a spherical line. "length" is the ID of a length angle.
  */
-void		set_line(int length);
+void	set_line(int length);
 
 /*
- * Creates an Euler transformation \param phi the ID of first angle
- * \param theta the ID of second angle \param psi the ID of  third angle
- * \param etype three letter code of Euler transformation axes
+ * Creates an Euler transformation. "phi" is the ID of a first angle,
+ * "theta" is the ID of a second angle, "psi" is the ID of a third angle,
+ * "etype" is the three letter code of Euler transformation axes.
  */
-void		set_euler(int phi, int theta, int psi, char *etype);
+void	set_euler(int phi, int theta, int psi, char *etype);
 
 /*
- * Creates a spherical ellipse \param r1 ID of first radius angle
- * \param r2 ID of second radius angle \param sp ID of spherical point (
- * center ) \param inc ID	of inclination angle
+ * Creates a spherical ellipse. "r1" is the ID of a first radius angle,
+ * "r2" is the ID of a second radius angle, "sp" is the ID of a spherical
+ * point ( center ), "inc" is the ID of an inclination angle.
  */
-void		set_ellipse(int r1, int r2, int sp, int inc);
+void	set_ellipse(int r1, int r2, int sp, int inc);
 
 /*
- * Returns the point parameters \param lng pointer to longitude
- * value \param lat pointer to latitude value \return <>0 , if user input is
- * spherical point
+ * Returns the point parameters. "lng" is the pointer to a longitude
+ * value, "lat" is the pointer to a latitude value. Returns 0 if user
+ * input is a spherical point.
  */
-int			get_point(double *lng, double *lat);
+int		get_point(double *lng, double *lat);
 
 /*
- * Returns the circle parameters \param lng pointer to longitude
- * value of center \param lat pointer to latitude value of center \param
- * radius pointer to radius value \return <>0 , if user input is spherical
- * circle
+ * Returns the circle parameters. "lng" is pointer to a longitude
+ * value of its center, "lat" is pointer to the latitude value of the center,
+ * "radius" is the pointer to the radius value. Returns 0 if user input
+ * is a spherical circle.
  */
-int			get_circle(double *lng, double *lat, double *radius);
+int		get_circle(double *lng, double *lat, double *radius);
 
 /*
- * Returns the ellipse parameters \param lng pointer to longitude
- * value of center \param lat pointer to latitude value of center \param r1
- * pointer to first radius value \param r2 pointer to second radius value
- * \param inc pointer to inclination angle \return <>0 , if user input is
- * spherical ellipse
+ * Returns the ellipse parameters. "lng" is the pointer to a longitude value
+ * of its center, "lat" is the pointer to a latitude value of the center, "r1"
+ * is the pointer to a first radius value, "r2" is the pointer to a second
+ * radius value, "inc" is the pointer to an inclination angle. Returns 0 if user
+ * input is a spherical ellipse.
  */
-int			get_ellipse(double *lng, double *lat, double *r1,
-													double *r2, double *inc);
+int		get_ellipse(double *lng, double *lat, double *r1,
+					double *r2, double *inc);
 
 /*
- * Returns the line parameters \param phi   pointer to first angle
- * of Euler transformation \param theta pointer to second angle of Euler
- * transformation \param psi	pointer to third angle of Euler transformation
- * \param etype pointer to axes value of Euler transformation \param length
- * pointer to length value \return <>0 , if user input is spherical line
+ * Returns the line parameters. "phi" is the pointer to the first angle
+ * of Euler transformation, "theta" is the pointer to the second angle of Euler
+ * transformation, "psi" is the pointer to the third angle of Euler transformation,
+ * "etype" is the pointer to the axes value of Euler transformation, "length" is
+ * the pointer to the length value. Returns 0 if user input is a spherical line.
  */
-int			get_line(double *phi, double *theta, double *psi,
-										unsigned char *etype, double *length);
+int		get_line(double *phi, double *theta, double *psi,
+				 unsigned char *etype, double *length);
 
 /*
- * Returns the Euler transformation parameters \param phi   pointer
- * to first angle of Euler transformation \param theta pointer to second
- * angle of Euler transformation \param psi   pointer to third angle of Euler
- * transformation \param etype pointer to axes value of Euler transformation
- * \return <>0 , if user input is an Euler transformation
+ * Returns the Euler transformation parameters. "phi" is the pointer to the
+ * first angle of Euler transformation, "theta" is the pointer to the second
+ * angle of Euler transformation, "psi" is the pointer to the third angle of Euler
+ * transformation, "etype" is the pointer to the axes value of Euler transformation.
+ * Returns 0 if user input is an Euler transformation.
  */
-int			get_euler(double *phi, double *theta,
-											double *psi, unsigned char *etype);
+int		get_euler(double *phi, double *theta,
+				  double *psi, unsigned char *etype);
 
 /*
- * Returns the count of path elements \return count of points
+ * Returns the number of path elements.
  */
-int			get_path_count(void);
+int		get_path_count(void);
 
 /*
- * Returns the elements of path \param spos number of element \param
- * lng the ID of longitude angle \param lat the ID of latitude angle \return
- * <>0 , if user input is an path or polygon and spos is valid
+ * Returns the elements of a path. "spos" is the number of element, "lng" is
+ * the ID of longitude angle, "lat" is the ID of a latitude angle. Returns 0
+ * if user input is a path or a polygon and "spos" is valid.
  */
-int			get_path_elem(int spos, double *lng, double *lat);
+int		get_path_elem(int spos, double *lng, double *lat);
 
 /*
- * Returns the elements of box \param lng1 the ID of first longitude
- * angle \param lat1 the ID of first latitude angle \param lng2 the ID of
- * second longitude angle \param lat2 the ID of second latitude angle \return
- * <>0 , if user input is a box
+ * Returns the elements of a box. "lng1" is the ID of the first longitude
+ * angle, "lat1" is the ID of the first latitude angle, "lng2" is the ID of
+ * the second longitude angle, "lat2" is the ID of the second latitude angle.
+ * Returns 0 if user input is a box.
  */
-int			get_box(double *lng1, double *lat1, double *lng2, double *lat2);
+int		get_box(double *lng1, double *lat1, double *lng2, double *lat2);
 
 #endif

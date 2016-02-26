@@ -14,25 +14,25 @@ CREATE FUNCTION npoints(spath)
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION  npoints(spath) IS
-  'returns number of points of spherical path'; 
+  'returns number of points of spherical path';
 
-CREATE FUNCTION spoint(spath,int4)
+CREATE FUNCTION spoint(spath, int4)
    RETURNS spoint
    AS 'MODULE_PATHNAME', 'spherepath_get_point'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoint(spath,int4) IS
-  'returns n-th point of spherical path'; 
+COMMENT ON FUNCTION  spoint(spath, int4) IS
+  'returns n-th point of spherical path';
 
-CREATE FUNCTION spoint(spath,float8)
+CREATE FUNCTION spoint(spath, float8)
    RETURNS spoint
    AS 'MODULE_PATHNAME', 'spherepath_point'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoint(spath,float8) IS
-  'returns n-th point of spherical path using linear interpolation'; 
+COMMENT ON FUNCTION  spoint(spath, float8) IS
+  'returns n-th point of spherical path using linear interpolation';
 
 
 -- ******************************
@@ -46,14 +46,14 @@ COMMENT ON FUNCTION  spoint(spath,float8) IS
 -- equal
 --
 
-CREATE FUNCTION spath_equal(spath,spath)
+CREATE FUNCTION spath_equal(spath, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_equal'
+   AS 'MODULE_PATHNAME', 'spherepath_equal'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spath_equal(spath,spath) IS
-  'returns true, if spherical pathes are equal'; 
+COMMENT ON FUNCTION spath_equal(spath, spath) IS
+  'returns true, if spherical paths are equal';
 
 
 CREATE OPERATOR  = (
@@ -63,25 +63,25 @@ CREATE OPERATOR  = (
    NEGATOR    = <>,
    PROCEDURE  = spath_equal,
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR = ( spath, spath ) IS
-  'true, if spherical pathes are equal'; 
+COMMENT ON OPERATOR = (spath, spath) IS
+  'true, if spherical paths are equal';
 
 
 --
 -- not equal
 --
 
-CREATE FUNCTION spath_equal_neg(spath,spath)
+CREATE FUNCTION spath_equal_neg(spath, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_equal_neg'
+   AS 'MODULE_PATHNAME', 'spherepath_equal_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spath_equal_neg(spath,spath) IS
-  'returns true, if spherical pathes are equal'; 
+COMMENT ON FUNCTION spath_equal_neg(spath, spath) IS
+  'returns true, if spherical paths are equal';
 
 
 CREATE OPERATOR  <> (
@@ -91,11 +91,11 @@ CREATE OPERATOR  <> (
    NEGATOR    = = ,
    PROCEDURE  = spath_equal_neg,
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR <> ( spath, spath ) IS
-  'true, if spherical pathes are not equal'; 
+COMMENT ON OPERATOR <> (spath, spath) IS
+  'true, if spherical paths are not equal';
 
 
 --
@@ -109,7 +109,7 @@ CREATE FUNCTION length(spath)
    IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION  length(spath) IS
-  'returns length of spherical path'; 
+  'returns length of spherical path';
 
 
 CREATE OPERATOR  @-@ (
@@ -117,8 +117,8 @@ CREATE OPERATOR  @-@ (
    PROCEDURE  = length
 );
 
-COMMENT ON OPERATOR @-@ ( NONE, spath ) IS
-  'returns length of spherical path'; 
+COMMENT ON OPERATOR @-@ (NONE, spath) IS
+  'returns length of spherical path';
 
 
 
@@ -126,37 +126,37 @@ COMMENT ON OPERATOR @-@ ( NONE, spath ) IS
 -- change the direction of path
 --
 
-CREATE FUNCTION swap( spath )
+CREATE FUNCTION swap(spath)
    RETURNS spath
-   AS 'MODULE_PATHNAME' , 'spherepath_swap'
+   AS 'MODULE_PATHNAME', 'spherepath_swap'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
-COMMENT ON FUNCTION swap( spath ) IS
+COMMENT ON FUNCTION swap(spath) IS
   'returns a swapped spherical path (changed direction)';
 
-CREATE OPERATOR - ( 
+CREATE OPERATOR - (
    RIGHTARG   = spath,
    PROCEDURE  = swap
 );
 
-COMMENT ON OPERATOR - ( NONE , spath ) IS
+COMMENT ON OPERATOR - (NONE, spath) IS
   'changes the direction of a spherical path';
 
 
 
 --
--- pathes overlap
+-- paths overlap
 --
 
-CREATE FUNCTION spath_overlap_path(spath,spath)
+CREATE FUNCTION spath_overlap_path(spath, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_overlap_path'
+   AS 'MODULE_PATHNAME', 'spherepath_overlap_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spath_overlap_path(spath,spath) IS
-  'true if spherical path overlaps spherical path '; 
+COMMENT ON FUNCTION  spath_overlap_path(spath, spath) IS
+  'true if spherical path overlaps spherical path';
 
 CREATE OPERATOR && (
    LEFTARG    = spath,
@@ -165,24 +165,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spath, spath ) IS
-  'true if spherical pathes overlap '; 
+COMMENT ON OPERATOR && (spath, spath) IS
+  'true if spherical paths overlap';
 
 --
--- pathes do not overlap
+-- paths do not overlap
 --
 
-CREATE FUNCTION spath_overlap_path_neg(spath,spath)
+CREATE FUNCTION spath_overlap_path_neg(spath, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_overlap_path_neg'
+   AS 'MODULE_PATHNAME', 'spherepath_overlap_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spath_overlap_path_neg(spath,spath) IS
-  'true if spherical path does not overlap spherical path '; 
+COMMENT ON FUNCTION  spath_overlap_path_neg(spath, spath) IS
+  'true if spherical path does not overlap spherical path';
 
 CREATE OPERATOR !&& (
    LEFTARG    = spath,
@@ -191,11 +191,11 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spath, spath ) IS
-  'true if spherical path does not overlap spherical path ';
+COMMENT ON OPERATOR !&& (spath, spath) IS
+  'true if spherical path does not overlap spherical path';
 
 
 
@@ -205,69 +205,69 @@ COMMENT ON OPERATOR !&& ( spath, spath ) IS
 --
 
 
-CREATE FUNCTION spath_contains_point(spath,spoint)
+CREATE FUNCTION spath_contains_point(spath, spoint)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_cont_point'
+   AS 'MODULE_PATHNAME', 'spherepath_cont_point'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spath_contains_point(spath,spoint) IS
-  'true if spherical path contains spherical point'; 
+COMMENT ON FUNCTION spath_contains_point(spath, spoint) IS
+  'true if spherical path contains spherical point';
 
 
 --
 -- point is contained by path
 --
 
-CREATE FUNCTION spath_contains_point_com(spoint,spath)
+CREATE FUNCTION spath_contains_point_com(spoint, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_cont_point_com'
+   AS 'MODULE_PATHNAME', 'spherepath_cont_point_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spath_contains_point_com(spoint,spath) IS
-  'true if spherical path contains spherical point'; 
+COMMENT ON FUNCTION spath_contains_point_com(spoint, spath) IS
+  'true if spherical path contains spherical point';
 
 --
 -- path does not contain point
 --
 
 
-CREATE FUNCTION spath_contains_point_neg(spath,spoint)
+CREATE FUNCTION spath_contains_point_neg(spath, spoint)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_cont_point_neg'
+   AS 'MODULE_PATHNAME', 'spherepath_cont_point_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spath_contains_point_neg(spath,spoint) IS
-  'true if spherical path does not contain spherical point'; 
+COMMENT ON FUNCTION spath_contains_point_neg(spath, spoint) IS
+  'true if spherical path does not contain spherical point';
 
 
 --
 -- point is not contained by path
 --
 
-CREATE FUNCTION spath_contains_point_com_neg(spoint,spath)
+CREATE FUNCTION spath_contains_point_com_neg(spoint, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_cont_point_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepath_cont_point_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spath_contains_point_com_neg(spoint,spath) IS
-  'true if spherical path does not contain spherical point'; 
+COMMENT ON FUNCTION spath_contains_point_com_neg(spoint, spath) IS
+  'true if spherical path does not contain spherical point';
 
 --
 -- Transformation of path
 --
 
-CREATE FUNCTION strans_path( spath, strans )
+CREATE FUNCTION strans_path(spath, strans)
    RETURNS spath
-   AS 'MODULE_PATHNAME' , 'spheretrans_path'
+   AS 'MODULE_PATHNAME', 'spheretrans_path'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
-COMMENT ON FUNCTION strans_path ( spath, strans ) IS
-  'returns a transformated spherical path'; 
+COMMENT ON FUNCTION strans_path (spath, strans) IS
+  'returns a transformated spherical path';
 
 CREATE OPERATOR + (
    LEFTARG    = spath,
@@ -275,17 +275,17 @@ CREATE OPERATOR + (
    PROCEDURE  = strans_path
 );
 
-COMMENT ON OPERATOR + ( spath, strans ) IS
-  'transforms a spherical path '; 
+COMMENT ON OPERATOR + (spath, strans) IS
+  'transforms a spherical path';
 
-CREATE FUNCTION strans_path_inverse( spath, strans )
+CREATE FUNCTION strans_path_inverse(spath, strans)
    RETURNS spath
-   AS 'MODULE_PATHNAME' , 'spheretrans_path_inverse'
+   AS 'MODULE_PATHNAME', 'spheretrans_path_inverse'
    LANGUAGE 'c'
-   WITH (isstrict,iscachable);
+   WITH (isstrict, iscachable);
 
-COMMENT ON FUNCTION strans_path_inverse ( spath, strans ) IS
-  'returns a inverse transformated spherical path'; 
+COMMENT ON FUNCTION strans_path_inverse (spath, strans) IS
+  'returns a inverse transformated spherical path';
 
 CREATE OPERATOR - (
    LEFTARG    = spath,
@@ -293,8 +293,8 @@ CREATE OPERATOR - (
    PROCEDURE  = strans_path_inverse
 );
 
-COMMENT ON OPERATOR - ( spath, strans ) IS
-  'transforms inverse a spherical path ';
+COMMENT ON OPERATOR - (spath, strans) IS
+  'transforms inverse a spherical path';
 
 
 
@@ -302,68 +302,68 @@ COMMENT ON OPERATOR - ( spath, strans ) IS
 --  circle contains path
 --
 
-CREATE FUNCTION scircle_contains_path(scircle,spath)
+CREATE FUNCTION scircle_contains_path(scircle, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_path'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_path(scircle,spath) IS
-  'true if spherical circle contains spherical path '; 
+COMMENT ON FUNCTION scircle_contains_path(scircle, spath) IS
+  'true if spherical circle contains spherical path';
 
 
 --
 --  path is contained by circle
 --
 
-CREATE FUNCTION scircle_contains_path_com(spath,scircle)
+CREATE FUNCTION scircle_contains_path_com(spath, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_path_com'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_path_com(spath,scircle) IS
-  'true if spherical circle contains spherical path '; 
+COMMENT ON FUNCTION scircle_contains_path_com(spath, scircle) IS
+  'true if spherical circle contains spherical path';
 
 --
 --  circle does not contains path
 --
 
-CREATE FUNCTION scircle_contains_path_neg(scircle,spath)
+CREATE FUNCTION scircle_contains_path_neg(scircle, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_path_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_path_neg(scircle,spath) IS
-  'true if spherical circle does not contain spherical path '; 
+COMMENT ON FUNCTION scircle_contains_path_neg(scircle, spath) IS
+  'true if spherical circle does not contain spherical path';
 
 
 --
 --  path is not contained by circle
 --
 
-CREATE FUNCTION scircle_contains_path_com_neg(spath,scircle)
+CREATE FUNCTION scircle_contains_path_com_neg(spath, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_cont_path_com_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_cont_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION scircle_contains_path_com_neg(spath,scircle) IS
-  'true if spherical circle does not contain spherical path '; 
+COMMENT ON FUNCTION scircle_contains_path_com_neg(spath, scircle) IS
+  'true if spherical circle does not contain spherical path';
 
 --
 -- circle overlaps path
 --
 
-CREATE FUNCTION scircle_overlap_path(scircle,spath)
+CREATE FUNCTION scircle_overlap_path(scircle, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_overlap_path'
+   AS 'MODULE_PATHNAME', 'spherecircle_overlap_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  scircle_overlap_path(scircle,spath) IS
-  'true if spherical circle overlap spherical path '; 
+COMMENT ON FUNCTION  scircle_overlap_path(scircle, spath) IS
+  'true if spherical circle overlap spherical path';
 
 
 CREATE OPERATOR && (
@@ -373,25 +373,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( scircle, spath ) IS
-  'true if spherical circle overlap spherical path'; 
+COMMENT ON OPERATOR && (scircle, spath) IS
+  'true if spherical circle overlap spherical path';
 
 
 --
 -- path overlaps circle
 --
 
-CREATE FUNCTION scircle_overlap_path_com(spath,scircle)
+CREATE FUNCTION scircle_overlap_path_com(spath, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_overlap_path_com'
+   AS 'MODULE_PATHNAME', 'spherecircle_overlap_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  scircle_overlap_path_com(spath,scircle) IS
-  'true if spherical circle overlap spherical path '; 
+COMMENT ON FUNCTION  scircle_overlap_path_com(spath, scircle) IS
+  'true if spherical circle overlap spherical path';
 
 CREATE OPERATOR && (
    LEFTARG    = spath,
@@ -400,24 +400,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spath, scircle ) IS
-  'true if spherical circle overlap spherical path'; 
+COMMENT ON OPERATOR && (spath, scircle) IS
+  'true if spherical circle overlap spherical path';
 
 --
 -- circle does not overlap path
 --
 
-CREATE FUNCTION scircle_overlap_path_neg(scircle,spath)
+CREATE FUNCTION scircle_overlap_path_neg(scircle, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_overlap_path_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_overlap_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  scircle_overlap_path_neg(scircle,spath) IS
-  'true if spherical circle does not overlap spherical path '; 
+COMMENT ON FUNCTION  scircle_overlap_path_neg(scircle, spath) IS
+  'true if spherical circle does not overlap spherical path';
 
 
 CREATE OPERATOR !&& (
@@ -427,25 +427,25 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( scircle, spath ) IS
-  'true if spherical circle does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (scircle, spath) IS
+  'true if spherical circle does not overlap spherical path';
 
 
 --
 -- path does not overlap circle
 --
 
-CREATE FUNCTION scircle_overlap_path_com_neg(spath,scircle)
+CREATE FUNCTION scircle_overlap_path_com_neg(spath, scircle)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherecircle_overlap_path_com_neg'
+   AS 'MODULE_PATHNAME', 'spherecircle_overlap_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  scircle_overlap_path_com_neg(spath,scircle) IS
-  'true if spherical circle overlap spherical path '; 
+COMMENT ON FUNCTION  scircle_overlap_path_com_neg(spath, scircle) IS
+  'true if spherical circle overlap spherical path';
 
 CREATE OPERATOR !&& (
    LEFTARG    = spath,
@@ -454,24 +454,24 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spath, scircle ) IS
-  'true if spherical circle does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (spath, scircle) IS
+  'true if spherical circle does not overlap spherical path';
 
 --
 -- path overlaps line
 --
 
-CREATE FUNCTION spath_overlap_line(spath,sline)
+CREATE FUNCTION spath_overlap_line(spath, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_overlap_line'
+   AS 'MODULE_PATHNAME', 'spherepath_overlap_line'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spath_overlap_line(spath,sline) IS
-  'true if spherical path overlaps spherical line '; 
+COMMENT ON FUNCTION  spath_overlap_line(spath, sline) IS
+  'true if spherical path overlaps spherical line';
 
 
 CREATE OPERATOR && (
@@ -481,25 +481,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spath, sline ) IS
-  'true if spherical line overlap spherical path'; 
+COMMENT ON OPERATOR && (spath, sline) IS
+  'true if spherical line overlap spherical path';
 
 
 --
 -- line overlaps path
 --
 
-CREATE FUNCTION spath_overlap_line_com(sline,spath)
+CREATE FUNCTION spath_overlap_line_com(sline, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_overlap_line_com'
+   AS 'MODULE_PATHNAME', 'spherepath_overlap_line_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spath_overlap_line_com(sline,spath) IS
-  'true if spherical path overlaps spherical line '; 
+COMMENT ON FUNCTION  spath_overlap_line_com(sline, spath) IS
+  'true if spherical path overlaps spherical line';
 
 
 CREATE OPERATOR && (
@@ -509,25 +509,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sline, spath ) IS
-  'true if spherical line overlap spherical path'; 
+COMMENT ON OPERATOR && (sline, spath) IS
+  'true if spherical line overlap spherical path';
 
 
 --
 -- path does not overlap line
 --
 
-CREATE FUNCTION spath_overlap_line_neg(spath,sline)
+CREATE FUNCTION spath_overlap_line_neg(spath, sline)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_overlap_line_neg'
+   AS 'MODULE_PATHNAME', 'spherepath_overlap_line_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spath_overlap_line_neg(spath,sline) IS
-  'true if spherical path does not overlap spherical line '; 
+COMMENT ON FUNCTION  spath_overlap_line_neg(spath, sline) IS
+  'true if spherical path does not overlap spherical line';
 
 
 CREATE OPERATOR !&& (
@@ -537,25 +537,25 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spath, sline ) IS
-  'true if spherical line does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (spath, sline) IS
+  'true if spherical line does not overlap spherical path';
 
 
 --
 -- line does not overlap path
 --
 
-CREATE FUNCTION spath_overlap_line_com_neg(sline,spath)
+CREATE FUNCTION spath_overlap_line_com_neg(sline, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepath_overlap_line_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepath_overlap_line_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spath_overlap_line_com_neg(sline,spath) IS
-  'true if spherical path does not overlap spherical line '; 
+COMMENT ON FUNCTION  spath_overlap_line_com_neg(sline, spath) IS
+  'true if spherical path does not overlap spherical line';
 
 
 CREATE OPERATOR !&& (
@@ -565,79 +565,79 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sline, spath ) IS
-  'true if spherical line does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (sline, spath) IS
+  'true if spherical line does not overlap spherical path';
 
 
 --
 --  ellipse contains path
 --
 
-CREATE FUNCTION sellipse_contains_path(sellipse,spath)
+CREATE FUNCTION sellipse_contains_path(sellipse, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_path'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_path(sellipse,spath) IS
-  'true if spherical ellipse contains spherical path '; 
+COMMENT ON FUNCTION sellipse_contains_path(sellipse, spath) IS
+  'true if spherical ellipse contains spherical path';
 
 
 --
 --  path is contained by ellipse
 --
 
-CREATE FUNCTION sellipse_contains_path_com(spath,sellipse)
+CREATE FUNCTION sellipse_contains_path_com(spath, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_path_com'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_path_com(spath,sellipse) IS
-  'true if spherical ellipse contains spherical path '; 
+COMMENT ON FUNCTION sellipse_contains_path_com(spath, sellipse) IS
+  'true if spherical ellipse contains spherical path';
 
 --
 --  ellipse does not contains path
 --
 
-CREATE FUNCTION sellipse_contains_path_neg(sellipse,spath)
+CREATE FUNCTION sellipse_contains_path_neg(sellipse, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_path_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_path_neg(sellipse,spath) IS
-  'true if spherical ellipse does not contain spherical path '; 
+COMMENT ON FUNCTION sellipse_contains_path_neg(sellipse, spath) IS
+  'true if spherical ellipse does not contain spherical path';
 
 
 --
 --  path is not contained by ellipse
 --
 
-CREATE FUNCTION sellipse_contains_path_com_neg(spath,sellipse)
+CREATE FUNCTION sellipse_contains_path_com_neg(spath, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_cont_path_com_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_cont_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION sellipse_contains_path_com_neg(spath,sellipse) IS
-  'true if spherical ellipse does not contain spherical path '; 
+COMMENT ON FUNCTION sellipse_contains_path_com_neg(spath, sellipse) IS
+  'true if spherical ellipse does not contain spherical path';
 
 --
 -- ellipse overlaps path
 --
 
-CREATE FUNCTION sellipse_overlap_path(sellipse,spath)
+CREATE FUNCTION sellipse_overlap_path(sellipse, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_path'
+   AS 'MODULE_PATHNAME', 'sphereellipse_overlap_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sellipse_overlap_path(sellipse,spath) IS
-  'true if spherical ellipse overlap spherical path '; 
+COMMENT ON FUNCTION  sellipse_overlap_path(sellipse, spath) IS
+  'true if spherical ellipse overlap spherical path';
 
 
 CREATE OPERATOR && (
@@ -647,25 +647,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( sellipse, spath ) IS
-  'true if spherical ellipse overlap spherical path'; 
+COMMENT ON OPERATOR && (sellipse, spath) IS
+  'true if spherical ellipse overlap spherical path';
 
 
 --
 -- path overlaps ellipse
 --
 
-CREATE FUNCTION sellipse_overlap_path_com(spath,sellipse)
+CREATE FUNCTION sellipse_overlap_path_com(spath, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_path_com'
+   AS 'MODULE_PATHNAME', 'sphereellipse_overlap_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sellipse_overlap_path_com(spath,sellipse) IS
-  'true if spherical ellipse overlap spherical path '; 
+COMMENT ON FUNCTION  sellipse_overlap_path_com(spath, sellipse) IS
+  'true if spherical ellipse overlap spherical path';
 
 CREATE OPERATOR && (
    LEFTARG    = spath,
@@ -674,24 +674,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spath, sellipse ) IS
-  'true if spherical ellipse overlap spherical path'; 
+COMMENT ON OPERATOR && (spath, sellipse) IS
+  'true if spherical ellipse overlap spherical path';
 
 --
 -- ellipse does not overlap path
 --
 
-CREATE FUNCTION sellipse_overlap_path_neg(sellipse,spath)
+CREATE FUNCTION sellipse_overlap_path_neg(sellipse, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_path_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_overlap_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sellipse_overlap_path_neg(sellipse,spath) IS
-  'true if spherical ellipse does not overlap spherical path '; 
+COMMENT ON FUNCTION  sellipse_overlap_path_neg(sellipse, spath) IS
+  'true if spherical ellipse does not overlap spherical path';
 
 
 CREATE OPERATOR !&& (
@@ -701,25 +701,25 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( sellipse, spath ) IS
-  'true if spherical ellipse does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (sellipse, spath) IS
+  'true if spherical ellipse does not overlap spherical path';
 
 
 --
 -- path does not overlap ellipse
 --
 
-CREATE FUNCTION sellipse_overlap_path_com_neg(spath,sellipse)
+CREATE FUNCTION sellipse_overlap_path_com_neg(spath, sellipse)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'sphereellipse_overlap_path_com_neg'
+   AS 'MODULE_PATHNAME', 'sphereellipse_overlap_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  sellipse_overlap_path_com_neg(spath,sellipse) IS
-  'true if spherical ellipse overlap spherical path '; 
+COMMENT ON FUNCTION  sellipse_overlap_path_com_neg(spath, sellipse) IS
+  'true if spherical ellipse overlap spherical path';
 
 CREATE OPERATOR !&& (
    LEFTARG    = spath,
@@ -728,79 +728,79 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spath, sellipse ) IS
-  'true if spherical ellipse does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (spath, sellipse) IS
+  'true if spherical ellipse does not overlap spherical path';
 
 
 --
 --  polygon contains path
 --
 
-CREATE FUNCTION spoly_contains_path(spoly,spath)
+CREATE FUNCTION spoly_contains_path(spoly, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_path'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_path(spoly,spath) IS
-  'true if spherical polygon contains spherical path '; 
+COMMENT ON FUNCTION spoly_contains_path(spoly, spath) IS
+  'true if spherical polygon contains spherical path';
 
 
 --
 --  path is contained by polygon
 --
 
-CREATE FUNCTION spoly_contains_path_com(spath,spoly)
+CREATE FUNCTION spoly_contains_path_com(spath, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_path_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_path_com(spath,spoly) IS
-  'true if spherical polygon contains spherical path '; 
+COMMENT ON FUNCTION spoly_contains_path_com(spath, spoly) IS
+  'true if spherical polygon contains spherical path';
 
 --
 --  polygon does not contains path
 --
 
-CREATE FUNCTION spoly_contains_path_neg(spoly,spath)
+CREATE FUNCTION spoly_contains_path_neg(spoly, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_path_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_path_neg(spoly,spath) IS
-  'true if spherical polygon does not contain spherical path '; 
+COMMENT ON FUNCTION spoly_contains_path_neg(spoly, spath) IS
+  'true if spherical polygon does not contain spherical path';
 
 
 --
 --  path is not contained by polygon
 --
 
-CREATE FUNCTION spoly_contains_path_com_neg(spath,spoly)
+CREATE FUNCTION spoly_contains_path_com_neg(spath, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_cont_path_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_cont_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION spoly_contains_path_com_neg(spath,spoly) IS
-  'true if spherical polygon does not contain spherical path '; 
+COMMENT ON FUNCTION spoly_contains_path_com_neg(spath, spoly) IS
+  'true if spherical polygon does not contain spherical path';
 
 --
 -- polygon overlaps path
 --
 
-CREATE FUNCTION spoly_overlap_path(spoly,spath)
+CREATE FUNCTION spoly_overlap_path(spoly, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_path'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_path'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_path(spoly,spath) IS
-  'true if spherical polygon overlap spherical path '; 
+COMMENT ON FUNCTION  spoly_overlap_path(spoly, spath) IS
+  'true if spherical polygon overlap spherical path';
 
 
 CREATE OPERATOR && (
@@ -810,25 +810,25 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spoly, spath ) IS
-  'true if spherical polygon overlap spherical path'; 
+COMMENT ON OPERATOR && (spoly, spath) IS
+  'true if spherical polygon overlap spherical path';
 
 
 --
 -- path overlaps polygon
 --
 
-CREATE FUNCTION spoly_overlap_path_com(spath,spoly)
+CREATE FUNCTION spoly_overlap_path_com(spath, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_path_com'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_path_com'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_path_com(spath,spoly) IS
-  'true if spherical polygon overlap spherical path '; 
+COMMENT ON FUNCTION  spoly_overlap_path_com(spath, spoly) IS
+  'true if spherical polygon overlap spherical path';
 
 CREATE OPERATOR && (
    LEFTARG    = spath,
@@ -837,24 +837,24 @@ CREATE OPERATOR && (
    COMMUTATOR = '&&',
    NEGATOR    = '!&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR && ( spath, spoly ) IS
-  'true if spherical polygon overlap spherical path'; 
+COMMENT ON OPERATOR && (spath, spoly) IS
+  'true if spherical polygon overlap spherical path';
 
 --
 -- polygon does not overlap path
 --
 
-CREATE FUNCTION spoly_overlap_path_neg(spoly,spath)
+CREATE FUNCTION spoly_overlap_path_neg(spoly, spath)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_path_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_path_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_path_neg(spoly,spath) IS
-  'true if spherical polygon does not overlap spherical path '; 
+COMMENT ON FUNCTION  spoly_overlap_path_neg(spoly, spath) IS
+  'true if spherical polygon does not overlap spherical path';
 
 
 CREATE OPERATOR !&& (
@@ -864,25 +864,25 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spoly, spath ) IS
-  'true if spherical polygon does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (spoly, spath) IS
+  'true if spherical polygon does not overlap spherical path';
 
 
 --
 -- path does not overlap polygon
 --
 
-CREATE FUNCTION spoly_overlap_path_com_neg(spath,spoly)
+CREATE FUNCTION spoly_overlap_path_com_neg(spath, spoly)
    RETURNS BOOL
-   AS 'MODULE_PATHNAME' , 'spherepoly_overlap_path_com_neg'
+   AS 'MODULE_PATHNAME', 'spherepoly_overlap_path_com_neg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
 
-COMMENT ON FUNCTION  spoly_overlap_path_com_neg(spath,spoly) IS
-  'true if spherical polygon overlap spherical path '; 
+COMMENT ON FUNCTION  spoly_overlap_path_com_neg(spath, spoly) IS
+  'true if spherical polygon overlap spherical path';
 
 CREATE OPERATOR !&& (
    LEFTARG    = spath,
@@ -891,11 +891,11 @@ CREATE OPERATOR !&& (
    COMMUTATOR = '!&&',
    NEGATOR    = '&&',
    RESTRICT   = contsel,
-   JOIN       = contjoinsel 
+   JOIN       = contjoinsel
 );
 
-COMMENT ON OPERATOR !&& ( spath, spoly ) IS
-  'true if spherical polygon does not overlap spherical path'; 
+COMMENT ON OPERATOR !&& (spath, spoly) IS
+  'true if spherical polygon does not overlap spherical path';
 
 
 
@@ -903,23 +903,23 @@ COMMENT ON OPERATOR !&& ( spath, spoly ) IS
 -- Aggregate functions to add points to path
 --
 
-CREATE FUNCTION spath_add_point_aggr ( spath, spoint )
+CREATE FUNCTION spath_add_point_aggr (spath, spoint)
   RETURNS spath
-  AS 'MODULE_PATHNAME' , 'spherepath_add_point'
+  AS 'MODULE_PATHNAME', 'spherepath_add_point'
   LANGUAGE 'c'
   IMMUTABLE;
 
-COMMENT ON FUNCTION  spath_add_point_aggr ( spath, spoint ) IS
-  'adds a spherical point to spherical path. Do not use it standalone!'; 
+COMMENT ON FUNCTION  spath_add_point_aggr (spath, spoint) IS
+  'adds a spherical point to spherical path. Do not use it standalone!';
 
-CREATE FUNCTION spath_add_points_fin_aggr ( spath )
+CREATE FUNCTION spath_add_points_fin_aggr (spath)
   RETURNS spath
-  AS 'MODULE_PATHNAME' , 'spherepath_add_points_finalize'
+  AS 'MODULE_PATHNAME', 'spherepath_add_points_finalize'
   LANGUAGE 'c'
   IMMUTABLE STRICT ;
 
-COMMENT ON FUNCTION  spath_add_points_fin_aggr ( spath ) IS
-  'Finalize spherical point adding to spherical path. Do not use it standalone!'; 
+COMMENT ON FUNCTION  spath_add_points_fin_aggr (spath) IS
+  'Finalize spherical point adding to spherical path. Do not use it standalone!';
 
 CREATE AGGREGATE spath (
     sfunc     = spath_add_point_aggr,

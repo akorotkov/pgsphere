@@ -56,8 +56,8 @@ Datum gnomonic_inv(PG_FUNCTION_ARGS)
 	double cos_lat_t = cos(t->lat);
 	double sin_lat_t = sin(t->lat);
 
-	p->lng = t->lng + atan2(g->x * sin_c, rho * cos_lat_t * cos_c
-										- g->y * sin_lat_t * sin_c); 
+	p->lng = t->lng + atan2(g->x * sin_c,
+							rho * cos_lat_t * cos_c - g->y * sin_lat_t * sin_c);
 	p->lat = asin(cos_c * sin_lat_t + g->y *sin_c * cos_lat_t / rho);
 
 	PG_RETURN_POINTER(p);

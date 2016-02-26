@@ -1,80 +1,63 @@
 #include "pg_sphere.h"
 #include "sbuffer.h"
 
-/*!
-  \file
-  \brief functions to buffer the parser input
-*/
+/* Functions to buffer the parser input. */
 
+/* Maximum count of buffered angles. */
+#define MAX_BUF_ANGLE	20
 
-#define MAX_BUF_ANGLE	20	//!< maximum count of buffered angles
-
+/* The type of parsed spherical object. */
 unsigned char spheretype;
 
-/* !<the type of parsed spherical object */
+/* The angle buffer. */
+float8	bufangle[MAX_BUF_ANGLE];
 
-float8		bufangle[MAX_BUF_ANGLE];
-
-/* !<the angle buffer */
-
- /*
-  * ! \brief a simple spherical point
-  */
+/* A simple spherical point. */
 typedef struct
 {
-	double		lng;
-	/* !<longitude */
-	double		lat;
-	/* !<latitude */
+	double	lng;	/* longitude */
+	double	lat;	/* latitude */
 } bpoint;
 
- /* ! spherical point buffer */
+ /* Spherical point buffer. */
 struct
 {
-	int			m;
-	/* !count of buffered points */
-	bpoint	   *p;
-	/* !pointer to array of points */
-}	bufpoints;
+	int		m;		/* count of buffered points */
+	bpoint *p;		/* pointer to array of points */
+}		bufpoints;
 
- /* ! ID of line's length angle */
-int			bufline;
+/* ID of line's length angle. */
+int		bufline;
 
- /*
-  * ! First element is the ID of spherical point ( center ). Second element is
-  * the ID of radius angle. \brief Buffer of circle
-  */
-int			bufcircle[2];
+/*
+ * First element is the ID of spherical point ( center ).
+ * Second element is the ID of radius angle.
+ */
+int		bufcircle[2];
 
- /*
-  * ! \brief Buffer of ellipse
-  */
-int			bufellipse[5];
+/* Buffer of ellipse. */
+int		bufellipse[5];
 
- /*
-  * ! \brief Buffer of ID's of Euler transformation values
-  */
-int			bufeuler[3];
+/* Buffer of IDs of Euler transformation values. */
+int		bufeuler[3];
 
- /* !  Structure to buffer the axes of Euler transformation */
+/* Structure to buffer the axes of Euler transformation. */
 struct
 {
-	unsigned char phi,
-	/* !first axis */
-				theta,
-	/* !second axis */
-				psi;
-	/* !third axis */
-}	bufeulertype;
+	unsigned char	phi,	/* first axis */
+					theta,	/* second axis */
+					psi;	/* third axis */
+}		bufeulertype;
 
- /* ! Current angle ID */
-int			bufapos;
+/* Current angle ID. */
+int		bufapos;
 
- /* ! Current point ID */
-int			bufspos;
+/* Current point ID. */
+int		bufspos;
 
- /* ! Pointer to input buffer */
-char	   *parse_buffer;
+/* Pointer to input buffer. */
+char   *parse_buffer;
+
 
 void
 set_spheretype(unsigned char st)
@@ -189,7 +172,7 @@ set_line(int length)
 void
 set_euler(int phi, int theta, int psi, char *etype)
 {
-	int			i;
+	int			  i;
 	unsigned char t = 0;
 
 	bufeuler[0] = phi;
@@ -246,7 +229,7 @@ int
 get_line(double *phi, double *theta,
 		 double *psi, unsigned char *etype, double *length)
 {
-	int			i;
+	int i;
 
 	if (spheretype != STYPE_LINE)
 	{
@@ -280,7 +263,7 @@ int
 get_euler(double *phi, double *theta,
 		  double *psi, unsigned char *etype)
 {
-	int			i;
+	int i;
 
 	if (spheretype != STYPE_EULER)
 	{
@@ -384,9 +367,7 @@ get_box(double *lng1, double *lat1, double *lng2, double *lat2)
 int
 get_buffer(char *buf, int offset)
 {
-	int			slen = 0;
-
-	slen = strlen(parse_buffer);
+	int slen = strlen(parse_buffer);
 
 	if (!parse_buffer || !(slen > 0))
 	{
