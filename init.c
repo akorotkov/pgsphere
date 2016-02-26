@@ -117,6 +117,15 @@ join_pathlist_hook(PlannerInfo *root,
 	text	   *dist_func_name = cstring_to_text("dist(spoint,spoint)");
 	Oid			dist_func;
 	List	   *restrict_clauses = extra->restrictlist;
+	Relids		required_relids = NULL;
+
+	if (outerrel->reloptkind == RELOPT_BASEREL &&
+		innerrel->reloptkind == RELOPT_BASEREL)
+	{
+		required_relids = bms_add_member(required_relids, outerrel->relid);
+		required_relids = bms_add_member(required_relids, innerrel->relid);
+	}
+	else return; /* one of relations can't have index */
 
 	dist_func = DatumGetObjectId(DirectFunctionCall1(to_regprocedure,
 													 PointerGetDatum(dist_func_name)));
@@ -136,14 +145,9 @@ join_pathlist_hook(PlannerInfo *root,
 	{
 		RestrictInfo *restrInfo = (RestrictInfo *) lfirst(restr);
 
-		if (outerrel->reloptkind == RELOPT_BASEREL &&
-			innerrel->reloptkind == RELOPT_BASEREL &&
-			bms_is_member(outerrel->relid, restrInfo->clause_relids) &&
-			bms_is_member(innerrel->relid, restrInfo->clause_relids))
-		{
-			/* This is our case */
-		}
-		else continue;
+		/* Skip irrelevant JOIN case */
+		if (!bms_equal(required_relids, restrInfo->required_relids))
+			continue;
 
 		if (IsA(restrInfo->clause, OpExpr))
 		{
@@ -176,7 +180,6 @@ join_pathlist_hook(PlannerInfo *root,
 																	  required_outer,
 																	  &restrict_clauses);
 
-				/* DEBUG */
 				create_crossmatch_path(root, joinrel, outer_path, inner_path,
 									   param_info, restrict_clauses, required_outer);
 
@@ -187,6 +190,7 @@ join_pathlist_hook(PlannerInfo *root,
 					 IsA(arg2, FuncExpr) &&
 					 ((FuncExpr *) arg2)->funcid == dist_func)
 			{
+				/* TODO: merge duplicate code */
 				Path *outer_path = crossmatch_find_cheapest_path(root, joinrel, outerrel);
 				Path *inner_path = crossmatch_find_cheapest_path(root, joinrel, innerrel);
 
@@ -200,14 +204,11 @@ join_pathlist_hook(PlannerInfo *root,
 																	  required_outer,
 																	  &restrict_clauses);
 
-				/* DEBUG */
 				create_crossmatch_path(root, joinrel, outer_path, inner_path,
 									   param_info, restrict_clauses, required_outer);
 			}
 		}
 	}
-
-	pprint(root->parse->rtable);
 }
 
 static Plan *
@@ -241,7 +242,7 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->scan.plan.qual = NIL;
 	cscan->scan.scanrelid = 0;
 
-	cscan->custom_scan_tlist = tlist;
+	cscan->custom_scan_tlist = tlist; /* TODO: recheck target list */
 
 	elog(LOG, "tlist:");
 	pprint(tlist);
@@ -268,6 +269,7 @@ crossmatch_create_scan_state(CustomScan *node)
 	return (Node *) scan_state;
 }
 
+/* HACK: remove this */
 static int i = 0;
 
 static void
