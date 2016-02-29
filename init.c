@@ -12,7 +12,10 @@
 #include "funcapi.h"
 
 #include "access/htup_details.h"
+#include "access/heapam.h"
+
 #include "point.h"
+#include "crossmatch.h"
 
 extern void _PG_init(void);
 
@@ -37,6 +40,9 @@ typedef struct
 	HeapTupleData	scan_tuple;		/* buffer to fetch tuple */
 	List		   *dev_tlist;		/* tlist to be returned from the device */
 	List		   *dev_quals;		/* quals to be run on the device */
+
+	Relation		left;
+	Relation		right;
 } CrossmatchScanState;
 
 static CustomPathMethods	crossmatch_path_methods;
@@ -91,6 +97,7 @@ create_crossmatch_path(PlannerInfo *root,
 	result->cpath.path.parent = joinrel;
 	result->cpath.path.param_info = param_info;
 	result->cpath.path.pathkeys = NIL;
+	result->cpath.path.pathtarget = &joinrel->reltarget;
 	result->cpath.path.rows = joinrel->rows;
 	result->cpath.flags = 0;
 	result->cpath.methods = &crossmatch_path_methods;
@@ -221,7 +228,7 @@ create_crossmatch_plan(PlannerInfo *root,
 {
 	CrossmatchJoinPath	   *gpath = (CrossmatchJoinPath *) best_path;
 	List				   *joinrestrictclauses = gpath->joinrestrictinfo;
-	List				   *joinclauses;
+	List				   *joinclauses; /* NOTE: do we really need it? */
 	List				   *otherclauses;
 	CustomScan			   *cscan;
 
@@ -249,7 +256,6 @@ create_crossmatch_plan(PlannerInfo *root,
 
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
-	cscan->custom_plans = list_copy_tail(custom_plans, 1);
 
 	return &cscan->scan.plan;
 }
@@ -261,45 +267,57 @@ crossmatch_create_scan_state(CustomScan *node)
 
 	NodeSetTag(scan_state, T_CustomScanState);
 	scan_state->css.flags = node->flags;
-	if (node->methods == &crossmatch_plan_methods)
-		scan_state->css.methods = &crossmatch_exec_methods;
-	else
-		elog(ERROR, "Bug? unexpected CustomPlanMethods");
+	scan_state->css.methods = &crossmatch_exec_methods;
+
+	scan_state->css.ss.ps.ps_TupFromTlist = false;
 
 	return (Node *) scan_state;
 }
 
-/* HACK: remove this */
-static int i = 0;
-
 static void
 crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 {
-	i = 0;
+
 }
 
 static TupleTableSlot *
 crossmatch_exec(CustomScanState *node)
 {
-	TupleTableSlot *slot = node->ss.ss_ScanTupleSlot;
-	TupleDesc	tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
+	TupleTableSlot *slot = node->ss.ps.ps_ResultTupleSlot;
+	TupleDesc	tupdesc = node->ss.ps.ps_ResultTupleSlot->tts_tupleDescriptor;
+	ExprContext *econtext = node->ss.ps.ps_ProjInfo->pi_exprContext;
 	HeapTuple	htup;
 
+	HeapTupleData fetched_tup;
+
+	ResetExprContext(econtext);
+
 	/* TODO: fill with real data from joined tables */
-	Datum values[2] = { DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")),
+	Datum values[4] = { DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")),
 						DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")) };
-	bool nulls[2] = {0, 0};
+	bool nulls[4] = {0,1,1,1};
+
+	elog(LOG, "slot.natts: %d", tupdesc->natts);
 
 	htup = heap_form_tuple(tupdesc, values, nulls);
 
-	elog(LOG, "natts: %d", tupdesc->natts);
+	if (node->ss.ps.ps_ProjInfo->pi_itemIsDone != ExprEndResult)
+	{
+		TupleTableSlot *result;
+		ExprDoneCond isDone;
 
-	i++;
+		econtext->ecxt_scantuple = ExecStoreTuple(htup, slot, InvalidBuffer, false);
 
-	if (i > 10)
-		ExecClearTuple(slot);
+		result = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
+
+		if (isDone != ExprEndResult)
+		{
+			node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
+			return result;
+		}
+	}
 	else
-		ExecStoreTuple(htup, slot, InvalidBuffer, false);
+		ExecClearTuple(slot);
 
 	return slot;
 }
