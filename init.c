@@ -5,7 +5,9 @@
 #include "utils/builtins.h"
 #include "utils/elog.h"
 #include "utils/lsyscache.h"
+
 #include "nodes/print.h"
+
 #include "catalog/pg_proc.h"
 #include "catalog/pg_operator.h"
 #include "commands/explain.h"
@@ -37,12 +39,15 @@ typedef struct
 {
 	CustomScanState css;
 
-	HeapTupleData	scan_tuple;		/* buffer to fetch tuple */
-	List		   *dev_tlist;		/* tlist to be returned from the device */
-	List		   *dev_quals;		/* quals to be run on the device */
+	List		   *scan_tlist;
 
-	Relation		left;
-	Relation		right;
+	Relation		outer_rel;
+	ItemPointer		outer_ptr;
+	HeapTuple		outer_tup;
+
+	Relation		inner_rel;
+	ItemPointer		inner_ptr;
+	HeapTuple		inner_tup;
 } CrossmatchScanState;
 
 static CustomPathMethods	crossmatch_path_methods;
@@ -232,6 +237,12 @@ create_crossmatch_plan(PlannerInfo *root,
 	List				   *otherclauses;
 	CustomScan			   *cscan;
 
+	Index lrel = gpath->outer_path->parent->relid;
+	Index rrel = gpath->inner_path->parent->relid;
+
+	/* relids should not be 0 */
+	Assert(lrel != 0 && rrel != 0);
+
 	if (IS_OUTER_JOIN(gpath->jointype))
 	{
 		extract_actual_join_clauses(joinrestrictclauses,
@@ -246,16 +257,15 @@ create_crossmatch_plan(PlannerInfo *root,
 
 	cscan = makeNode(CustomScan);
 	cscan->scan.plan.targetlist = tlist;
+	cscan->custom_scan_tlist = tlist;	/* output of this node */
 	cscan->scan.plan.qual = NIL;
 	cscan->scan.scanrelid = 0;
 
-	cscan->custom_scan_tlist = tlist; /* TODO: recheck target list */
-
-	elog(LOG, "tlist:");
-	pprint(tlist);
-
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
+
+	cscan->custom_private = list_make2_oid(root->simple_rte_array[lrel]->relid,
+										   root->simple_rte_array[rrel]->relid);
 
 	return &cscan->scan.plan;
 }
@@ -271,6 +281,12 @@ crossmatch_create_scan_state(CustomScan *node)
 
 	scan_state->css.ss.ps.ps_TupFromTlist = false;
 
+	scan_state->scan_tlist = node->custom_scan_tlist;
+	scan_state->outer_rel = heap_open(linitial_oid(node->custom_private),
+								 AccessShareLock);
+	scan_state->inner_rel = heap_open(lsecond_oid(node->custom_private),
+								  AccessShareLock);
+
 	return (Node *) scan_state;
 }
 
@@ -283,49 +299,53 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 static TupleTableSlot *
 crossmatch_exec(CustomScanState *node)
 {
-	TupleTableSlot *slot = node->ss.ps.ps_ResultTupleSlot;
-	TupleDesc	tupdesc = node->ss.ps.ps_ResultTupleSlot->tts_tupleDescriptor;
-	ExprContext *econtext = node->ss.ps.ps_ProjInfo->pi_exprContext;
+	TupleTableSlot *slot = node->ss.ss_ScanTupleSlot;
+	TupleDesc	tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
 	HeapTuple	htup;
-
-	HeapTupleData fetched_tup;
-
-	ResetExprContext(econtext);
+	TupleTableSlot *result;
 
 	/* TODO: fill with real data from joined tables */
-	Datum values[4] = { DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")),
+	Datum values[2] = { DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")),
 						DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")) };
-	bool nulls[4] = {0,1,1,1};
+	bool nulls[2] = {0,0};
 
 	elog(LOG, "slot.natts: %d", tupdesc->natts);
 
 	htup = heap_form_tuple(tupdesc, values, nulls);
 
-	if (node->ss.ps.ps_ProjInfo->pi_itemIsDone != ExprEndResult)
+	if (node->ss.ps.ps_ProjInfo)
 	{
-		TupleTableSlot *result;
-		ExprDoneCond isDone;
-
-		econtext->ecxt_scantuple = ExecStoreTuple(htup, slot, InvalidBuffer, false);
-
-		result = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
-
-		if (isDone != ExprEndResult)
+		if (*(node->ss.ps.ps_ProjInfo->pi_itemIsDone) != ExprEndResult)
 		{
-			node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
-			return result;
+			ExprDoneCond isDone;
+
+			node->ss.ps.ps_ProjInfo->pi_exprContext->ecxt_scantuple = ExecStoreTuple(htup, slot, InvalidBuffer, false);
+
+			result = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
+
+			if (isDone != ExprEndResult)
+			{
+				node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
+			}
 		}
+		else
+			result = ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
 	}
 	else
-		ExecClearTuple(slot);
+	{
+		result = ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
+	}
 
-	return slot;
+	return result;
 }
 
 static void
 crossmatch_end(CustomScanState *node)
 {
+	CrossmatchScanState *scan_state = (CrossmatchScanState *) node;
 
+	heap_close(scan_state->outer_rel, AccessShareLock);
+	heap_close(scan_state->inner_rel, AccessShareLock);
 }
 
 static void
