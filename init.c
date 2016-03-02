@@ -107,7 +107,12 @@ pick_suitable_index(Oid relation, AttrNumber column)
 	HeapTuple		htup;
 	SysScanDesc		scan;
 	Relation		pg_index;
+	List		   *spoint2_opclass_name;
+	Oid				spoint2_opclass;
 	ScanKeyData		key[3];
+
+	spoint2_opclass_name = stringToQualifiedNameList("public.spoint2");
+	spoint2_opclass = get_opclass_oid(GIST_AM_OID, spoint2_opclass_name, false);
 
 	ScanKeyInit(&key[0],
 				Anum_pg_index_indrelid,
@@ -146,9 +151,18 @@ pick_suitable_index(Oid relation, AttrNumber column)
 															PointerGetDatum(cstring_to_text("main"))));
 
 					if (found_index == InvalidOid || cur_index_size < found_index_size)
-						found_index = pg_ind->indexrelid;
+					{
+						bool		is_null;
+						Datum		indclass = heap_getattr(htup, Anum_pg_index_indclass,
+															pg_index->rd_att, &is_null);
+						oidvector  *indclasses = (oidvector *) DatumGetPointer(indclass);
 
-					break;	/* no need to go further */
+						/* column must use 'spoint2' opclass */
+						if (!is_null && indclasses->values[i] == spoint2_opclass)
+							found_index = pg_ind->indexrelid;
+					}
+
+					break;	/* no need to scan 'indkey' further */
 				}
 			}
 		}
