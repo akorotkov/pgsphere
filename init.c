@@ -16,6 +16,7 @@
 #include "catalog/pg_proc.h"
 #include "catalog/pg_operator.h"
 #include "commands/explain.h"
+#include "commands/defrem.h"
 #include "funcapi.h"
 
 #include "access/htup_details.h"
@@ -43,6 +44,8 @@ typedef struct
 	Oid				inner_rel;
 
 	List		   *joinrestrictinfo;
+
+	float8			threshold;
 } CrossmatchJoinPath;
 
 typedef struct
@@ -65,6 +68,8 @@ typedef struct
 	HeapTuple		inner_tup;
 	Relation		inner;
 
+	float8			threshold;
+
 	CrossmatchContext *ctx;
 } CrossmatchScanState;
 
@@ -72,6 +77,23 @@ static CustomPathMethods	crossmatch_path_methods;
 static CustomScanMethods	crossmatch_plan_methods;
 static CustomExecMethods	crossmatch_exec_methods;
 
+
+static float8
+get_const_val(Const *node)
+{
+	FmgrInfo	finfo;
+	Oid			cast;
+
+	Assert(IsA(node, Const));
+
+	if (node->consttype == FLOAT8OID)
+		return DatumGetFloat8(node->constvalue);
+
+	cast = get_cast_oid(node->consttype, FLOAT8OID, false);
+	fmgr_info(cast, &finfo);
+
+	return DatumGetFloat8(FunctionCall1(&finfo, node->constvalue));
+}
 
 /*
  * TODO: check for the predicates & decide
@@ -174,7 +196,8 @@ create_crossmatch_path(PlannerInfo *root,
 					   Path *inner_path,
 					   ParamPathInfo *param_info,
 					   List *restrict_clauses,
-					   Relids required_outer)
+					   Relids required_outer,
+					   float8 threshold)
 {
 	CrossmatchJoinPath *result;
 
@@ -207,6 +230,7 @@ create_crossmatch_path(PlannerInfo *root,
 	result->inner_path = inner_path;
 	result->inner_idx = inner_idx;
 	result->inner_rel = inner_rel;
+	result->threshold = threshold;
 	result->joinrestrictinfo = restrict_clauses;
 
 	/* TODO: real costs */
@@ -292,7 +316,8 @@ join_pathlist_hook(PlannerInfo *root,
 																	  &restrict_clauses);
 
 				create_crossmatch_path(root, joinrel, outer_path, inner_path,
-									   param_info, restrict_clauses, required_outer);
+									   param_info, restrict_clauses, required_outer,
+									   get_const_val((Const *) arg2));
 
 				break;
 			}
@@ -316,7 +341,8 @@ join_pathlist_hook(PlannerInfo *root,
 																	  &restrict_clauses);
 
 				create_crossmatch_path(root, joinrel, outer_path, inner_path,
-									   param_info, restrict_clauses, required_outer);
+									   param_info, restrict_clauses, required_outer,
+									   get_const_val((Const *) arg1));
 			}
 		}
 	}
@@ -335,6 +361,7 @@ create_crossmatch_plan(PlannerInfo *root,
 	List				   *joinclauses; /* NOTE: do we really need it? */
 	List				   *otherclauses;
 	CustomScan			   *cscan;
+	float8				   *threshold = palloc(sizeof(float8));
 
 	if (IS_OUTER_JOIN(gpath->jointype))
 	{
@@ -357,10 +384,12 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
 
-	cscan->custom_private = list_make4_oid(gpath->outer_idx,
-										   gpath->outer_rel,
-										   gpath->inner_idx,
-										   gpath->inner_rel);
+	cscan->custom_private = list_make2(list_make4_oid(gpath->outer_idx,
+													  gpath->outer_rel,
+													  gpath->inner_idx,
+													  gpath->inner_rel),
+									   list_make1(threshold));
+	*threshold = gpath->threshold;
 
 	return &cscan->scan.plan;
 }
@@ -379,10 +408,11 @@ crossmatch_create_scan_state(CustomScan *node)
 
 	scan_state->scan_tlist = node->custom_scan_tlist;
 
-	scan_state->outer_idx = linitial_oid(node->custom_private);
-	scan_state->outer_rel = lsecond_oid(node->custom_private);
-	scan_state->inner_idx = lthird_oid(node->custom_private);
-	scan_state->inner_rel = lfourth_oid(node->custom_private);
+	scan_state->outer_idx = linitial_oid(linitial(node->custom_private));
+	scan_state->outer_rel = lsecond_oid(linitial(node->custom_private));
+	scan_state->inner_idx = lthird_oid(linitial(node->custom_private));
+	scan_state->inner_rel = lfourth_oid(linitial(node->custom_private));
+	scan_state->threshold = *(float8 *) linitial(lsecond(node->custom_private));
 
 	return (Node *) scan_state;
 }
@@ -394,7 +424,8 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 	CrossmatchContext *ctx = (CrossmatchContext *) palloc0(sizeof(CrossmatchContext));
 
 	scan_state->ctx = ctx;
-	setupFirstcall(ctx, scan_state->outer_idx, scan_state->inner_idx, 1);
+	setupFirstcall(ctx, scan_state->outer_idx,
+				   scan_state->inner_idx, scan_state->threshold);
 
 	scan_state->outer = heap_open(scan_state->outer_rel, AccessShareLock);
 	scan_state->inner = heap_open(scan_state->inner_rel, AccessShareLock);
