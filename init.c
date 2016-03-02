@@ -2,11 +2,13 @@
 #include "optimizer/paths.h"
 #include "optimizer/pathnode.h"
 #include "optimizer/restrictinfo.h"
+#include "utils/tqual.h"
 #include "utils/builtins.h"
 #include "utils/elog.h"
 #include "utils/lsyscache.h"
 #include "utils/rel.h"
 #include "utils/fmgroids.h"
+#include "storage/bufmgr.h"
 
 #include "nodes/print.h"
 
@@ -47,17 +49,23 @@ typedef struct
 {
 	CustomScanState css;
 
+	HeapTuple		stored_tuple;
+
 	List		   *scan_tlist;
 
 	Oid				outer_idx;
 	Oid				outer_rel;
 	ItemPointer		outer_ptr;
 	HeapTuple		outer_tup;
+	Relation		outer;
 
 	Oid				inner_idx;
 	Oid				inner_rel;
 	ItemPointer		inner_ptr;
 	HeapTuple		inner_tup;
+	Relation		inner;
+
+	CrossmatchContext *ctx;
 } CrossmatchScanState;
 
 static CustomPathMethods	crossmatch_path_methods;
@@ -374,7 +382,7 @@ crossmatch_create_scan_state(CustomScan *node)
 	scan_state->outer_idx = linitial_oid(node->custom_private);
 	scan_state->outer_rel = lsecond_oid(node->custom_private);
 	scan_state->inner_idx = lthird_oid(node->custom_private);
-	scan_state->outer_rel = lfourth_oid(node->custom_private);
+	scan_state->inner_rel = lfourth_oid(node->custom_private);
 
 	return (Node *) scan_state;
 }
@@ -382,25 +390,59 @@ crossmatch_create_scan_state(CustomScan *node)
 static void
 crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 {
+	CrossmatchScanState *scan_state = (CrossmatchScanState *) node;
+	CrossmatchContext *ctx = (CrossmatchContext *) palloc0(sizeof(CrossmatchContext));
 
+	scan_state->ctx = ctx;
+	setupFirstcall(ctx, scan_state->outer_idx, scan_state->inner_idx, 1);
+
+	scan_state->outer = heap_open(scan_state->outer_rel, AccessShareLock);
+	scan_state->inner = heap_open(scan_state->inner_rel, AccessShareLock);
 }
 
 static TupleTableSlot *
 crossmatch_exec(CustomScanState *node)
 {
+	CrossmatchScanState *scan_state = (CrossmatchScanState *) node;
 	TupleTableSlot *slot = node->ss.ss_ScanTupleSlot;
 	TupleDesc	tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
-	HeapTuple	htup;
+	HeapTuple	htup = scan_state->stored_tuple;
+
 	TupleTableSlot *result;
 
-	/* TODO: fill with real data from joined tables */
-	Datum values[2] = { DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")),
-						DirectFunctionCall1(spherepoint_in, CStringGetDatum("(1d, 1d)")) };
-	bool nulls[2] = {0,0};
+	if (!node->ss.ps.ps_TupFromTlist)
+	{
+		Datum				values[2];
+		bool				nulls[2]  = { 0 };
 
-	elog(LOG, "slot.natts: %d", tupdesc->natts);
+		ItemPointerData		p_tids[2] = { 0 };
+		HeapTupleData		htup1;
+		HeapTupleData		htup2;
+		Buffer				buf1;
+		Buffer				buf2;
 
-	htup = heap_form_tuple(tupdesc, values, nulls);
+		crossmatch(scan_state->ctx, p_tids);
+
+		if (!ItemPointerIsValid(&p_tids[0]) || !ItemPointerIsValid(&p_tids[1]))
+		{
+			result = ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
+			return result;
+		}
+
+		htup1.t_self = p_tids[0];
+		heap_fetch(scan_state->outer, SnapshotSelf, &htup1, &buf1, false, NULL);
+		values[0] = heap_getattr(&htup1, 1, scan_state->outer->rd_att, &nulls[0]);
+
+		htup2.t_self = p_tids[1];
+		heap_fetch(scan_state->inner, SnapshotSelf, &htup2, &buf2, false, NULL);
+		values[1] = heap_getattr(&htup2, 1, scan_state->inner->rd_att, &nulls[1]);
+
+		ReleaseBuffer(buf1);
+		ReleaseBuffer(buf2);
+
+		htup = heap_form_tuple(tupdesc, values, nulls);
+		scan_state->stored_tuple = htup;
+	}
 
 	if (node->ss.ps.ps_ProjInfo)
 	{
@@ -418,12 +460,10 @@ crossmatch_exec(CustomScanState *node)
 				node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
 			}
 		}
-		else
-			result = ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
 	}
 	else
 	{
-		result = ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
+		result = ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot, InvalidBuffer, false);
 	}
 
 	return result;
@@ -432,7 +472,12 @@ crossmatch_exec(CustomScanState *node)
 static void
 crossmatch_end(CustomScanState *node)
 {
+	CrossmatchScanState *scan_state = (CrossmatchScanState *) node;
 
+	heap_close(scan_state->outer, AccessShareLock);
+	heap_close(scan_state->inner, AccessShareLock);
+
+	endCall(scan_state->ctx);
 }
 
 static void
