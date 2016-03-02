@@ -5,9 +5,12 @@
 #include "utils/builtins.h"
 #include "utils/elog.h"
 #include "utils/lsyscache.h"
+#include "utils/rel.h"
+#include "utils/fmgroids.h"
 
 #include "nodes/print.h"
 
+#include "catalog/pg_am.h"
 #include "catalog/pg_proc.h"
 #include "catalog/pg_operator.h"
 #include "commands/explain.h"
@@ -30,7 +33,12 @@ typedef struct
 	JoinType		jointype;
 
 	Path		   *outer_path;
+	Oid				outer_idx;
+	Oid				outer_rel;
+
 	Path		   *inner_path;
+	Oid				inner_idx;
+	Oid				inner_rel;
 
 	List		   *joinrestrictinfo;
 } CrossmatchJoinPath;
@@ -41,11 +49,13 @@ typedef struct
 
 	List		   *scan_tlist;
 
-	Relation		outer_rel;
+	Oid				outer_idx;
+	Oid				outer_rel;
 	ItemPointer		outer_ptr;
 	HeapTuple		outer_tup;
 
-	Relation		inner_rel;
+	Oid				inner_idx;
+	Oid				inner_rel;
 	ItemPointer		inner_ptr;
 	HeapTuple		inner_tup;
 } CrossmatchScanState;
@@ -54,6 +64,71 @@ static CustomPathMethods	crossmatch_path_methods;
 static CustomScanMethods	crossmatch_plan_methods;
 static CustomExecMethods	crossmatch_exec_methods;
 
+
+/*
+ * TODO: check for the predicates & decide
+ * whether some partial indices may suffice
+ */
+static Oid
+pick_suitable_index(Oid relation, AttrNumber column)
+{
+	Oid				found_index = InvalidOid;
+	int64			found_index_size = 0;
+	HeapTuple		htup;
+	SysScanDesc		scan;
+	Relation		pg_index;
+	ScanKeyData		key[3];
+
+	ScanKeyInit(&key[0],
+				Anum_pg_index_indrelid,
+				BTEqualStrategyNumber,
+				F_OIDEQ,
+				ObjectIdGetDatum(relation));
+
+	pg_index = heap_open(IndexRelationId, AccessShareLock);
+	scan = systable_beginscan(pg_index, InvalidOid, false, NULL, 1, key);
+
+	while (HeapTupleIsValid(htup = systable_getnext(scan)))
+	{
+		Form_pg_index	pg_ind = (Form_pg_index) GETSTRUCT(htup);
+		Relation		index;
+		Oid				index_am;
+
+		index = index_open(pg_ind->indexrelid, AccessShareLock);
+		index_am = index->rd_rel->relam;
+		index_close(index, AccessShareLock);
+
+		/* check if this is a valid GIST index with no predicates */
+		if (index_am == GIST_AM_OID && pg_ind->indisvalid &&
+			heap_attisnull(htup, Anum_pg_index_indpred))
+		{
+			int i;
+
+			for (i = 0; i < pg_ind->indkey.dim1; i++)
+			{
+				int64 cur_index_size = 0;
+
+				if (pg_ind->indkey.values[i] == column)
+				{
+					cur_index_size = DatumGetInt64(
+										DirectFunctionCall2(pg_relation_size,
+															ObjectIdGetDatum(relation),
+															PointerGetDatum(cstring_to_text("main"))));
+
+					if (found_index == InvalidOid || cur_index_size < found_index_size)
+						found_index = pg_ind->indexrelid;
+
+					break;	/* no need to go further */
+				}
+			}
+		}
+	}
+
+	systable_endscan(scan);
+	heap_close(pg_index, AccessShareLock);
+
+	return found_index;
+}
 
 static Path *
 crossmatch_find_cheapest_path(PlannerInfo *root,
@@ -95,6 +170,18 @@ create_crossmatch_path(PlannerInfo *root,
 {
 	CrossmatchJoinPath *result;
 
+	Oid outer_rel = root->simple_rte_array[outer_path->parent->relid]->relid;
+	Oid inner_rel = root->simple_rte_array[inner_path->parent->relid]->relid;
+	Oid outer_idx;
+	Oid inner_idx;
+
+	/* TODO: use actual column numbers */
+	if ((outer_idx = pick_suitable_index(outer_rel, 1)) == InvalidOid ||
+		(inner_idx = pick_suitable_index(inner_rel, 1)) == InvalidOid)
+	{
+		return;
+	}
+
 	result = palloc0(sizeof(CrossmatchJoinPath));
 	NodeSetTag(result, T_CustomPath);
 
@@ -107,11 +194,15 @@ create_crossmatch_path(PlannerInfo *root,
 	result->cpath.flags = 0;
 	result->cpath.methods = &crossmatch_path_methods;
 	result->outer_path = outer_path;
+	result->outer_idx = outer_idx;
+	result->outer_rel = outer_rel;
 	result->inner_path = inner_path;
+	result->inner_idx = inner_idx;
+	result->inner_rel = inner_rel;
 	result->joinrestrictinfo = restrict_clauses;
 
 	/* TODO: real costs */
-	result->cpath.path.startup_cost = 1;
+	result->cpath.path.startup_cost = 0;
 	result->cpath.path.total_cost = 1;
 
 	add_path(joinrel, &result->cpath.path);
@@ -237,12 +328,6 @@ create_crossmatch_plan(PlannerInfo *root,
 	List				   *otherclauses;
 	CustomScan			   *cscan;
 
-	Index lrel = gpath->outer_path->parent->relid;
-	Index rrel = gpath->inner_path->parent->relid;
-
-	/* relids should not be 0 */
-	Assert(lrel != 0 && rrel != 0);
-
 	if (IS_OUTER_JOIN(gpath->jointype))
 	{
 		extract_actual_join_clauses(joinrestrictclauses,
@@ -264,8 +349,10 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
 
-	cscan->custom_private = list_make2_oid(root->simple_rte_array[lrel]->relid,
-										   root->simple_rte_array[rrel]->relid);
+	cscan->custom_private = list_make4_oid(gpath->outer_idx,
+										   gpath->outer_rel,
+										   gpath->inner_idx,
+										   gpath->inner_rel);
 
 	return &cscan->scan.plan;
 }
@@ -279,13 +366,15 @@ crossmatch_create_scan_state(CustomScan *node)
 	scan_state->css.flags = node->flags;
 	scan_state->css.methods = &crossmatch_exec_methods;
 
+	/* TODO: check if this assignment is redundant */
 	scan_state->css.ss.ps.ps_TupFromTlist = false;
 
 	scan_state->scan_tlist = node->custom_scan_tlist;
-	scan_state->outer_rel = heap_open(linitial_oid(node->custom_private),
-								 AccessShareLock);
-	scan_state->inner_rel = heap_open(lsecond_oid(node->custom_private),
-								  AccessShareLock);
+
+	scan_state->outer_idx = linitial_oid(node->custom_private);
+	scan_state->outer_rel = lsecond_oid(node->custom_private);
+	scan_state->inner_idx = lthird_oid(node->custom_private);
+	scan_state->outer_rel = lfourth_oid(node->custom_private);
 
 	return (Node *) scan_state;
 }
@@ -306,7 +395,7 @@ crossmatch_exec(CustomScanState *node)
 
 	/* TODO: fill with real data from joined tables */
 	Datum values[2] = { DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")),
-						DirectFunctionCall1(spherepoint_in, CStringGetDatum("(0d, 0d)")) };
+						DirectFunctionCall1(spherepoint_in, CStringGetDatum("(1d, 1d)")) };
 	bool nulls[2] = {0,0};
 
 	elog(LOG, "slot.natts: %d", tupdesc->natts);
@@ -319,6 +408,7 @@ crossmatch_exec(CustomScanState *node)
 		{
 			ExprDoneCond isDone;
 
+			/* TODO: find a better way to fill 'ecxt_scantuple' */
 			node->ss.ps.ps_ProjInfo->pi_exprContext->ecxt_scantuple = ExecStoreTuple(htup, slot, InvalidBuffer, false);
 
 			result = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
@@ -342,10 +432,7 @@ crossmatch_exec(CustomScanState *node)
 static void
 crossmatch_end(CustomScanState *node)
 {
-	CrossmatchScanState *scan_state = (CrossmatchScanState *) node;
 
-	heap_close(scan_state->outer_rel, AccessShareLock);
-	heap_close(scan_state->inner_rel, AccessShareLock);
 }
 
 static void
