@@ -434,8 +434,8 @@ crossmatch_create_scan_state(CustomScan *node)
 static void
 crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 {
-	CrossmatchScanState *scan_state = (CrossmatchScanState *) node;
-	CrossmatchContext *ctx = (CrossmatchContext *) palloc0(sizeof(CrossmatchContext));
+	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
+	CrossmatchContext	   *ctx = (CrossmatchContext *) palloc0(sizeof(CrossmatchContext));
 
 	scan_state->ctx = ctx;
 	setupFirstcall(ctx, scan_state->outer_idx,
@@ -448,10 +448,10 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 static TupleTableSlot *
 crossmatch_exec(CustomScanState *node)
 {
-	CrossmatchScanState *scan_state = (CrossmatchScanState *) node;
-	TupleTableSlot *slot = node->ss.ss_ScanTupleSlot;
-	TupleDesc	tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
-	HeapTuple	htup = scan_state->stored_tuple;
+	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
+	TupleTableSlot		   *slot = node->ss.ss_ScanTupleSlot;
+	TupleDesc				tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
+	HeapTuple				htup = scan_state->stored_tuple;
 
 	TupleTableSlot *result;
 
@@ -534,7 +534,20 @@ crossmatch_rescan(CustomScanState *node)
 static void
 crossmatch_explain(CustomScanState *node, List *ancestors, ExplainState *es)
 {
+	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
+	StringInfoData			str;
 
+	initStringInfo(&str);
+
+	appendStringInfo(&str, "%s",
+					 get_rel_name(scan_state->outer_idx));
+	ExplainPropertyText("Outer index", str.data, es);
+
+	resetStringInfo(&str);
+
+	appendStringInfo(&str, "%s",
+					 get_rel_name(scan_state->inner_idx));
+	ExplainPropertyText("Inner index", str.data, es);
 }
 
 void
