@@ -47,6 +47,10 @@
 #define heap_formtuple heap_form_tuple
 #endif
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 /*
  * Pair of pages for pending scan.
  */
@@ -146,7 +150,7 @@ setupFirstcall(CrossmatchContext *ctx, Oid idx1, Oid idx2,
 	ctx->indexes[0] = index_open(idx1, AccessShareLock);
 	ctx->indexes[1] = index_open(idx2, AccessShareLock);
 
-	ctx->pointThreshold = 2.0 * sin(0.5 * threshold);
+	ctx->pointThreshold = 2.0 * sin(0.5 * (threshold > M_PI ? M_PI : threshold));
 	ctx->box3dThreshold = MAXCVALUE * ctx->pointThreshold;
 
 	/*
