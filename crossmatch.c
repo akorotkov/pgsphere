@@ -12,16 +12,6 @@
  * tuples in page is significant simple variation of line sweep algorithm is
  * used to compare index tuples inside pages.
  *
- * There are two versions of crossmatch function:
- * - crossmatch(text, text, float8)
- * - crossmatch(text, text, float8, sbox)
- * First two argument is names of GiST indexes of spoint2 opclass.
- * Third argument is threshold for crossmatch.
- * Forth optional argument is filter for tuples of first index. If this
- * argument gived then in first index only spoints inside given sbox will be
- * considered. Useful for parallel processing.
- * The result is set of tid pairs which points to matching heap tuples.
- *
  * Author: Alexander Korotkov <aekorotkov@gmail.com>
  *----------------------------------------------------------------------------
  */
