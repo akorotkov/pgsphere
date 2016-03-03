@@ -449,6 +449,15 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 
 	scan_state->values = palloc(sizeof(Datum) * nlist);
 	scan_state->nulls = palloc(sizeof(bool) * nlist);
+
+	/* Store blank tuple in case scan tlist is empty */
+	if (scan_state->scan_tlist == NIL)
+	{
+		TupleDesc tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
+		scan_state->stored_tuple = heap_form_tuple(tupdesc, NULL, NULL);
+	}
+	else
+		scan_state->stored_tuple = NULL;
 }
 
 static TupleTableSlot *
@@ -456,7 +465,6 @@ crossmatch_exec(CustomScanState *node)
 {
 	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
 	TupleTableSlot		   *slot = node->ss.ss_ScanTupleSlot;
-	TupleDesc				tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
 	HeapTuple				htup = scan_state->stored_tuple;
 
 	for(;;)
@@ -479,19 +487,29 @@ crossmatch_exec(CustomScanState *node)
 				return ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
 			}
 
-			htup1.t_self = p_tids[0];
-			heap_fetch(scan_state->outer, SnapshotSelf, &htup1, &buf1, false, NULL);
-			values[0] = heap_getattr(&htup1, 1, scan_state->outer->rd_att, &nulls[0]);
+			/* We don't have to fetch tuples if scan tlist is empty */
+			if (scan_state->scan_tlist != NIL)
+			{
+				TupleDesc tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
 
-			htup2.t_self = p_tids[1];
-			heap_fetch(scan_state->inner, SnapshotSelf, &htup2, &buf2, false, NULL);
-			values[1] = heap_getattr(&htup2, 1, scan_state->inner->rd_att, &nulls[1]);
+				htup1.t_self = p_tids[0];
+				heap_fetch(scan_state->outer, SnapshotSelf,
+						   &htup1, &buf1, false, NULL);
+				values[0] = heap_getattr(&htup1, 1, scan_state->outer->rd_att,
+										 &nulls[0]);
 
-			ReleaseBuffer(buf1);
-			ReleaseBuffer(buf2);
+				htup2.t_self = p_tids[1];
+				heap_fetch(scan_state->inner, SnapshotSelf,
+						   &htup2, &buf2, false, NULL);
+				values[1] = heap_getattr(&htup2, 1, scan_state->inner->rd_att,
+										 &nulls[1]);
 
-			htup = heap_form_tuple(tupdesc, values, nulls);
-			scan_state->stored_tuple = htup;
+				ReleaseBuffer(buf1);
+				ReleaseBuffer(buf2);
+
+				htup = heap_form_tuple(tupdesc, values, nulls);
+				scan_state->stored_tuple = htup;
+			}
 		}
 
 		if (node->ss.ps.ps_ProjInfo)
@@ -515,7 +533,8 @@ crossmatch_exec(CustomScanState *node)
 				node->ss.ps.ps_TupFromTlist = false;
 		}
 		else
-			return ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot, InvalidBuffer, false);
+			return ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot,
+								  InvalidBuffer, false);
 	}
 }
 
