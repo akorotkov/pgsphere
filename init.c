@@ -8,10 +8,8 @@
 #include "utils/lsyscache.h"
 #include "utils/rel.h"
 #include "utils/fmgroids.h"
+#include "utils/memutils.h"
 #include "storage/bufmgr.h"
-
-#include "nodes/print.h"
-
 #include "catalog/pg_am.h"
 #include "catalog/pg_proc.h"
 #include "catalog/pg_operator.h"
@@ -52,6 +50,8 @@ typedef struct
 {
 	CustomScanState css;
 
+	Datum		   *values;
+	bool		   *nulls;
 	HeapTuple		stored_tuple;
 
 	List		   *scan_tlist;
@@ -437,12 +437,18 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
 	CrossmatchContext	   *ctx = (CrossmatchContext *) palloc0(sizeof(CrossmatchContext));
 
+	/* TODO: fix this kludge */
+	int						nlist = list_length(scan_state->scan_tlist) + 2;
+
 	scan_state->ctx = ctx;
 	setupFirstcall(ctx, scan_state->outer_idx,
 				   scan_state->inner_idx, scan_state->threshold);
 
 	scan_state->outer = heap_open(scan_state->outer_rel, AccessShareLock);
 	scan_state->inner = heap_open(scan_state->inner_rel, AccessShareLock);
+
+	scan_state->values = palloc(sizeof(Datum) * nlist);
+	scan_state->nulls = palloc(sizeof(bool) * nlist);
 }
 
 static TupleTableSlot *
@@ -453,47 +459,47 @@ crossmatch_exec(CustomScanState *node)
 	TupleDesc				tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
 	HeapTuple				htup = scan_state->stored_tuple;
 
-	TupleTableSlot *result;
-
-	if (!node->ss.ps.ps_TupFromTlist)
+	for(;;)
 	{
-		Datum				values[2];
-		bool				nulls[2]  = { 0 };
-
-		ItemPointerData		p_tids[2] = { 0 };
-		HeapTupleData		htup1;
-		HeapTupleData		htup2;
-		Buffer				buf1;
-		Buffer				buf2;
-
-		crossmatch(scan_state->ctx, p_tids);
-
-		if (!ItemPointerIsValid(&p_tids[0]) || !ItemPointerIsValid(&p_tids[1]))
+		if (!node->ss.ps.ps_TupFromTlist)
 		{
-			result = ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
-			return result;
+			Datum			   *values = scan_state->values;
+			bool			   *nulls = scan_state->nulls;
+
+			ItemPointerData		p_tids[2] = { 0 };
+			HeapTupleData		htup1;
+			HeapTupleData		htup2;
+			Buffer				buf1;
+			Buffer				buf2;
+
+			crossmatch(scan_state->ctx, p_tids);
+
+			if (!ItemPointerIsValid(&p_tids[0]) || !ItemPointerIsValid(&p_tids[1]))
+			{
+				return ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
+			}
+
+			htup1.t_self = p_tids[0];
+			heap_fetch(scan_state->outer, SnapshotSelf, &htup1, &buf1, false, NULL);
+			values[0] = heap_getattr(&htup1, 1, scan_state->outer->rd_att, &nulls[0]);
+
+			htup2.t_self = p_tids[1];
+			heap_fetch(scan_state->inner, SnapshotSelf, &htup2, &buf2, false, NULL);
+			values[1] = heap_getattr(&htup2, 1, scan_state->inner->rd_att, &nulls[1]);
+
+			ReleaseBuffer(buf1);
+			ReleaseBuffer(buf2);
+
+			htup = heap_form_tuple(tupdesc, values, nulls);
+			scan_state->stored_tuple = htup;
 		}
 
-		htup1.t_self = p_tids[0];
-		heap_fetch(scan_state->outer, SnapshotSelf, &htup1, &buf1, false, NULL);
-		values[0] = heap_getattr(&htup1, 1, scan_state->outer->rd_att, &nulls[0]);
-
-		htup2.t_self = p_tids[1];
-		heap_fetch(scan_state->inner, SnapshotSelf, &htup2, &buf2, false, NULL);
-		values[1] = heap_getattr(&htup2, 1, scan_state->inner->rd_att, &nulls[1]);
-
-		ReleaseBuffer(buf1);
-		ReleaseBuffer(buf2);
-
-		htup = heap_form_tuple(tupdesc, values, nulls);
-		scan_state->stored_tuple = htup;
-	}
-
-	if (node->ss.ps.ps_ProjInfo)
-	{
-		if (*(node->ss.ps.ps_ProjInfo->pi_itemIsDone) != ExprEndResult)
+		if (node->ss.ps.ps_ProjInfo)
 		{
 			ExprDoneCond isDone;
+			TupleTableSlot *result;
+
+			ResetExprContext(node->ss.ps.ps_ProjInfo->pi_exprContext);
 
 			/* TODO: find a better way to fill 'ecxt_scantuple' */
 			node->ss.ps.ps_ProjInfo->pi_exprContext->ecxt_scantuple = ExecStoreTuple(htup, slot, InvalidBuffer, false);
@@ -503,15 +509,14 @@ crossmatch_exec(CustomScanState *node)
 			if (isDone != ExprEndResult)
 			{
 				node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
+				return result;
 			}
+			else
+				node->ss.ps.ps_TupFromTlist = false;
 		}
+		else
+			return ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot, InvalidBuffer, false);
 	}
-	else
-	{
-		result = ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot, InvalidBuffer, false);
-	}
-
-	return result;
 }
 
 static void
