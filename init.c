@@ -56,16 +56,14 @@ typedef struct
 
 	List		   *scan_tlist;
 
+	Index			outer_relid;
 	Oid				outer_idx;
 	Oid				outer_rel;
-	ItemPointer		outer_ptr;
-	HeapTuple		outer_tup;
 	Relation		outer;
 
+	Index			inner_relid;
 	Oid				inner_idx;
 	Oid				inner_rel;
-	ItemPointer		inner_ptr;
-	HeapTuple		inner_tup;
 	Relation		inner;
 
 	float8			threshold;
@@ -446,8 +444,16 @@ create_crossmatch_plan(PlannerInfo *root,
 													  gpath->outer_rel,
 													  gpath->inner_idx,
 													  gpath->inner_rel));
+
+	/* store threshold as cstring */
 	cscan->custom_private = lappend(cscan->custom_private,
 									makeString(float8_to_cstring(gpath->threshold)));
+
+	cscan->custom_private = lappend(cscan->custom_private,
+									makeInteger(gpath->outer_path->parent->relid));
+
+	cscan->custom_private = lappend(cscan->custom_private,
+									makeInteger(gpath->inner_path->parent->relid));
 
 	return &cscan->scan.plan;
 }
@@ -470,7 +476,11 @@ crossmatch_create_scan_state(CustomScan *node)
 	scan_state->outer_rel = lsecond_oid(linitial(node->custom_private));
 	scan_state->inner_idx = lthird_oid(linitial(node->custom_private));
 	scan_state->inner_rel = lfourth_oid(linitial(node->custom_private));
+
 	scan_state->threshold = cstring_to_float8(strVal(lsecond(node->custom_private)));
+
+	scan_state->outer_relid = intVal(lthird(node->custom_private));
+	scan_state->inner_relid = intVal(lfourth(node->custom_private));
 
 	return (Node *) scan_state;
 }
@@ -480,9 +490,7 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 {
 	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
 	CrossmatchContext	   *ctx = (CrossmatchContext *) palloc0(sizeof(CrossmatchContext));
-
-	/* TODO: fix this kludge */
-	int						nlist = list_length(scan_state->scan_tlist) + 2;
+	int						nlist = list_length(scan_state->scan_tlist);
 
 	scan_state->ctx = ctx;
 	setupFirstcall(ctx, scan_state->outer_idx,
@@ -519,8 +527,8 @@ crossmatch_exec(CustomScanState *node)
 			bool			   *nulls = scan_state->nulls;
 
 			ItemPointerData		p_tids[2] = { 0 };
-			HeapTupleData		htup1;
-			HeapTupleData		htup2;
+			HeapTupleData		htup_outer;
+			HeapTupleData		htup_inner;
 			Buffer				buf1;
 			Buffer				buf2;
 
@@ -534,22 +542,55 @@ crossmatch_exec(CustomScanState *node)
 			/* We don't have to fetch tuples if scan tlist is empty */
 			if (scan_state->scan_tlist != NIL)
 			{
-				TupleDesc tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
+				TupleDesc	tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
+				int			col_index = 0;
+				bool		htup_outer_ready = false;
+				bool		htup_inner_ready = false;
+				ListCell   *l;
 
-				htup1.t_self = p_tids[0];
-				heap_fetch(scan_state->outer, SnapshotSelf,
-						   &htup1, &buf1, false, NULL);
-				values[0] = heap_getattr(&htup1, 1, scan_state->outer->rd_att,
-										 &nulls[0]);
+				htup_outer.t_self = p_tids[0];
+				htup_inner.t_self = p_tids[1];
 
-				htup2.t_self = p_tids[1];
-				heap_fetch(scan_state->inner, SnapshotSelf,
-						   &htup2, &buf2, false, NULL);
-				values[1] = heap_getattr(&htup2, 1, scan_state->inner->rd_att,
-										 &nulls[1]);
+				foreach(l, scan_state->scan_tlist)
+				{
+					TargetEntry *target = (TargetEntry *) lfirst(l);
+					Var *var = (Var *) target->expr;
 
-				ReleaseBuffer(buf1);
-				ReleaseBuffer(buf2);
+					if (var->varno == scan_state->outer_relid)
+					{
+						if (!htup_outer_ready)
+						{
+							htup_outer_ready = true;
+							heap_fetch(scan_state->outer, SnapshotSelf,
+									   &htup_outer, &buf1, false, NULL);
+						}
+
+						values[col_index] = heap_getattr(&htup_outer, var->varattno,
+														 scan_state->outer->rd_att,
+														 &nulls[col_index]);
+					}
+
+					if (var->varno == scan_state->inner_relid)
+					{
+						if (!htup_inner_ready)
+						{
+							htup_inner_ready = true;
+							heap_fetch(scan_state->inner, SnapshotSelf,
+									   &htup_inner, &buf2, false, NULL);
+						}
+
+						values[col_index] = heap_getattr(&htup_inner, var->varattno,
+														 scan_state->outer->rd_att,
+														 &nulls[col_index]);
+					}
+
+					col_index++;
+				}
+
+				if (htup_outer_ready)
+					ReleaseBuffer(buf1);
+				if (htup_inner_ready)
+					ReleaseBuffer(buf2);
 
 				htup = heap_form_tuple(tupdesc, values, nulls);
 				scan_state->stored_tuple = htup;
