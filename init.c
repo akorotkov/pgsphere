@@ -78,6 +78,29 @@ static CustomScanMethods	crossmatch_plan_methods;
 static CustomExecMethods	crossmatch_exec_methods;
 
 
+#define IsVarSpointDist(arg, dist_func_oid) 				\
+	(														\
+		IsA(arg, FuncExpr) &&								\
+		((FuncExpr *) (arg))->funcid == (dist_func_oid) &&	\
+		IsA(linitial(((FuncExpr *) (arg))->args), Var) &&	\
+		IsA(lsecond(((FuncExpr *) (arg))->args), Var)		\
+	)
+
+
+static float8
+cstring_to_float8(char *str)
+{
+	return DatumGetFloat8(DirectFunctionCall1(float8in,
+											  CStringGetDatum(str)));
+}
+
+static char *
+float8_to_cstring(float8 val)
+{
+	return DatumGetCString(DirectFunctionCall1(float8out,
+											   Float8GetDatum(val)));
+}
+
 static float8
 get_const_val(Const *node)
 {
@@ -174,6 +197,26 @@ pick_suitable_index(Oid relation, AttrNumber column)
 	return found_index;
 }
 
+static void
+get_spoint_attnums(FuncExpr *fexpr, RelOptInfo *outer, RelOptInfo *inner,
+				   AttrNumber *outer_spoint, AttrNumber *inner_spoint)
+{
+	ListCell *dist_arg;
+
+	Assert(outer->relid != 0 && inner->relid != 0);
+
+	foreach(dist_arg, fexpr->args)
+	{
+		Var *arg = (Var *) lfirst(dist_arg);
+
+		if (arg->varno == outer->relid)
+			*outer_spoint = arg->varoattno;
+
+		if (arg->varno == inner->relid)
+			*inner_spoint = arg->varoattno;
+	}
+}
+
 static Path *
 crossmatch_find_cheapest_path(PlannerInfo *root,
 							  RelOptInfo *joinrel,
@@ -211,7 +254,9 @@ create_crossmatch_path(PlannerInfo *root,
 					   ParamPathInfo *param_info,
 					   List *restrict_clauses,
 					   Relids required_outer,
-					   float8 threshold)
+					   float8 threshold,
+					   AttrNumber outer_spoint,
+					   AttrNumber inner_spoint)
 {
 	CrossmatchJoinPath *result;
 
@@ -221,8 +266,8 @@ create_crossmatch_path(PlannerInfo *root,
 	Oid inner_idx;
 
 	/* TODO: use actual column numbers */
-	if ((outer_idx = pick_suitable_index(outer_rel, 1)) == InvalidOid ||
-		(inner_idx = pick_suitable_index(inner_rel, 1)) == InvalidOid)
+	if ((outer_idx = pick_suitable_index(outer_rel, outer_spoint)) == InvalidOid ||
+		(inner_idx = pick_suitable_index(inner_rel, inner_spoint)) == InvalidOid)
 	{
 		return;
 	}
@@ -280,7 +325,7 @@ join_pathlist_hook(PlannerInfo *root,
 													 PointerGetDatum(dist_func_name)));
 
 	if (dist_func == InvalidOid)
-		elog(ERROR, "function dist not found!");
+		return;
 
 	if (set_join_pathlist_next)
 		set_join_pathlist_next(root,
@@ -312,10 +357,11 @@ join_pathlist_hook(PlannerInfo *root,
 			arg2 = lsecond(opExpr->args);
 
 			if (opExpr->opno == Float8LessOperator &&
-				IsA(arg1, FuncExpr) &&
-				((FuncExpr *) arg1)->funcid == dist_func &&
-				IsA(arg2, Const))
+				IsVarSpointDist(arg1, dist_func) && IsA(arg2, Const))
 			{
+				AttrNumber outer_spoint,
+						   inner_spoint;
+
 				Path *outer_path = crossmatch_find_cheapest_path(root, joinrel, outerrel);
 				Path *inner_path = crossmatch_find_cheapest_path(root, joinrel, innerrel);
 
@@ -329,17 +375,22 @@ join_pathlist_hook(PlannerInfo *root,
 																	  required_outer,
 																	  &restrict_clauses);
 
+				get_spoint_attnums((FuncExpr *) arg1, outerrel, innerrel,
+								   &outer_spoint, &inner_spoint);
+
 				create_crossmatch_path(root, joinrel, outer_path, inner_path,
 									   param_info, restrict_clauses, required_outer,
-									   get_const_val((Const *) arg2));
+									   get_const_val((Const *) arg2),
+									   outer_spoint, inner_spoint);
 
 				break;
 			}
 			else if (opExpr->opno == get_commutator(Float8LessOperator) &&
-					 IsA(arg1, Const) &&
-					 IsA(arg2, FuncExpr) &&
-					 ((FuncExpr *) arg2)->funcid == dist_func)
+					 IsA(arg1, Const) && IsVarSpointDist(arg2, dist_func))
 			{
+				AttrNumber outer_spoint,
+						   inner_spoint;
+
 				/* TODO: merge duplicate code */
 				Path *outer_path = crossmatch_find_cheapest_path(root, joinrel, outerrel);
 				Path *inner_path = crossmatch_find_cheapest_path(root, joinrel, innerrel);
@@ -354,9 +405,13 @@ join_pathlist_hook(PlannerInfo *root,
 																	  required_outer,
 																	  &restrict_clauses);
 
+				get_spoint_attnums((FuncExpr *) arg2, outerrel, innerrel,
+								   &outer_spoint, &inner_spoint);
+
 				create_crossmatch_path(root, joinrel, outer_path, inner_path,
 									   param_info, restrict_clauses, required_outer,
-									   get_const_val((Const *) arg1));
+									   get_const_val((Const *) arg1),
+									   outer_spoint, inner_spoint);
 			}
 		}
 	}
@@ -372,38 +427,27 @@ create_crossmatch_plan(PlannerInfo *root,
 {
 	CrossmatchJoinPath	   *gpath = (CrossmatchJoinPath *) best_path;
 	List				   *joinrestrictclauses = gpath->joinrestrictinfo;
-	List				   *joinclauses; /* NOTE: do we really need it? */
-	List				   *otherclauses;
+	List				   *joinclauses;
 	CustomScan			   *cscan;
-	float8				   *threshold = palloc(sizeof(float8));
 
-	if (IS_OUTER_JOIN(gpath->jointype))
-	{
-		extract_actual_join_clauses(joinrestrictclauses,
-									&joinclauses, &otherclauses);
-	}
-	else
-	{
-		joinclauses = extract_actual_clauses(joinrestrictclauses,
-											 false);
-		otherclauses = NIL;
-	}
+	Assert(!IS_OUTER_JOIN(gpath->jointype));
+	joinclauses = extract_actual_clauses(joinrestrictclauses, false);
 
 	cscan = makeNode(CustomScan);
 	cscan->scan.plan.targetlist = tlist;
-	cscan->custom_scan_tlist = tlist;	/* output of this node */
 	cscan->scan.plan.qual = NIL;
 	cscan->scan.scanrelid = 0;
+	cscan->custom_scan_tlist = tlist;	/* output of this node */
 
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
 
-	cscan->custom_private = list_make2(list_make4_oid(gpath->outer_idx,
+	cscan->custom_private = list_make1(list_make4_oid(gpath->outer_idx,
 													  gpath->outer_rel,
 													  gpath->inner_idx,
-													  gpath->inner_rel),
-									   list_make1(threshold));
-	*threshold = gpath->threshold;
+													  gpath->inner_rel));
+	cscan->custom_private = lappend(cscan->custom_private,
+									makeString(float8_to_cstring(gpath->threshold)));
 
 	return &cscan->scan.plan;
 }
@@ -411,7 +455,7 @@ create_crossmatch_plan(PlannerInfo *root,
 static Node *
 crossmatch_create_scan_state(CustomScan *node)
 {
-	CrossmatchScanState *scan_state = palloc0(sizeof(CrossmatchScanState));
+	CrossmatchScanState	*scan_state = palloc0(sizeof(CrossmatchScanState));
 
 	NodeSetTag(scan_state, T_CustomScanState);
 	scan_state->css.flags = node->flags;
@@ -426,7 +470,7 @@ crossmatch_create_scan_state(CustomScan *node)
 	scan_state->outer_rel = lsecond_oid(linitial(node->custom_private));
 	scan_state->inner_idx = lthird_oid(linitial(node->custom_private));
 	scan_state->inner_rel = lfourth_oid(linitial(node->custom_private));
-	scan_state->threshold = *(float8 *) linitial(lsecond(node->custom_private));
+	scan_state->threshold = cstring_to_float8(strVal(lsecond(node->custom_private)));
 
 	return (Node *) scan_state;
 }
@@ -533,8 +577,14 @@ crossmatch_exec(CustomScanState *node)
 				node->ss.ps.ps_TupFromTlist = false;
 		}
 		else
-			return ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot,
-								  InvalidBuffer, false);
+		{
+			TupleTableSlot *result;
+
+			result = ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot,
+									InvalidBuffer, false);
+
+			return result;
+		}
 	}
 }
 
@@ -572,6 +622,12 @@ crossmatch_explain(CustomScanState *node, List *ancestors, ExplainState *es)
 	appendStringInfo(&str, "%s",
 					 get_rel_name(scan_state->inner_idx));
 	ExplainPropertyText("Inner index", str.data, es);
+
+	resetStringInfo(&str);
+
+	appendStringInfo(&str, "%s",
+					 float8_to_cstring(scan_state->threshold));
+	ExplainPropertyText("Threshold", str.data, es);
 }
 
 void
