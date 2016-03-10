@@ -623,8 +623,6 @@ crossmatch_exec(CustomScanState *node)
 		}
 		else
 		{
-			ExecStoreTuple(htup, scanSlot, InvalidBuffer, false);
-
 			/* Check join conditions */
 			node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
 			if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
