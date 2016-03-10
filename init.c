@@ -263,7 +263,6 @@ create_crossmatch_path(PlannerInfo *root,
 	Oid outer_idx;
 	Oid inner_idx;
 
-	/* TODO: use actual column numbers */
 	if ((outer_idx = pick_suitable_index(outer_rel, outer_spoint)) == InvalidOid ||
 		(inner_idx = pick_suitable_index(inner_rel, inner_spoint)) == InvalidOid)
 	{
@@ -298,6 +297,49 @@ create_crossmatch_path(PlannerInfo *root,
 }
 
 static void
+try_crossmatch_path(RestrictInfo *restrInfo,
+					FuncExpr *distFuncExpr,
+					Const *thresholdConst,
+					PlannerInfo *root,
+					RelOptInfo *joinrel,
+					RelOptInfo *outerrel,
+					RelOptInfo *innerrel,
+					JoinPathExtraData *extra)
+{
+	AttrNumber		outer_spoint,
+					inner_spoint;
+	List		   *restrict_clauses;
+	Path		   *outer_path,
+				   *inner_path;
+	Relids			required_outer;
+	ParamPathInfo  *param_info;
+
+	/* Remove current RestrictInfo from restrict clauses */
+	restrict_clauses = list_delete_ptr(list_copy(extra->restrictlist), restrInfo);
+
+	outer_path = crossmatch_find_cheapest_path(root, joinrel, outerrel);
+	inner_path = crossmatch_find_cheapest_path(root, joinrel, innerrel);
+
+	required_outer = calc_nestloop_required_outer(outer_path, inner_path);
+
+	param_info = get_joinrel_parampathinfo(root,
+										   joinrel,
+										   outer_path,
+										   inner_path,
+										   extra->sjinfo,
+										   required_outer,
+										   &restrict_clauses);
+
+	get_spoint_attnums(distFuncExpr, outerrel, innerrel,
+					   &outer_spoint, &inner_spoint);
+
+	create_crossmatch_path(root, joinrel, outer_path, inner_path,
+						   param_info, restrict_clauses, required_outer,
+						   get_const_val(thresholdConst),
+						   outer_spoint, inner_spoint);
+}
+
+static void
 join_pathlist_hook(PlannerInfo *root,
 				   RelOptInfo *joinrel,
 				   RelOptInfo *outerrel,
@@ -308,7 +350,6 @@ join_pathlist_hook(PlannerInfo *root,
 	ListCell   *restr;
 	text	   *dist_func_name = cstring_to_text("dist(spoint,spoint)");
 	Oid			dist_func;
-	List	   *restrict_clauses = extra->restrictlist;
 	Relids		required_relids = NULL;
 
 	if (outerrel->reloptkind == RELOPT_BASEREL &&
@@ -357,59 +398,16 @@ join_pathlist_hook(PlannerInfo *root,
 			if (opExpr->opno == Float8LessOperator &&
 				IsVarSpointDist(arg1, dist_func) && IsA(arg2, Const))
 			{
-				AttrNumber outer_spoint,
-						   inner_spoint;
-
-				Path *outer_path = crossmatch_find_cheapest_path(root, joinrel, outerrel);
-				Path *inner_path = crossmatch_find_cheapest_path(root, joinrel, innerrel);
-
-				Relids required_outer = calc_nestloop_required_outer(outer_path, inner_path);
-
-				ParamPathInfo *param_info = get_joinrel_parampathinfo(root,
-																	  joinrel,
-																	  outer_path,
-																	  inner_path,
-																	  extra->sjinfo,
-																	  required_outer,
-																	  &restrict_clauses);
-
-				get_spoint_attnums((FuncExpr *) arg1, outerrel, innerrel,
-								   &outer_spoint, &inner_spoint);
-
-				create_crossmatch_path(root, joinrel, outer_path, inner_path,
-									   param_info, restrict_clauses, required_outer,
-									   get_const_val((Const *) arg2),
-									   outer_spoint, inner_spoint);
-
+				try_crossmatch_path(restrInfo, (FuncExpr *) arg1, (Const *) arg2,
+									root, joinrel, outerrel, innerrel, extra);
 				break;
 			}
 			else if (opExpr->opno == get_commutator(Float8LessOperator) &&
 					 IsA(arg1, Const) && IsVarSpointDist(arg2, dist_func))
 			{
-				AttrNumber outer_spoint,
-						   inner_spoint;
-
-				/* TODO: merge duplicate code */
-				Path *outer_path = crossmatch_find_cheapest_path(root, joinrel, outerrel);
-				Path *inner_path = crossmatch_find_cheapest_path(root, joinrel, innerrel);
-
-				Relids required_outer = calc_nestloop_required_outer(outer_path, inner_path);
-
-				ParamPathInfo *param_info = get_joinrel_parampathinfo(root,
-																	  joinrel,
-																	  outer_path,
-																	  inner_path,
-																	  extra->sjinfo,
-																	  required_outer,
-																	  &restrict_clauses);
-
-				get_spoint_attnums((FuncExpr *) arg2, outerrel, innerrel,
-								   &outer_spoint, &inner_spoint);
-
-				create_crossmatch_path(root, joinrel, outer_path, inner_path,
-									   param_info, restrict_clauses, required_outer,
-									   get_const_val((Const *) arg1),
-									   outer_spoint, inner_spoint);
+				try_crossmatch_path(restrInfo, (FuncExpr *) arg2, (Const *) arg1,
+									root, joinrel, outerrel, innerrel, extra);
+				break;
 			}
 		}
 	}
@@ -433,7 +431,7 @@ create_crossmatch_plan(PlannerInfo *root,
 
 	cscan = makeNode(CustomScan);
 	cscan->scan.plan.targetlist = tlist;
-	cscan->scan.plan.qual = NIL;
+	cscan->scan.plan.qual = joinclauses;
 	cscan->scan.scanrelid = 0;
 	cscan->custom_scan_tlist = tlist;	/* output of this node */
 
@@ -516,7 +514,7 @@ static TupleTableSlot *
 crossmatch_exec(CustomScanState *node)
 {
 	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
-	TupleTableSlot		   *slot = node->ss.ss_ScanTupleSlot;
+	TupleTableSlot		   *scanSlot = node->ss.ss_ScanTupleSlot;
 	HeapTuple				htup = scan_state->stored_tuple;
 
 	for(;;)
@@ -594,37 +592,43 @@ crossmatch_exec(CustomScanState *node)
 
 				htup = heap_form_tuple(tupdesc, values, nulls);
 				scan_state->stored_tuple = htup;
+
+				/* Fill scanSlot with a new tuple */
+				ExecStoreTuple(htup, scanSlot, InvalidBuffer, false);
 			}
 		}
 
 		if (node->ss.ps.ps_ProjInfo)
 		{
 			ExprDoneCond isDone;
-			TupleTableSlot *result;
+			TupleTableSlot *resultSlot;
 
 			ResetExprContext(node->ss.ps.ps_ProjInfo->pi_exprContext);
 
-			/* TODO: find a better way to fill 'ecxt_scantuple' */
-			node->ss.ps.ps_ProjInfo->pi_exprContext->ecxt_scantuple = ExecStoreTuple(htup, slot, InvalidBuffer, false);
+			/* Check join conditions */
+			node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
+			if (!ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
+				continue;
 
-			result = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
+			node->ss.ps.ps_ProjInfo->pi_exprContext->ecxt_scantuple = scanSlot;
+			resultSlot = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
 
 			if (isDone != ExprEndResult)
 			{
 				node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
-				return result;
+				return resultSlot;
 			}
 			else
 				node->ss.ps.ps_TupFromTlist = false;
 		}
 		else
 		{
-			TupleTableSlot *result;
+			ExecStoreTuple(htup, scanSlot, InvalidBuffer, false);
 
-			result = ExecStoreTuple(htup, node->ss.ps.ps_ResultTupleSlot,
-									InvalidBuffer, false);
-
-			return result;
+			/* Check join conditions */
+			node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
+			if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
+				return scanSlot;
 		}
 	}
 }
