@@ -85,6 +85,25 @@ static CustomExecMethods	crossmatch_exec_methods;
 	)
 
 
+static inline int64
+get_index_size(Oid idx)
+{
+	Datum size = DirectFunctionCall2(pg_relation_size,
+									 ObjectIdGetDatum(idx),
+									 PointerGetDatum(cstring_to_text("main")));
+	return DatumGetInt64(size);
+}
+
+static inline Oid
+get_dist_func()
+{
+	text *dist_func_name =
+		cstring_to_text("public.dist(public.spoint, public.spoint)");
+
+	return DatumGetObjectId(DirectFunctionCall1(to_regprocedure,
+												PointerGetDatum(dist_func_name)));
+}
+
 static float8
 cstring_to_float8(char *str)
 {
@@ -166,10 +185,7 @@ pick_suitable_index(Oid relation, AttrNumber column)
 
 				if (pg_ind->indkey.values[i] == column)
 				{
-					cur_index_size = DatumGetInt64(
-										DirectFunctionCall2(pg_relation_size,
-															ObjectIdGetDatum(relation),
-															PointerGetDatum(cstring_to_text("main"))));
+					cur_index_size = get_index_size(pg_ind->indexrelid);
 
 					if (found_index == InvalidOid || cur_index_size < found_index_size)
 					{
@@ -263,6 +279,9 @@ create_crossmatch_path(PlannerInfo *root,
 	Oid outer_idx;
 	Oid inner_idx;
 
+	if (outer_rel == inner_rel)
+		return;
+
 	if ((outer_idx = pick_suitable_index(outer_rel, outer_spoint)) == InvalidOid ||
 		(inner_idx = pick_suitable_index(inner_rel, inner_spoint)) == InvalidOid)
 	{
@@ -348,9 +367,16 @@ join_pathlist_hook(PlannerInfo *root,
 				   JoinPathExtraData *extra)
 {
 	ListCell   *restr;
-	text	   *dist_func_name = cstring_to_text("dist(spoint,spoint)");
 	Oid			dist_func;
 	Relids		required_relids = NULL;
+
+	if (set_join_pathlist_next)
+		set_join_pathlist_next(root, joinrel, outerrel,
+							   innerrel, jointype, extra);
+
+	/* Get oid of the dist(spoint, spoint) function */
+	if ((dist_func = get_dist_func()) == InvalidOid)
+		return;
 
 	if (outerrel->reloptkind == RELOPT_BASEREL &&
 		innerrel->reloptkind == RELOPT_BASEREL)
@@ -359,20 +385,6 @@ join_pathlist_hook(PlannerInfo *root,
 		required_relids = bms_add_member(required_relids, innerrel->relid);
 	}
 	else return; /* one of relations can't have index */
-
-	dist_func = DatumGetObjectId(DirectFunctionCall1(to_regprocedure,
-													 PointerGetDatum(dist_func_name)));
-
-	if (dist_func == InvalidOid)
-		return;
-
-	if (set_join_pathlist_next)
-		set_join_pathlist_next(root,
-							   joinrel,
-							   outerrel,
-							   innerrel,
-							   jointype,
-							   extra);
 
 	foreach(restr, extra->restrictlist)
 	{
@@ -433,7 +445,8 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->scan.plan.targetlist = tlist;
 	cscan->scan.plan.qual = joinclauses;
 	cscan->scan.scanrelid = 0;
-	cscan->custom_scan_tlist = tlist;	/* output of this node */
+	cscan->custom_scan_tlist = tlist;	/* tlist of the 'virtual' join rel
+										   we'll have to build and scan */
 
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
@@ -465,9 +478,7 @@ crossmatch_create_scan_state(CustomScan *node)
 	scan_state->css.flags = node->flags;
 	scan_state->css.methods = &crossmatch_exec_methods;
 
-	/* TODO: check if this assignment is redundant */
-	scan_state->css.ss.ps.ps_TupFromTlist = false;
-
+	/* Save scan tlist for join relation */
 	scan_state->scan_tlist = node->custom_scan_tlist;
 
 	scan_state->outer_idx = linitial_oid(linitial(node->custom_private));
@@ -519,6 +530,7 @@ crossmatch_exec(CustomScanState *node)
 
 	for(;;)
 	{
+		/* Fetch next tid pair */
 		if (!node->ss.ps.ps_TupFromTlist)
 		{
 			Datum			   *values = scan_state->values;
@@ -541,9 +553,9 @@ crossmatch_exec(CustomScanState *node)
 			if (scan_state->scan_tlist != NIL)
 			{
 				TupleDesc	tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
-				int			col_index = 0;
 				bool		htup_outer_ready = false;
 				bool		htup_inner_ready = false;
+				int			col_index = 0;
 				ListCell   *l;
 
 				htup_outer.t_self = p_tids[0];
@@ -645,7 +657,7 @@ crossmatch_end(CustomScanState *node)
 static void
 crossmatch_rescan(CustomScanState *node)
 {
-
+	/* NOTE: nothing to do here? */
 }
 
 static void
