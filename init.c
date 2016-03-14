@@ -621,18 +621,19 @@ crossmatch_exec(CustomScanState *node)
 
 			ResetExprContext(node->ss.ps.ps_ProjInfo->pi_exprContext);
 
-			/* Check join conditions */
-			node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
-			if (!ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
-				continue;
-
 			node->ss.ps.ps_ProjInfo->pi_exprContext->ecxt_scantuple = scanSlot;
 			resultSlot = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
 
 			if (isDone != ExprEndResult)
 			{
 				node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
-				return resultSlot;
+
+				/* Check join conditions */
+				node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
+				if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
+					return resultSlot;
+				else
+					InstrCountFiltered1(node, 1);
 			}
 			else
 				node->ss.ps.ps_TupFromTlist = false;
@@ -643,6 +644,8 @@ crossmatch_exec(CustomScanState *node)
 			node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
 			if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
 				return scanSlot;
+			else
+				InstrCountFiltered1(node, 1);
 		}
 	}
 }
