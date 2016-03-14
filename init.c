@@ -325,8 +325,8 @@ try_crossmatch_path(RestrictInfo *restrInfo,
 					RelOptInfo *innerrel,
 					JoinPathExtraData *extra)
 {
-	AttrNumber		outer_spoint,
-					inner_spoint;
+	AttrNumber		outer_spoint = InvalidAttrNumber,
+					inner_spoint = InvalidAttrNumber;
 	List		   *restrict_clauses;
 	Path		   *outer_path,
 				   *inner_path;
