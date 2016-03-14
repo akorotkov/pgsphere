@@ -335,6 +335,10 @@ try_crossmatch_path(RestrictInfo *restrInfo,
 
 	/* Remove current RestrictInfo from restrict clauses */
 	restrict_clauses = list_delete_ptr(list_copy(extra->restrictlist), restrInfo);
+	restrict_clauses = list_concat_unique(restrict_clauses,
+										  outerrel->baserestrictinfo);
+	restrict_clauses = list_concat_unique(restrict_clauses,
+										  innerrel->baserestrictinfo);
 
 	outer_path = crossmatch_find_cheapest_path(root, joinrel, outerrel);
 	inner_path = crossmatch_find_cheapest_path(root, joinrel, innerrel);
