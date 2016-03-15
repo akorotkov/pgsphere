@@ -208,7 +208,10 @@ pick_suitable_index(Oid relation, AttrNumber column)
 
 						/* column must use 'spoint2' opclass */
 						if (!is_null && indclasses->values[i] == spoint2_opclass)
+						{
 							found_index = pg_ind->indexrelid;
+							found_index_size = cur_index_size;
+						}
 					}
 
 					break;	/* no need to scan 'indkey' further */
