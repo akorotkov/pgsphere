@@ -128,8 +128,7 @@ indexClose(Relation r)
  * Do necessary initialization for first SRF call.
  */
 void
-setupFirstcall(CrossmatchContext *ctx, Oid idx1, Oid idx2,
-			   float8 threshold)
+setupFirstcall(CrossmatchContext *ctx, Oid idx1, Oid idx2, float8 threshold)
 {
 	GistNSN		parentnsn = InvalidNSN;
 

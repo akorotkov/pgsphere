@@ -37,8 +37,7 @@ typedef struct
 	AttInMetadata *attinmeta;
 } CrossmatchContext;
 
-void setupFirstcall(CrossmatchContext *ctx, Oid idx1, Oid idx2,
-			   float8 threshold);
+void setupFirstcall(CrossmatchContext *ctx, Oid idx1, Oid idx2, float8 threshold);
 
 void endCall(CrossmatchContext *ctx);
 

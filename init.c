@@ -53,7 +53,6 @@ typedef struct
 
 	Datum		   *values;
 	bool		   *nulls;
-	HeapTuple		stored_tuple;
 
 	List		   *scan_tlist;
 
@@ -450,8 +449,9 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->scan.plan.targetlist = tlist;
 	cscan->scan.plan.qual = joinclauses;
 	cscan->scan.scanrelid = 0;
-	cscan->custom_scan_tlist = make_tlist_from_pathtarget(&rel->reltarget);	/* tlist of the 'virtual' join rel
-										   we'll have to build and scan */
+
+	/* tlist of the 'virtual' join rel we'll have to build and scan */
+	cscan->custom_scan_tlist = make_tlist_from_pathtarget(&rel->reltarget);
 
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
@@ -520,10 +520,98 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 	if (scan_state->scan_tlist == NIL)
 	{
 		TupleDesc tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
-		scan_state->stored_tuple = heap_form_tuple(tupdesc, NULL, NULL);
+
+		ExecStoreTuple(heap_form_tuple(tupdesc, NULL, NULL),
+					   node->ss.ss_ScanTupleSlot,
+					   InvalidBuffer,
+					   false);
 	}
-	else
-		scan_state->stored_tuple = NULL;
+}
+
+static bool
+fetch_next_pair(CrossmatchScanState *scan_state)
+{
+	ScanState		   *ss = &scan_state->css.ss;
+	TupleTableSlot	   *slot = ss->ss_ScanTupleSlot;
+	TupleDesc			tupdesc = ss->ss_ScanTupleSlot->tts_tupleDescriptor;
+
+	HeapTuple			htup;
+	Datum			   *values = scan_state->values;
+	bool			   *nulls = scan_state->nulls;
+
+	ItemPointerData		p_tids[2] = { 0 };
+	HeapTupleData		htup_outer;
+	HeapTupleData		htup_inner;
+	Buffer				buf1;
+	Buffer				buf2;
+
+	crossmatch(scan_state->ctx, p_tids);
+
+	if (!ItemPointerIsValid(&p_tids[0]) || !ItemPointerIsValid(&p_tids[1]))
+	{
+		return false;
+	}
+
+	/* We don't have to fetch tuples if scan tlist is empty */
+	if (scan_state->scan_tlist != NIL)
+	{
+		bool		htup_outer_ready = false;
+		bool		htup_inner_ready = false;
+		int			col_index = 0;
+		ListCell   *l;
+
+		htup_outer.t_self = p_tids[0];
+		htup_inner.t_self = p_tids[1];
+
+		foreach(l, scan_state->scan_tlist)
+		{
+			TargetEntry *target = (TargetEntry *) lfirst(l);
+			Var *var = (Var *) target->expr;
+
+			if (var->varno == scan_state->outer_relid)
+			{
+				if (!htup_outer_ready)
+				{
+					htup_outer_ready = true;
+					/* TODO: check result */
+					heap_fetch(scan_state->outer, SnapshotSelf,
+								&htup_outer, &buf1, false, NULL);
+				}
+
+				values[col_index] = heap_getattr(&htup_outer, var->varattno,
+													scan_state->outer->rd_att,
+													&nulls[col_index]);
+			}
+
+			if (var->varno == scan_state->inner_relid)
+			{
+				if (!htup_inner_ready)
+				{
+					htup_inner_ready = true;
+					heap_fetch(scan_state->inner, SnapshotSelf,
+								&htup_inner, &buf2, false, NULL);
+				}
+
+				values[col_index] = heap_getattr(&htup_inner, var->varattno,
+													scan_state->outer->rd_att,
+													&nulls[col_index]);
+			}
+
+			col_index++;
+		}
+
+		if (htup_outer_ready)
+			ReleaseBuffer(buf1);
+		if (htup_inner_ready)
+			ReleaseBuffer(buf2);
+
+		htup = heap_form_tuple(tupdesc, values, nulls);
+
+		/* Fill scanSlot with a new tuple */
+		ExecStoreTuple(htup, slot, InvalidBuffer, false);
+	}
+
+	return true;
 }
 
 static TupleTableSlot *
@@ -531,89 +619,14 @@ crossmatch_exec(CustomScanState *node)
 {
 	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
 	TupleTableSlot		   *scanSlot = node->ss.ss_ScanTupleSlot;
-	HeapTuple				htup = scan_state->stored_tuple;
 
 	for(;;)
 	{
-		/* Fetch next tid pair */
 		if (!node->ss.ps.ps_TupFromTlist)
 		{
-			Datum			   *values = scan_state->values;
-			bool			   *nulls = scan_state->nulls;
-
-			ItemPointerData		p_tids[2] = { 0 };
-			HeapTupleData		htup_outer;
-			HeapTupleData		htup_inner;
-			Buffer				buf1;
-			Buffer				buf2;
-
-			crossmatch(scan_state->ctx, p_tids);
-
-			if (!ItemPointerIsValid(&p_tids[0]) || !ItemPointerIsValid(&p_tids[1]))
-			{
-				return ExecClearTuple(node->ss.ps.ps_ResultTupleSlot);
-			}
-
-			/* We don't have to fetch tuples if scan tlist is empty */
-			if (scan_state->scan_tlist != NIL)
-			{
-				TupleDesc	tupdesc = node->ss.ss_ScanTupleSlot->tts_tupleDescriptor;
-				bool		htup_outer_ready = false;
-				bool		htup_inner_ready = false;
-				int			col_index = 0;
-				ListCell   *l;
-
-				htup_outer.t_self = p_tids[0];
-				htup_inner.t_self = p_tids[1];
-
-				foreach(l, scan_state->scan_tlist)
-				{
-					TargetEntry *target = (TargetEntry *) lfirst(l);
-					Var *var = (Var *) target->expr;
-
-					if (var->varno == scan_state->outer_relid)
-					{
-						if (!htup_outer_ready)
-						{
-							htup_outer_ready = true;
-							/* TODO: check result */
-							heap_fetch(scan_state->outer, SnapshotSelf,
-									   &htup_outer, &buf1, false, NULL);
-						}
-
-						values[col_index] = heap_getattr(&htup_outer, var->varattno,
-														 scan_state->outer->rd_att,
-														 &nulls[col_index]);
-					}
-
-					if (var->varno == scan_state->inner_relid)
-					{
-						if (!htup_inner_ready)
-						{
-							htup_inner_ready = true;
-							heap_fetch(scan_state->inner, SnapshotSelf,
-									   &htup_inner, &buf2, false, NULL);
-						}
-
-						values[col_index] = heap_getattr(&htup_inner, var->varattno,
-														 scan_state->outer->rd_att,
-														 &nulls[col_index]);
-					}
-
-					col_index++;
-				}
-
-				if (htup_outer_ready)
-					ReleaseBuffer(buf1);
-				if (htup_inner_ready)
-					ReleaseBuffer(buf2);
-
-				htup = heap_form_tuple(tupdesc, values, nulls);
-				scan_state->stored_tuple = htup;
-
-				/* Fill scanSlot with a new tuple */
-				ExecStoreTuple(htup, scanSlot, InvalidBuffer, false);
-			}
+			/* Fetch next tid pair if we're done with the SRF function */
+			if (!fetch_next_pair(scan_state))
+				return NULL;
 		}
 
 		if (node->ss.ps.ps_ProjInfo)
