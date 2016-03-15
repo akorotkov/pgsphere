@@ -2,6 +2,7 @@
 #include "optimizer/paths.h"
 #include "optimizer/pathnode.h"
 #include "optimizer/restrictinfo.h"
+#include "optimizer/tlist.h"
 #include "utils/tqual.h"
 #include "utils/builtins.h"
 #include "utils/elog.h"
@@ -449,7 +450,7 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->scan.plan.targetlist = tlist;
 	cscan->scan.plan.qual = joinclauses;
 	cscan->scan.scanrelid = 0;
-	cscan->custom_scan_tlist = tlist;	/* tlist of the 'virtual' join rel
+	cscan->custom_scan_tlist = make_tlist_from_pathtarget(&rel->reltarget);	/* tlist of the 'virtual' join rel
 										   we'll have to build and scan */
 
 	cscan->flags = best_path->flags;
@@ -512,8 +513,8 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 	scan_state->outer = heap_open(scan_state->outer_rel, AccessShareLock);
 	scan_state->inner = heap_open(scan_state->inner_rel, AccessShareLock);
 
-	scan_state->values = palloc(sizeof(Datum) * nlist);
-	scan_state->nulls = palloc(sizeof(bool) * nlist);
+	scan_state->values = palloc0(sizeof(Datum) * nlist);
+	scan_state->nulls = palloc0(sizeof(bool) * nlist);
 
 	/* Store blank tuple in case scan tlist is empty */
 	if (scan_state->scan_tlist == NIL)
@@ -575,6 +576,7 @@ crossmatch_exec(CustomScanState *node)
 						if (!htup_outer_ready)
 						{
 							htup_outer_ready = true;
+							/* TODO: check result */
 							heap_fetch(scan_state->outer, SnapshotSelf,
 									   &htup_outer, &buf1, false, NULL);
 						}
@@ -665,6 +667,7 @@ static void
 crossmatch_rescan(CustomScanState *node)
 {
 	/* NOTE: nothing to do here? */
+	node->ss.ps.ps_TupFromTlist = false;
 }
 
 static void
