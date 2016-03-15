@@ -572,8 +572,8 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 
 		foreach(l, scan_state->scan_tlist)
 		{
-			TargetEntry *target = (TargetEntry *) lfirst(l);
-			Var *var = (Var *) target->expr;
+			TargetEntry	   *target = (TargetEntry *) lfirst(l);
+			Var			   *var = (Var *) target->expr;
 
 			if (var->varno == scan_state->outer_relid)
 			{
@@ -588,8 +588,8 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 				}
 
 				values[col_index] = heap_getattr(&htup_outer, var->varattno,
-													scan_state->outer->rd_att,
-													&nulls[col_index]);
+												 scan_state->outer->rd_att,
+												 &nulls[col_index]);
 			}
 
 			if (var->varno == scan_state->inner_relid)
@@ -605,8 +605,8 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 				}
 
 				values[col_index] = heap_getattr(&htup_inner, var->varattno,
-													scan_state->outer->rd_att,
-													&nulls[col_index]);
+												 scan_state->outer->rd_att,
+												 &nulls[col_index]);
 			}
 
 			col_index++;
