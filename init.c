@@ -91,6 +91,11 @@ static CustomExecMethods	crossmatch_exec_methods;
 		IsA(lsecond(((FuncExpr *) (arg))->args), Var)		\
 	)
 
+#define HeapFetchVisibleTuple(rel, htup, buf)							\
+	(																	\
+		heap_fetch((rel), SnapshotSelf, (htup), &(buf), false, NULL) &&	\
+		HeapTupleSatisfiesVisibility((htup), SnapshotSelf, (buf))		\
+	)
 
 static inline int64
 get_index_size(Oid idx)
@@ -549,8 +554,8 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 	ItemPointerData		p_tids[2] = { 0 };
 	HeapTupleData		htup_outer;
 	HeapTupleData		htup_inner;
-	Buffer				buf1;
-	Buffer				buf2;
+	Buffer				buf1 = InvalidBuffer;
+	Buffer				buf2 = InvalidBuffer;
 
 	crossmatch(scan_state->ctx, p_tids);
 
@@ -559,16 +564,20 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 		return FetchTidPairFinished;
 	}
 
+	htup_outer.t_self = p_tids[0];
+	htup_inner.t_self = p_tids[1];
+
+	if (!HeapFetchVisibleTuple(scan_state->outer, &htup_outer, buf1) ||
+		!HeapFetchVisibleTuple(scan_state->inner, &htup_inner, buf2))
+	{
+		return FetchTidPairInvalid;
+	}
+
 	/* We don't have to fetch tuples if scan tlist is empty */
 	if (scan_state->scan_tlist != NIL)
 	{
-		bool		htup_outer_ready = false;
-		bool		htup_inner_ready = false;
 		int			col_index = 0;
 		ListCell   *l;
-
-		htup_outer.t_self = p_tids[0];
-		htup_inner.t_self = p_tids[1];
 
 		foreach(l, scan_state->scan_tlist)
 		{
@@ -577,16 +586,6 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 
 			if (var->varno == scan_state->outer_relid)
 			{
-				if (!htup_outer_ready)
-				{
-					htup_outer_ready = true;
-					if(!heap_fetch(scan_state->outer, SnapshotSelf,
-								   &htup_outer, &buf1, false, NULL))
-					{
-						return FetchTidPairInvalid;
-					}
-				}
-
 				values[col_index] = heap_getattr(&htup_outer, var->varattno,
 												 scan_state->outer->rd_att,
 												 &nulls[col_index]);
@@ -594,16 +593,6 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 
 			if (var->varno == scan_state->inner_relid)
 			{
-				if (!htup_inner_ready)
-				{
-					htup_inner_ready = true;
-					if(!heap_fetch(scan_state->inner, SnapshotSelf,
-								   &htup_inner, &buf2, false, NULL))
-					{
-						return FetchTidPairInvalid;
-					}
-				}
-
 				values[col_index] = heap_getattr(&htup_inner, var->varattno,
 												 scan_state->outer->rd_att,
 												 &nulls[col_index]);
@@ -612,16 +601,16 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 			col_index++;
 		}
 
-		if (htup_outer_ready)
-			ReleaseBuffer(buf1);
-		if (htup_inner_ready)
-			ReleaseBuffer(buf2);
-
 		htup = heap_form_tuple(tupdesc, values, nulls);
 
 		/* Fill scanSlot with a new tuple */
 		ExecStoreTuple(htup, slot, InvalidBuffer, false);
 	}
+
+	if (buf1 != InvalidBuffer)
+		ReleaseBuffer(buf1);
+	if (buf2 != InvalidBuffer)
+		ReleaseBuffer(buf2);
 
 	return FetchTidPairReady;
 }
