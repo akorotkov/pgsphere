@@ -28,6 +28,13 @@ extern void _PG_init(void);
 
 static set_join_pathlist_hook_type set_join_pathlist_next;
 
+typedef enum
+{
+	FetchTidPairFinished = 0,
+	FetchTidPairInvalid,
+	FetchTidPairReady
+} FetchTidPairState;
+
 typedef struct
 {
 	CustomPath		cpath;
@@ -528,7 +535,7 @@ crossmatch_begin(CustomScanState *node, EState *estate, int eflags)
 	}
 }
 
-static bool
+static FetchTidPairState
 fetch_next_pair(CrossmatchScanState *scan_state)
 {
 	ScanState		   *ss = &scan_state->css.ss;
@@ -549,7 +556,7 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 
 	if (!ItemPointerIsValid(&p_tids[0]) || !ItemPointerIsValid(&p_tids[1]))
 	{
-		return false;
+		return FetchTidPairFinished;
 	}
 
 	/* We don't have to fetch tuples if scan tlist is empty */
@@ -573,9 +580,11 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 				if (!htup_outer_ready)
 				{
 					htup_outer_ready = true;
-					/* TODO: check result */
-					heap_fetch(scan_state->outer, SnapshotSelf,
-								&htup_outer, &buf1, false, NULL);
+					if(!heap_fetch(scan_state->outer, SnapshotSelf,
+								   &htup_outer, &buf1, false, NULL))
+					{
+						return FetchTidPairInvalid;
+					}
 				}
 
 				values[col_index] = heap_getattr(&htup_outer, var->varattno,
@@ -588,8 +597,11 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 				if (!htup_inner_ready)
 				{
 					htup_inner_ready = true;
-					heap_fetch(scan_state->inner, SnapshotSelf,
-								&htup_inner, &buf2, false, NULL);
+					if(!heap_fetch(scan_state->inner, SnapshotSelf,
+								   &htup_inner, &buf2, false, NULL))
+					{
+						return FetchTidPairInvalid;
+					}
 				}
 
 				values[col_index] = heap_getattr(&htup_inner, var->varattno,
@@ -611,7 +623,7 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 		ExecStoreTuple(htup, slot, InvalidBuffer, false);
 	}
 
-	return true;
+	return FetchTidPairReady;
 }
 
 static TupleTableSlot *
@@ -620,12 +632,19 @@ crossmatch_exec(CustomScanState *node)
 	CrossmatchScanState	   *scan_state = (CrossmatchScanState *) node;
 	TupleTableSlot		   *scanSlot = node->ss.ss_ScanTupleSlot;
 
-	for(;;)
+	for (;;)
 	{
 		if (!node->ss.ps.ps_TupFromTlist)
 		{
-			/* Fetch next tid pair if we're done with the SRF function */
-			if (!fetch_next_pair(scan_state))
+			FetchTidPairState fetch_state;
+
+			do
+			{
+				fetch_state = fetch_next_pair(scan_state);
+			}
+			while (fetch_state == FetchTidPairInvalid);
+
+			if (fetch_state == FetchTidPairFinished)
 				return NULL;
 		}
 
