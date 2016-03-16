@@ -7,6 +7,7 @@
 #include "utils/builtins.h"
 #include "utils/elog.h"
 #include "utils/lsyscache.h"
+#include "utils/syscache.h"
 #include "utils/rel.h"
 #include "utils/fmgroids.h"
 #include "utils/memutils.h"
@@ -14,6 +15,7 @@
 #include "catalog/pg_am.h"
 #include "catalog/pg_proc.h"
 #include "catalog/pg_operator.h"
+#include "catalog/pg_cast.h"
 #include "commands/explain.h"
 #include "commands/defrem.h"
 #include "funcapi.h"
@@ -133,16 +135,34 @@ float8_to_cstring(float8 val)
 static float8
 get_const_val(Const *node)
 {
-	FmgrInfo	finfo;
-	Oid			cast;
+	FmgrInfo		finfo;
+	Oid				cast_func;
+	HeapTuple		cast_tup;
+	Form_pg_cast	cast;
 
 	Assert(IsA(node, Const));
 
 	if (node->consttype == FLOAT8OID)
 		return DatumGetFloat8(node->constvalue);
 
-	cast = get_cast_oid(node->consttype, FLOAT8OID, false);
-	fmgr_info(cast, &finfo);
+	/* It looks like this is not necessary at all, but anyway */
+	cast_tup = SearchSysCache2(CASTSOURCETARGET,
+							   ObjectIdGetDatum(node->consttype),
+							   ObjectIdGetDatum(FLOAT8OID));
+
+	if (!HeapTupleIsValid(cast_tup))
+		ereport(ERROR,
+				(errcode(ERRCODE_DUPLICATE_OBJECT),
+				 errmsg("no cast from type %s to type %s",
+						format_type_be(node->consttype),
+						format_type_be(FLOAT8OID))));
+
+	cast = (Form_pg_cast) GETSTRUCT(cast_tup);
+	cast_func = cast->castfunc;
+
+	ReleaseSysCache(cast_tup);
+
+	fmgr_info(cast_func, &finfo);
 
 	return DatumGetFloat8(FunctionCall1(&finfo, node->constvalue));
 }
