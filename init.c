@@ -330,7 +330,7 @@ create_crossmatch_path(PlannerInfo *root,
 	result->cpath.path.parent = joinrel;
 	result->cpath.path.param_info = param_info;
 	result->cpath.path.pathkeys = NIL;
-	result->cpath.path.pathtarget = &joinrel->reltarget;
+	result->cpath.path.pathtarget = joinrel->reltarget;
 	result->cpath.path.rows = joinrel->rows;
 	result->cpath.flags = 0;
 	result->cpath.methods = &crossmatch_path_methods;
@@ -486,7 +486,7 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->scan.scanrelid = 0;
 
 	/* tlist of the 'virtual' join rel we'll have to build and scan */
-	cscan->custom_scan_tlist = make_tlist_from_pathtarget(&rel->reltarget);
+	cscan->custom_scan_tlist = make_tlist_from_pathtarget(rel->reltarget);
 
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
