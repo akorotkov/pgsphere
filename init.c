@@ -205,36 +205,28 @@ pick_suitable_index(Oid relation, AttrNumber column)
 		index_am = index->rd_rel->relam;
 		index_close(index, AccessShareLock);
 
-		/* check if this is a valid GIST index with no predicates */
+		/*
+		 * check if this is a valid GIST index with no predicates and
+		 * its first column is the required spoint with opclass 'spoint2'.
+		 */
 		if (index_am == GIST_AM_OID && pg_ind->indisvalid &&
-			heap_attisnull(htup, Anum_pg_index_indpred))
+			heap_attisnull(htup, Anum_pg_index_indpred) &&
+			pg_ind->indkey.dim1 >= 1 && pg_ind->indkey.values[0] == column)
 		{
-			int i;
+			int64 cur_index_size = get_index_size(pg_ind->indexrelid);
 
-			for (i = 0; i < pg_ind->indkey.dim1; i++)
+			if (found_index == InvalidOid || cur_index_size < found_index_size)
 			{
-				int64 cur_index_size = 0;
+				bool		is_null;
+				Datum		indclass = heap_getattr(htup, Anum_pg_index_indclass,
+													pg_index->rd_att, &is_null);
+				oidvector  *indclasses = (oidvector *) DatumGetPointer(indclass);
 
-				if (pg_ind->indkey.values[i] == column)
+				/* column must use 'spoint2' opclass */
+				if (!is_null && indclasses->values[0] == spoint2_opclass)
 				{
-					cur_index_size = get_index_size(pg_ind->indexrelid);
-
-					if (found_index == InvalidOid || cur_index_size < found_index_size)
-					{
-						bool		is_null;
-						Datum		indclass = heap_getattr(htup, Anum_pg_index_indclass,
-															pg_index->rd_att, &is_null);
-						oidvector  *indclasses = (oidvector *) DatumGetPointer(indclass);
-
-						/* column must use 'spoint2' opclass */
-						if (!is_null && indclasses->values[i] == spoint2_opclass)
-						{
-							found_index = pg_ind->indexrelid;
-							found_index_size = cur_index_size;
-						}
-					}
-
-					break;	/* no need to scan 'indkey' further */
+					found_index = pg_ind->indexrelid;
+					found_index_size = cur_index_size;
 				}
 			}
 		}
