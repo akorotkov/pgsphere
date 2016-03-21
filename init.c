@@ -3,6 +3,7 @@
 #include "optimizer/pathnode.h"
 #include "optimizer/restrictinfo.h"
 #include "optimizer/tlist.h"
+#include "optimizer/var.h"
 #include "utils/tqual.h"
 #include "utils/builtins.h"
 #include "utils/elog.h"
@@ -172,68 +173,42 @@ get_const_val(Const *node)
  * whether some partial indices may suffice
  */
 static Oid
-pick_suitable_index(Oid relation, AttrNumber column)
+pick_suitable_index(RelOptInfo *relation, AttrNumber column)
 {
 	Oid				found_index = InvalidOid;
 	int64			found_index_size = 0;
-	HeapTuple		htup;
-	SysScanDesc		scan;
-	Relation		pg_index;
-	List		   *spoint2_opclass_name;
-	Oid				spoint2_opclass;
-	ScanKeyData		key[3];
+	List		   *spoint2_opfamily_name;
+	Oid				spoint2_opfamily;
+	ListCell	   *lc;
 
-	spoint2_opclass_name = stringToQualifiedNameList("public.spoint2");
-	spoint2_opclass = get_opclass_oid(GIST_AM_OID, spoint2_opclass_name, false);
+	spoint2_opfamily_name = stringToQualifiedNameList("public.spoint2");
+	spoint2_opfamily = get_opfamily_oid(GIST_AM_OID, spoint2_opfamily_name, false);
 
-	ScanKeyInit(&key[0],
-				Anum_pg_index_indrelid,
-				BTEqualStrategyNumber,
-				F_OIDEQ,
-				ObjectIdGetDatum(relation));
-
-	pg_index = heap_open(IndexRelationId, AccessShareLock);
-	scan = systable_beginscan(pg_index, InvalidOid, false, NULL, 1, key);
-
-	while (HeapTupleIsValid(htup = systable_getnext(scan)))
+	foreach(lc, relation->indexlist)
 	{
-		Form_pg_index	pg_ind = (Form_pg_index) GETSTRUCT(htup);
-		Relation		index;
-		Oid				index_am;
-
-		index = index_open(pg_ind->indexrelid, AccessShareLock);
-		index_am = index->rd_rel->relam;
-		index_close(index, AccessShareLock);
+		IndexOptInfo *index = (IndexOptInfo *) lfirst(lc);
 
 		/*
-		 * check if this is a valid GIST index with no predicates and
-		 * its first column is the required spoint with opclass 'spoint2'.
+		 * check if this is a valid GIST index and its first
+		 * column is the required spoint with opclass 'spoint2'.
 		 */
-		if (index_am == GIST_AM_OID && pg_ind->indisvalid &&
-			heap_attisnull(htup, Anum_pg_index_indpred) &&
-			pg_ind->indkey.dim1 >= 1 && pg_ind->indkey.values[0] == column)
+		if (index->relam == GIST_AM_OID &&
+			(index->indpred == NIL || index->predOK) &&
+			index->ncolumns >= 1 && index->indexkeys[0] == column)
 		{
-			int64 cur_index_size = get_index_size(pg_ind->indexrelid);
+			int64 cur_index_size = index->pages;
 
 			if (found_index == InvalidOid || cur_index_size < found_index_size)
 			{
-				bool		is_null;
-				Datum		indclass = heap_getattr(htup, Anum_pg_index_indclass,
-													pg_index->rd_att, &is_null);
-				oidvector  *indclasses = (oidvector *) DatumGetPointer(indclass);
-
 				/* column must use 'spoint2' opclass */
-				if (!is_null && indclasses->values[0] == spoint2_opclass)
+				if (index->opfamily[0] == spoint2_opfamily)
 				{
-					found_index = pg_ind->indexrelid;
+					found_index = index->indexoid;
 					found_index_size = cur_index_size;
 				}
 			}
 		}
 	}
-
-	systable_endscan(scan);
-	heap_close(pg_index, AccessShareLock);
 
 	return found_index;
 }
@@ -301,16 +276,22 @@ create_crossmatch_path(PlannerInfo *root,
 {
 	CrossmatchJoinPath *result;
 
-	Oid outer_rel = root->simple_rte_array[outer_path->parent->relid]->relid;
-	Oid inner_rel = root->simple_rte_array[inner_path->parent->relid]->relid;
-	Oid outer_idx;
-	Oid inner_idx;
+	RelOptInfo		   *outerrel = outer_path->parent;
+	RelOptInfo		   *innerrel = inner_path->parent;
+	Oid					outerrelid = root->simple_rte_array[outerrel->relid]->relid;
+	Oid					innerrelid = root->simple_rte_array[innerrel->relid]->relid;
+	Oid					outer_idx;
+	Oid					inner_idx;
 
-	if (outer_rel == inner_rel)
+	Assert(outerrelid != InvalidOid);
+	Assert(innerrelid != InvalidOid);
+
+	/* Relations should be different */
+	if (outerrel->relid == innerrel->relid)
 		return;
 
-	if ((outer_idx = pick_suitable_index(outer_rel, outer_spoint)) == InvalidOid ||
-		(inner_idx = pick_suitable_index(inner_rel, inner_spoint)) == InvalidOid)
+	if ((outer_idx = pick_suitable_index(outerrel, outer_spoint)) == InvalidOid ||
+		(inner_idx = pick_suitable_index(innerrel, inner_spoint)) == InvalidOid)
 	{
 		return;
 	}
@@ -328,10 +309,10 @@ create_crossmatch_path(PlannerInfo *root,
 	result->cpath.methods = &crossmatch_path_methods;
 	result->outer_path = outer_path;
 	result->outer_idx = outer_idx;
-	result->outer_rel = outer_rel;
+	result->outer_rel = outerrelid;
 	result->inner_path = inner_path;
 	result->inner_idx = inner_idx;
-	result->inner_rel = inner_rel;
+	result->inner_rel = innerrelid;
 	result->threshold = threshold;
 	result->joinrestrictinfo = restrict_clauses;
 
@@ -468,6 +449,7 @@ create_crossmatch_plan(PlannerInfo *root,
 	List				   *joinrestrictclauses = gpath->joinrestrictinfo;
 	List				   *joinclauses;
 	CustomScan			   *cscan;
+	PathTarget			   *target;
 
 	Assert(!IS_OUTER_JOIN(gpath->jointype));
 	joinclauses = extract_actual_clauses(joinrestrictclauses, false);
@@ -477,8 +459,12 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->scan.plan.qual = joinclauses;
 	cscan->scan.scanrelid = 0;
 
+	/* Add Vars needed for our extended 'joinclauses' */
+	target = copy_pathtarget(rel->reltarget);
+	add_new_columns_to_pathtarget(target, pull_var_clause((Node *) joinclauses, 0));
+
 	/* tlist of the 'virtual' join rel we'll have to build and scan */
-	cscan->custom_scan_tlist = make_tlist_from_pathtarget(rel->reltarget);
+	cscan->custom_scan_tlist = make_tlist_from_pathtarget(target);
 
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
