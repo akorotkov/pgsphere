@@ -112,11 +112,31 @@ get_index_size(Oid idx)
 static inline Oid
 get_dist_func()
 {
+	MemoryContext	oldcxt = CurrentMemoryContext;
+	Datum			result;
+
+#if PG_VERSION_NUM >= 90600
 	text *dist_func_name =
 		cstring_to_text("public.dist(public.spoint, public.spoint)");
+#else
+	char *dist_func_name = "public.dist(public.spoint, public.spoint)";
+#endif
 
-	return DatumGetObjectId(DirectFunctionCall1(to_regprocedure,
-												PointerGetDatum(dist_func_name)));
+	PG_TRY();
+	{
+		result = DirectFunctionCall1(to_regprocedure,
+									 PointerGetDatum(dist_func_name));
+	}
+	PG_CATCH();
+	{
+		MemoryContextSwitchTo(oldcxt);
+		FlushErrorState();
+
+		elog(ERROR, "can't find function \"dist(spoint, spoint)\"");
+	}
+	PG_END_TRY();
+
+	return DatumGetObjectId(result);
 }
 
 static float8
@@ -303,7 +323,9 @@ create_crossmatch_path(PlannerInfo *root,
 	result->cpath.path.parent = joinrel;
 	result->cpath.path.param_info = param_info;
 	result->cpath.path.pathkeys = NIL;
+#if PG_VERSION_NUM >= 90600
 	result->cpath.path.pathtarget = joinrel->reltarget;
+#endif
 	result->cpath.path.rows = joinrel->rows;
 	result->cpath.flags = 0;
 	result->cpath.methods = &crossmatch_path_methods;
@@ -449,7 +471,12 @@ create_crossmatch_plan(PlannerInfo *root,
 	List				   *joinrestrictclauses = gpath->joinrestrictinfo;
 	List				   *joinclauses;
 	CustomScan			   *cscan;
+
+#if PG_VERSION_NUM >= 90600
 	PathTarget			   *target;
+#else
+	List				   *target;
+#endif
 
 	Assert(!IS_OUTER_JOIN(gpath->jointype));
 	joinclauses = extract_actual_clauses(joinrestrictclauses, false);
@@ -459,12 +486,20 @@ create_crossmatch_plan(PlannerInfo *root,
 	cscan->scan.plan.qual = joinclauses;
 	cscan->scan.scanrelid = 0;
 
+#if PG_VERSION_NUM >= 90600
 	/* Add Vars needed for our extended 'joinclauses' */
 	target = copy_pathtarget(rel->reltarget);
 	add_new_columns_to_pathtarget(target, pull_var_clause((Node *) joinclauses, 0));
 
 	/* tlist of the 'virtual' join rel we'll have to build and scan */
 	cscan->custom_scan_tlist = make_tlist_from_pathtarget(target);
+#else
+	target = list_copy(tlist);
+	target = add_to_flat_tlist(target, pull_var_clause((Node *) joinclauses,
+													   PVC_REJECT_AGGREGATES,
+													   PVC_REJECT_PLACEHOLDERS));
+	cscan->custom_scan_tlist = target;
+#endif
 
 	cscan->flags = best_path->flags;
 	cscan->methods = &crossmatch_plan_methods;
