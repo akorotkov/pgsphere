@@ -188,10 +188,6 @@ get_const_val(Const *node)
 	return DatumGetFloat8(FunctionCall1(&finfo, node->constvalue));
 }
 
-/*
- * TODO: check for the predicates & decide
- * whether some partial indices may suffice
- */
 static Oid
 pick_suitable_index(RelOptInfo *relation, AttrNumber column)
 {
