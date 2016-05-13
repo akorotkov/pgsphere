@@ -494,6 +494,15 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	vector3d_spoint(&p[2], &v[1][0]);
 	vector3d_spoint(&p[3], &v[1][1]);
 
+	/* check connected lines */
+	if (FPgt(il2->length, 0.0) && (vector3d_eq(&v[0][0], &v[1][0]) ||
+								   vector3d_eq(&v[0][0], &v[1][1]) ||
+								   vector3d_eq(&v[0][1], &v[1][0]) ||
+								   vector3d_eq(&v[0][1], &v[1][1])))
+	{
+		return PGS_LINE_CONNECT;
+	}
+
 	/* Check, sl2 is at equator */
 	if (FPzero(p[2].lat) && FPzero(p[3].lat))
 	{
@@ -519,15 +528,6 @@ sline_sline_pos(const SLine *l1, const SLine *l2)
 	}
 
 	/* Now sl2 is not at equator */
-
-	/* check connected lines */
-	if (FPgt(il2->length, 0.0) && (vector3d_eq(&v[0][0], &v[1][0]) ||
-								   vector3d_eq(&v[0][0], &v[1][1]) ||
-								   vector3d_eq(&v[0][1], &v[1][0]) ||
-								   vector3d_eq(&v[0][1], &v[1][1])))
-	{
-		return PGS_LINE_CONNECT;
-	}
 
 	if (FPle(il2->length, seg_length))
 	{
