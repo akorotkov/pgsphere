@@ -1,3 +1,9 @@
+
+PGSPHERE_VERSION = 1.1.5
+
+# the base dir name may be changed depending on git clone command
+SRC_DIR = $(shell basename $(shell pwd))
+
 MODULE_big = pg_sphere
 OBJS       = sscan.o sparse.o sbuffer.o vector3d.o point.o \
              euler.o circle.o line.o ellipse.o polygon.o \
@@ -58,4 +64,4 @@ endif
 
 dist : clean sparse.c sscan.c
 	find . -name '*~' -type f -exec rm {} \;
-	cd .. && tar  --exclude CVS -czf pg_sphere.tar.gz pg_sphere && cd -
+	cd .. && tar --transform s/$(SRC_DIR)/pgsphere-$(PGSPHERE_VERSION)/ --exclude CVS -czf pgsphere-$(PGSPHERE_VERSION).tar.gz $(SRC_DIR) && cd -
