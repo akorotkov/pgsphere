@@ -28,6 +28,10 @@
 #include "nodes/extensible.h"
 #endif
 
+#if PG_VERSION_NUM >= 100000
+#include "utils/regproc.h"
+#endif
+
 #include "point.h"
 #include "crossmatch.h"
 
@@ -651,6 +655,14 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 	return FetchTidPairReady;
 }
 
+#if PG_VERSION_NUM < 100000
+#define COMPAT_PROJECT_ARG , &isDone
+#define COMPAT_QUAL_ARG , false
+#else
+#define COMPAT_PROJECT_ARG
+#define COMPAT_QUAL_ARG
+#endif
+
 static TupleTableSlot *
 crossmatch_exec(CustomScanState *node)
 {
@@ -659,7 +671,11 @@ crossmatch_exec(CustomScanState *node)
 
 	for (;;)
 	{
+#if PG_VERSION_NUM < 100000
+		ExprDoneCond isDone;
+		
 		if (!node->ss.ps.ps_TupFromTlist)
+#endif
 		{
 			FetchTidPairState fetch_state;
 
@@ -675,33 +691,38 @@ crossmatch_exec(CustomScanState *node)
 
 		if (node->ss.ps.ps_ProjInfo)
 		{
-			ExprDoneCond isDone;
 			TupleTableSlot *resultSlot;
 
 			ResetExprContext(node->ss.ps.ps_ProjInfo->pi_exprContext);
 
 			node->ss.ps.ps_ProjInfo->pi_exprContext->ecxt_scantuple = scanSlot;
-			resultSlot = ExecProject(node->ss.ps.ps_ProjInfo, &isDone);
-
+			resultSlot = ExecProject(node->ss.ps.ps_ProjInfo
+															COMPAT_PROJECT_ARG);
+#if PG_VERSION_NUM < 100000
 			if (isDone != ExprEndResult)
 			{
 				node->ss.ps.ps_TupFromTlist = (isDone == ExprMultipleResult);
+#endif
 
 				/* Check join conditions */
 				node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
-				if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
+				if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext 
+															COMPAT_QUAL_ARG))
 					return resultSlot;
 				else
 					InstrCountFiltered1(node, 1);
+#if PG_VERSION_NUM < 100000
 			}
 			else
 				node->ss.ps.ps_TupFromTlist = false;
+#endif
 		}
 		else
 		{
 			/* Check join conditions */
 			node->ss.ps.ps_ExprContext->ecxt_scantuple = scanSlot;
-			if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext, false))
+			if (ExecQual(node->ss.ps.qual, node->ss.ps.ps_ExprContext
+															COMPAT_QUAL_ARG))
 				return scanSlot;
 			else
 				InstrCountFiltered1(node, 1);
@@ -723,8 +744,10 @@ crossmatch_end(CustomScanState *node)
 static void
 crossmatch_rescan(CustomScanState *node)
 {
+#if PG_VERSION_NUM < 100000
 	/* NOTE: nothing to do here? */
 	node->ss.ps.ps_TupFromTlist = false;
+#endif
 }
 
 static void
