@@ -37,6 +37,7 @@ PG_FUNCTION_INFO_V1(spherebox_overlap_line_com_neg);
 PG_FUNCTION_INFO_V1(spherebox_cont_path);
 PG_FUNCTION_INFO_V1(spherebox_cont_path_neg);
 PG_FUNCTION_INFO_V1(spherebox_cont_eq_path_com);
+PG_FUNCTION_INFO_V1(spherebox_cont_path_com);
 PG_FUNCTION_INFO_V1(spherebox_cont_path_com_neg);
 PG_FUNCTION_INFO_V1(spherebox_overlap_path);
 PG_FUNCTION_INFO_V1(spherebox_overlap_path_neg);
