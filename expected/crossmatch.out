@@ -1,0 +1,127 @@
+SET enable_indexscan = OFF;
+SET enable_seqscan = ON;
+EXPLAIN (COSTS OFF)
+SELECT count(*)
+FROM spheretmp1 t1 JOIN spheretmpx tx ON dist(t1.p, tx.p) < 0.03;
+                             QUERY PLAN                             
+--------------------------------------------------------------------
+ Aggregate
+   ->  Nested Loop
+         Join Filter: (dist(t1.p, tx.p) < '0.03'::double precision)
+         ->  Seq Scan on spheretmpx tx
+         ->  Materialize
+               ->  Seq Scan on spheretmp1 t1
+(6 rows)
+
+SELECT count(*)
+FROM spheretmp1 t1 JOIN spheretmpx tx ON dist(t1.p, tx.p) < 0.03;
+ count 
+-------
+    44
+(1 row)
+
+SELECT DISTINCT concat_ws(', ', t1.p, tx.p) AS xm
+FROM spheretmp1 t1 JOIN spheretmpx tx ON dist(t1.p, tx.p) < 0.03 ORDER BY xm;
+                           xm                           
+--------------------------------------------------------
+ (0.13 , 0.34), (0.13 , 0.34)
+ (0.38 , 0.04), (0.38 , 0.03)
+ (0.55 , 0.27), (0.54 , 0.26)
+ (1.32 , 0.61), (1.33 , 0.61)
+ (1.85 , -0.46), (1.88 , -0.45)
+ (1.89 , 0.1), (1.87 , 0.11)
+ (1.94 , 1.33), (1.95 , 1.33)
+ (2.19 , 0.94), (2.19 , 0.94)
+ (3.34318530717959 , 1.05), (3.34318530717959 , 1.04)
+ (3.87318530717959 , 0.05), (3.86318530717959 , 0.06)
+ (5.88318530717959 , -0.17), (5.85318530717959 , -0.17)
+(11 rows)
+
+SET enable_seqscan = OFF;
+SET enable_indexscan = ON;
+CREATE INDEX idx_spoint1_1 ON spheretmp1 USING gist (p spoint);
+CREATE INDEX idx_spoint1_x ON spheretmpx USING gist (p spoint);
+ANALYZE spheretmp1;
+ANALYZE spheretmpx;
+EXPLAIN (COSTS OFF)
+SELECT count(*)
+FROM spheretmp1 t1 JOIN spheretmpx tx ON t1.p <@ scircle(tx.p, 0.03);
+                                QUERY PLAN                                
+--------------------------------------------------------------------------
+ Aggregate
+   ->  Nested Loop
+         ->  Seq Scan on spheretmpx tx
+         ->  Index Scan using idx_spoint1_1 on spheretmp1 t1
+               Index Cond: (p <@ scircle(tx.p, '0.03'::double precision))
+(5 rows)
+
+SELECT count(*)
+FROM spheretmp1 t1 JOIN spheretmpx tx ON t1.p <@ scircle(tx.p, 0.03);
+ count 
+-------
+    44
+(1 row)
+
+SELECT DISTINCT concat_ws(', ', t1.p, tx.p) AS xm
+FROM spheretmp1 t1 JOIN spheretmpx tx ON t1.p <@ scircle(tx.p, 0.03) ORDER BY xm;
+                           xm                           
+--------------------------------------------------------
+ (0.13 , 0.34), (0.13 , 0.34)
+ (0.38 , 0.04), (0.38 , 0.03)
+ (0.55 , 0.27), (0.54 , 0.26)
+ (1.32 , 0.61), (1.33 , 0.61)
+ (1.85 , -0.46), (1.88 , -0.45)
+ (1.89 , 0.1), (1.87 , 0.11)
+ (1.94 , 1.33), (1.95 , 1.33)
+ (2.19 , 0.94), (2.19 , 0.94)
+ (3.34318530717959 , 1.05), (3.34318530717959 , 1.04)
+ (3.87318530717959 , 0.05), (3.86318530717959 , 0.06)
+ (5.88318530717959 , -0.17), (5.85318530717959 , -0.17)
+(11 rows)
+
+DROP INDEX idx_spoint1_1;
+DROP INDEX idx_spoint1_x;
+CREATE INDEX idx_spoint2_1 ON spheretmp1 USING gist (p spoint2);
+CREATE INDEX idx_spoint2_x ON spheretmpx USING gist (p spoint2);
+ANALYZE spheretmp1;
+ANALYZE spheretmpx;
+EXPLAIN (COSTS OFF)
+SELECT count(*)
+FROM spheretmp1 t1 JOIN spheretmpx tx ON dist(t1.p, tx.p) < 0.03;
+             QUERY PLAN             
+------------------------------------
+ Aggregate
+   ->  Custom Scan (CrossmatchJoin)
+         Outer index: idx_spoint2_1
+         Inner index: idx_spoint2_x
+         Threshold: 0.03
+(5 rows)
+
+SELECT count(*)
+FROM spheretmp1 t1 JOIN spheretmpx tx ON dist(t1.p, tx.p) < 0.03;
+ count 
+-------
+    44
+(1 row)
+
+SELECT DISTINCT concat_ws(', ', t1.p, tx.p) AS xm
+FROM spheretmp1 t1 JOIN spheretmpx tx ON dist(t1.p, tx.p) < 0.03 ORDER BY xm;
+                           xm                           
+--------------------------------------------------------
+ (0.13 , 0.34), (0.13 , 0.34)
+ (0.38 , 0.04), (0.38 , 0.03)
+ (0.55 , 0.27), (0.54 , 0.26)
+ (1.32 , 0.61), (1.33 , 0.61)
+ (1.85 , -0.46), (1.88 , -0.45)
+ (1.89 , 0.1), (1.87 , 0.11)
+ (1.94 , 1.33), (1.95 , 1.33)
+ (2.19 , 0.94), (2.19 , 0.94)
+ (3.34318530717959 , 1.05), (3.34318530717959 , 1.04)
+ (3.87318530717959 , 0.05), (3.86318530717959 , 0.06)
+ (5.88318530717959 , -0.17), (5.85318530717959 , -0.17)
+(11 rows)
+
+SET enable_seqscan = ON;
+SET enable_indexscan = ON;
+DROP INDEX idx_spoint2_1;
+DROP INDEX idx_spoint2_x;

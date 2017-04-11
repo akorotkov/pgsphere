@@ -51,3 +51,9 @@ SELECT count(*) FROM spheretmp4 WHERE l @  scircle '<(1,1),0.3>' ;
 
 SELECT count(*) FROM spheretmp4 WHERE l && scircle '<(1,1),0.3>' ;
 
+DROP INDEX aaaidx;
+DROP INDEX bbbidx;
+DROP INDEX cccidx;
+DROP INDEX dddidx;
+
+SET enable_seqscan = ON;

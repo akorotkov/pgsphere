@@ -5,6 +5,8 @@ CREATE TABLE spheretmp1 (p spoint);
 \copy spheretmp1 from 'data/test_spherepoint.data'
 \copy spheretmp1 from 'data/test_spherepoint.data'
 \copy spheretmp1 from 'data/test_spherepoint.data'
+CREATE TABLE spheretmpx (p spoint);
+\copy spheretmpx from 'data/test_spherepointx.data'
 CREATE TABLE spheretmp2 (c scircle);
 \copy spheretmp2 from 'data/test_spherecircle.data'
 \copy spheretmp2 from 'data/test_spherecircle.data'
