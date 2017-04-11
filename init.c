@@ -24,6 +24,10 @@
 #include "access/htup_details.h"
 #include "access/heapam.h"
 
+#if PG_VERSION_NUM >= 90600
+#include "nodes/extensible.h"
+#endif
+
 #include "point.h"
 #include "crossmatch.h"
 
