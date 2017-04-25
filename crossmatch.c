@@ -878,14 +878,12 @@ crossmatch(CrossmatchContext *ctx, ItemPointer values)
 	/* Return next result pair if any. Otherwise close SRF. */
 	if (ctx->resultsPairs != NIL)
 	{
-		ResultPair *itemPointerPair = (ResultPair *) palloc(sizeof(ResultPair));
-
-		*itemPointerPair = *((ResultPair *) linitial(ctx->resultsPairs));
+		ResultPair itemPointerPair = *((ResultPair *) linitial(ctx->resultsPairs));
 		pfree(linitial(ctx->resultsPairs));
 		ctx->resultsPairs = list_delete_first(ctx->resultsPairs);
 
-		values[0] = itemPointerPair->iptr1;
-		values[1] = itemPointerPair->iptr2;
+		values[0] = itemPointerPair.iptr1;
+		values[1] = itemPointerPair.iptr2;
 	}
 	else
 	{
