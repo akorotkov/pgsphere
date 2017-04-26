@@ -644,7 +644,7 @@ fetch_next_pair(CrossmatchScanState *scan_state)
 		htup = heap_form_tuple(tupdesc, values, nulls);
 
 		/* Fill scanSlot with a new tuple */
-		ExecStoreTuple(htup, slot, InvalidBuffer, false);
+		ExecStoreTuple(htup, slot, InvalidBuffer, true);
 	}
 
 	if (buf1 != InvalidBuffer)
