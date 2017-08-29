@@ -95,7 +95,7 @@ Datum	pg_sphere_version(PG_FUNCTION_ARGS);
 static void
 rad_to_dms(double rad, unsigned int *deg, unsigned int *min, double *sec)
 {
-	char			rsign = (rad < 0) ? (-1) : (1);
+	double			rsign = rad < 0 ? -1 : 1;
 	const double	sec_dig = pow(10, FLT_DIG);
 
 	rad *= (rsign * RADIANS);
