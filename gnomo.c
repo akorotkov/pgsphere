@@ -35,6 +35,11 @@ Datum gnomonic_proj(PG_FUNCTION_ARGS)
 	g->x = cos_lat * sin_delta / cos_dist;
 	g->y = (cos_lat_t * sin_lat - sin_lat_t * cos_lat__cos_delta) / cos_dist;
 
+	if (p->lng == t->lng && p->lat == t->lat)
+	{
+		g->x = 0;
+		g->y = 0;
+	}
 	PG_RETURN_POINTER(g);
 }
 
