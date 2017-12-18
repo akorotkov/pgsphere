@@ -1,0 +1,21 @@
+
+-- spos from (ra,dec)[deg] return a spoint
+-- example: CREATE INDEX some_tbl_idx_spos ON some.tbl USING GIST(spos(RA,Dec));
+
+CREATE OR REPLACE FUNCTION spos(FLOAT8, FLOAT8) RETURNS spoint AS $$
+    BEGIN
+	RETURN spoint($1*1.74532925199432957692369E-2, $2*1.74532925199432957692369E-2);
+    END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- spbox from (ra_tl,dec_tl,ra_bl,dec_bl,ra_br,dec_br,ra_tr,dec_tr)[deg] return a spoly
+-- example: CREATE INDEX some_tbl_idx_spbox ON some.tbl USING GIST(spbox(ra_tl,dec_tl,ra_bl,dec_bl,ra_br,dec_br,ra_tr,dec_tr));
+
+
+CREATE FUNCTION spbox(double precision, double precision, double precision, double precision, double precision, double precision, double precision, double precision) RETURNS spoly
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    BEGIN
+RETURN spoly ('{(' || $1*1.74532925199432957692369E-2 || ',' || $2*1.74532925199432957692369E-2 || '), (' || $3*1.74532925199432957692369E-2 || ',' || $4*1.74532925199432957692369E-2 || '), (' || $5*1.74532925199432957692369E-2 || ',' || $6*1.74532925199432957692369E-2 || '), (' || $7*1.74532925199432957692369E-2 || ',' || $8*1.74532925199432957692369E-2 || ')}') ;
+    END;
+$$;
