@@ -8,19 +8,10 @@
 #include "postgres.h"
 
 #include "point.h"
+#include "circle.h"
 
-double deg2rad(double deg);
-double rad2deg(double rad);
-SPoint *spos(double ra, double dec);
-
-/**
- * (RA,Dec) -> spoint
- */
-// Datum spoint_deg(PG_FUNCTION_ARGS);
-
-/**
- * (RA_1,Dec_1,RA_2,Dec_2,RA_3,Dec_3, ... RA_n,Dec_n) -> spoly
- */
-// Datum spoly_deg(PG_FUNCTION_ARGS);
+float8 deg2rad(float8 deg);
+float8 rad2deg(float8 rad);
+SPoint *spos(float8 ra, float8 dec);
 
 #endif

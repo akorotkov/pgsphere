@@ -15,3 +15,9 @@ CREATE FUNCTION spoly_deg(float8[])
    AS 'MODULE_PATHNAME', 'spoly_deg'
    LANGUAGE 'c'
    IMMUTABLE STRICT;
+
+CREATE FUNCTION scircle_deg(float8,float8,float8)
+   RETURNS scircle
+   AS 'MODULE_PATHNAME', 'scircle_deg'
+   LANGUAGE 'c'
+   IMMUTABLE STRICT;
