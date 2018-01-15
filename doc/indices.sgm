@@ -8,15 +8,32 @@
         </title>
         <para>
           <application>pgSphere</application> uses <literal>GiST</literal>
-          to create spherical indices. An index speeds up the execution
-          time of operators <link
+          and Block Range INdexing (<literal>BRIN</literal>) algorithms to create
+          spherical indices.
+          <literal>GiST</literal> index represents the R-Tree implementation for
+          spherical objects, while <literal>BRINs</literal> are based on "summarization"
+          of data blocks (<literal>pages</literal>) on physical storage in order to
+          organize data searches on ranges of summarized data that can be easily skipped
+          on the base of search filters (see <ulink
+          url="https://www.postgresql.org/docs/9.5/static/brin-intro.html"><citetitle>
+          PostgreSQL documentation</citetitle></ulink> for further details on BRINs).
+          As a consequence, BRINs result to be really small indexes (up to 1000 times
+          than GiST ones), generally with lower a performance compared with a GiST one,
+          but up to 100 times faster than a full sequential scan of a table performed
+          without any index. So BRINs are particularly suitable in a big data context.
+          An index speeds up the execution time of searches based on operators <link
           linkend="op.over"><literal>&lt;@</literal></link>, <link
           linkend="op.over"><literal>@</literal></link>, <link
           linkend="op.over"><literal>&amp;&amp;</literal></link>, <link
           linkend="op.cross"><literal>&num;</literal></link>, <link
           linkend="op.equal"><literal>=</literal></link>, and <link
-          linkend="op.equal"><literal>!=</literal></link>.  You can create
-          an index with the following spherical data types:
+          linkend="op.equal"><literal>!=</literal></link>. 
+        </para>
+        <title>
+          Create a spherical index
+        </title>
+        <para>
+          You can create a GiST index with the following spherical data types:
         </para>
         <itemizedlist>
           <listitem>
@@ -55,6 +72,10 @@
             </para>
           </listitem>
         </itemizedlist>
+        <para>
+          BRIN indexing supports just spherical points (<type>spoint</type>)
+          and spherical coordinates range (<type>sbox</type>) at the moment.
+        </para>
         <example>
           <title>Simple index of spherical points</title>
           <programlisting>
@@ -64,6 +85,22 @@
 <![CDATA[-- Put in data now]]>
 <![CDATA[CREATE INDEX test_pos_idx USING GIST ON test (pos);]]>
 <![CDATA[VACUUM ANALYZE test;]]>
+          </programlisting>
+          <para>
+            BRINs can be created through the following syntax: 
+          </para>
+          <programlisting>
+<![CDATA[CREATE INDEX test_pos_idx USING BRIN ON test (pos);]]>
+          </programlisting>
+          <para>
+            By default, BRINs summarize block of 128 pages. The lower numbers
+            of pages are specified, the higher granularity is reached during
+            the searches, and performance's gap between GiST indexes and BRINs
+            is lower (consider that BRINs size increases as well). Different
+            summarizations can be used with the following command:
+          </para>
+          <programlisting>
+<![CDATA[CREATE INDEX test_pos_idx USING BRIN ON test (pos) WITH (pages_per_range = 16);]]>
           </programlisting>
         </example>
 
