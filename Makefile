@@ -17,6 +17,7 @@ BRIN_CHECK := $(shell [ $(PG_MAJOR_VERSION)$(PG_MINOR_VERSION) -gt 94 ] && echo 
 ifeq ($(BRIN_CHECK), 1)
   BRIN_OBJ := brin.o
   BRIN_SQL := pgs_brin.sql
+  BRIN_REGRESS := spoint_brin
 endif
 
 OBJS       = sscan.o sparse.o sbuffer.o vector3d.o point.o \
@@ -29,7 +30,8 @@ EXTENSION   = pg_sphere
 DATA_built  = pg_sphere--1.0.sql
 DOCS        = README.pg_sphere COPYRIGHT.pg_sphere
 REGRESS     = init tables points euler circle line ellipse poly path box index \
-              contains_ops contains_ops_compat bounding_box_gist gnomo spoint_brin
+              contains_ops contains_ops_compat bounding_box_gist gnomo \
+	      $(BRIN_REGRESS)
 
 EXTRA_CLEAN = pg_sphere--1.0.sql $(PGS_SQL) sscan.c
 
