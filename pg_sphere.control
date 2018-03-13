@@ -1,5 +1,5 @@
 # pg_sphere extension
 comment = 'spherical objects with useful functions, operators and index support'
-default_version = '1.0'
+default_version = '1.1'
 module_pathname = '$libdir/pg_sphere'
 relocatable = true
