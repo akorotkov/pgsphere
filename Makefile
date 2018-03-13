@@ -1,5 +1,5 @@
 
-PGSPHERE_VERSION = 1.1.5
+PGSPHERE_VERSION = 1.1.6
 
 # the base dir name may be changed depending on git clone command
 SRC_DIR = $(shell basename $(shell pwd))
@@ -27,13 +27,13 @@ OBJS       = sscan.o sparse.o sbuffer.o vector3d.o point.o \
              gnomo.o
 
 EXTENSION   = pg_sphere
-DATA_built  = pg_sphere--1.0.sql
+DATA_built  = pg_sphere--1.1.sql
 DOCS        = README.pg_sphere COPYRIGHT.pg_sphere
 REGRESS     = init tables points euler circle line ellipse poly path box index \
               contains_ops contains_ops_compat bounding_box_gist gnomo \
               $(BRIN_REGRESS)
 
-EXTRA_CLEAN = pg_sphere--1.0.sql $(PGS_SQL) sscan.c
+EXTRA_CLEAN = pg_sphere--1.1.sql $(PGS_SQL) sscan.c
 
 CRUSH_TESTS  = init_extended circle_extended 
 
@@ -58,7 +58,7 @@ endif
 crushtest: REGRESS += $(CRUSH_TESTS)
 crushtest: installcheck
 
-pg_sphere--1.0.sql: $(addsuffix .in, $(PGS_SQL))
+pg_sphere--1.1.sql: $(addsuffix .in, $(PGS_SQL))
 	cat $^ > $@
 
 sscan.o : sparse.c

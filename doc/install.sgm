@@ -120,5 +120,33 @@
 <![CDATA[pgsql> SELECT pg_sphere_version();]]>
             </programlisting>
         </sect2>
-        
+       
+        <sect2>
+           <title>
+               Upgrading PostgreSQL from pre-9.5 versions
+           </title>
+           <para>
+               Upgrading PostgreSQL from pre-9.5 versions to 9.5 one through
+               <application>pg_upgrade</application> will allow to continue to
+               use the <application>pgSphere</application> extension originally
+               installed; however, during the first installation of any
+               extension all features related to the most recent version (that
+               requires core functionalities just lately introduced) are
+               generally skipped, and the sole upgrade of PostgreSQL is not
+               able to activate them, even if supported by the extension
+               itself.
+           </para>
+           <para>
+               This is indeed the case of BRIN support in
+               <application>pgSphere</application>. In case of upgrades from
+               pre-9.5 versions, please run the following command in case you
+               are interested to activate BRIN support (adjust
+               <application>psql</application> connection parameters to your
+               needs):
+           </para>
+           <programlisting>
+<![CDATA[shell> bash utils/upgrade_from_pre95.sh | psql -U postgres -h localhost -p 5432 <dbname> 2> errors.log ]]>
+           </programlisting>
+        </sect2>
+ 
     </sect1>

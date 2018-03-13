@@ -26,6 +26,14 @@ LONG REGRESSION TEST:
 
 The 'make' program must be compatible with GNU make.
 
+UPGRADES:
+
+In case of upgrades from pre-9.5 versions, please run the following command in
+case you are interested to activate BRIN support (adjust psql connection
+parameters to your needs):
+
+  bash utils/upgrade_from_pre95.sh | psql -U postgres -h localhost -p 5432 <dbname> 2> errors.log
+
 For more information, have a look at http://pgsphere.projects.postgresql.org
 and https://github.com/akorotkov/pgsphere
 
