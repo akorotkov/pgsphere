@@ -33,7 +33,7 @@ REGRESS     = init tables points euler circle line ellipse poly path box index \
               contains_ops contains_ops_compat bounding_box_gist gnomo \
               $(BRIN_REGRESS)
 
-EXTRA_CLEAN = pg_sphere--1.1.sql $(PGS_SQL) sscan.c
+EXTRA_CLEAN = pg_sphere--1.1.sql $(PGS_SQL)
 
 CRUSH_TESTS  = init_extended circle_extended 
 
