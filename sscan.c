@@ -1909,4 +1909,3 @@ spherefree(void *ptr)
 #define YYTABLES_NAME "yytables"
 
 #line 56 "sscan.l"
-
