@@ -59,7 +59,7 @@ CREATE FUNCTION strans(sline)
    RETURNS strans
    AS 'MODULE_PATHNAME', 'spheretrans_from_line'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans(sline) IS
   'converts line to a transformation (ZXZ)';
@@ -77,7 +77,7 @@ CREATE FUNCTION sline(spoint)
    RETURNS sline
    AS 'MODULE_PATHNAME', 'sphereline_from_point'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sline(spoint) IS
   'casts a spherical point to a spherical line';
@@ -181,7 +181,7 @@ CREATE FUNCTION swap(sline)
    RETURNS sline
    AS 'MODULE_PATHNAME', 'sphereline_swap_beg_end'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION swap(sline) IS
   'returns a spherical line with swapped begin and end';
@@ -202,7 +202,7 @@ CREATE FUNCTION turn(sline)
    RETURNS sline
    AS 'MODULE_PATHNAME', 'sphereline_turn'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION turn(sline) IS
   'returns a turned spherical line but keeps begin and end';
@@ -393,7 +393,7 @@ CREATE FUNCTION strans_line(sline, strans)
    RETURNS sline
    AS 'MODULE_PATHNAME', 'spheretrans_line'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_line (sline, strans) IS
   'returns a transformated spherical line';
@@ -412,7 +412,7 @@ CREATE FUNCTION strans_line_inverse(sline, strans)
    RETURNS sline
    AS 'MODULE_PATHNAME', 'spheretrans_line_inverse'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_line_inverse (sline, strans) IS
   'returns a inverse transformated spherical line';

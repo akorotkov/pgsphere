@@ -9,7 +9,7 @@ CREATE FUNCTION sellipse(spoint, float8, float8, float8)
    RETURNS sellipse
    AS 'MODULE_PATHNAME', 'sphereellipse_infunc'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sellipse(spoint, float8, float8, float8) IS
   'returns spherical ellipse from center, radius1, radius2 and inclination';
@@ -18,7 +18,7 @@ CREATE FUNCTION inc(sellipse)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'sphereellipse_incl'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION inc(sellipse) IS
   'inclination of spherical ellipse';
@@ -27,7 +27,7 @@ CREATE FUNCTION lrad(sellipse)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'sphereellipse_rad1'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION lrad(sellipse) IS
   'large radius of spherical ellipse';
@@ -36,7 +36,7 @@ CREATE FUNCTION srad(sellipse)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'sphereellipse_rad2'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION srad(sellipse) IS
   'small radius of spherical ellipse';
@@ -51,7 +51,7 @@ CREATE FUNCTION sellipse(spoint)
    RETURNS sellipse
    AS 'MODULE_PATHNAME', 'spherepoint_ellipse'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sellipse(spoint) IS
   'returns spherical point as spherical ellipse';
@@ -69,7 +69,7 @@ CREATE FUNCTION scircle(sellipse)
    RETURNS scircle
    AS 'MODULE_PATHNAME', 'sphereellipse_circle'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION scircle(sellipse) IS
   'spherical bounding circle of spherical ellipse';
@@ -86,7 +86,7 @@ CREATE FUNCTION sellipse(scircle)
    RETURNS sellipse
    AS 'MODULE_PATHNAME', 'spherecircle_ellipse'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION sellipse(scircle) IS
   'returns spherical circle as spherical ellipse';
@@ -103,7 +103,7 @@ CREATE FUNCTION strans(sellipse)
    RETURNS strans
    AS 'MODULE_PATHNAME', 'sphereellipse_trans'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans(sellipse) IS
   'returns Euler transformation of spherical ellipse';
@@ -127,7 +127,7 @@ CREATE FUNCTION center(sellipse)
    RETURNS spoint
    AS 'MODULE_PATHNAME', 'sphereellipse_center'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION center(sellipse) IS
   'center of spherical ellipse';
@@ -370,7 +370,7 @@ CREATE FUNCTION strans_ellipse(sellipse, strans)
    RETURNS sellipse
    AS 'MODULE_PATHNAME', 'spheretrans_ellipse'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_ellipse (sellipse, strans) IS
   'returns a transformated spherical ellipse';
@@ -388,7 +388,7 @@ CREATE FUNCTION strans_ellipse_inverse (sellipse, strans)
    RETURNS sellipse
    AS 'MODULE_PATHNAME', 'spheretrans_ellipse_inv'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_ellipse_inverse (sellipse, strans) IS
   'returns a inverse transformated spherical ellipse';

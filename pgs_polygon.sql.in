@@ -275,7 +275,7 @@ CREATE FUNCTION strans_poly(spoly, strans)
    RETURNS spoly
    AS 'MODULE_PATHNAME', 'spheretrans_poly'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_poly (spoly, strans) IS
   'returns a transformated spherical polygon';
@@ -293,7 +293,7 @@ CREATE FUNCTION strans_poly_inverse(spoly, strans)
    RETURNS spoly
    AS 'MODULE_PATHNAME', 'spheretrans_poly_inverse'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_poly_inverse (spoly, strans) IS
   'returns a inverse transformated spherical polygon';

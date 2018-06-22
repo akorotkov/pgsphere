@@ -5,14 +5,14 @@ CREATE FUNCTION spherekey_in(CSTRING)
    RETURNS spherekey
    AS 'MODULE_PATHNAME'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 
 CREATE FUNCTION spherekey_out(spherekey)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 
 CREATE TYPE spherekey (
@@ -26,32 +26,32 @@ CREATE FUNCTION pointkey_in(CSTRING)
    RETURNS pointkey
    AS 'MODULE_PATHNAME', 'pointkey_in'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 
 CREATE FUNCTION pointkey_out(pointkey)
    RETURNS CSTRING
    AS 'MODULE_PATHNAME', 'pointkey_out'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 CREATE FUNCTION pointkey_volume(pointkey)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'pointkey_volume'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 CREATE FUNCTION pointkey_area(pointkey)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'pointkey_area'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 CREATE FUNCTION pointkey_perimeter(pointkey)
    RETURNS float8
    AS 'MODULE_PATHNAME', 'pointkey_perimeter'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 CREATE TYPE pointkey (
    input = pointkey_in,
@@ -76,7 +76,7 @@ CREATE FUNCTION g_spherekey_union(bytea, internal)
 CREATE FUNCTION g_spherekey_penalty (internal, internal, internal)
    RETURNS internal
    AS 'MODULE_PATHNAME', 'g_spherekey_penalty'
-   LANGUAGE 'c' with (isstrict);
+   LANGUAGE 'c';
 
 CREATE FUNCTION g_spherekey_picksplit(internal, internal)
    RETURNS internal

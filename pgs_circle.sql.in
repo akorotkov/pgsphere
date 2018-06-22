@@ -401,7 +401,7 @@ CREATE FUNCTION strans_circle(scircle, strans)
    RETURNS scircle
    AS 'MODULE_PATHNAME' , 'spheretrans_circle'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_circle (scircle, strans) IS
   'returns a transformated spherical circle';
@@ -420,7 +420,7 @@ CREATE FUNCTION strans_circle_inverse(scircle, strans)
    RETURNS scircle
    AS 'MODULE_PATHNAME' , 'spheretrans_circle_inverse'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_circle_inverse (scircle, strans) IS
   'returns a inverse transformated spherical circle';

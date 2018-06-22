@@ -130,7 +130,7 @@ CREATE FUNCTION swap(spath)
    RETURNS spath
    AS 'MODULE_PATHNAME', 'spherepath_swap'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION swap(spath) IS
   'returns a swapped spherical path (changed direction)';
@@ -264,7 +264,7 @@ CREATE FUNCTION strans_path(spath, strans)
    RETURNS spath
    AS 'MODULE_PATHNAME', 'spheretrans_path'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_path (spath, strans) IS
   'returns a transformated spherical path';
@@ -282,7 +282,7 @@ CREATE FUNCTION strans_path_inverse(spath, strans)
    RETURNS spath
    AS 'MODULE_PATHNAME', 'spheretrans_path_inverse'
    LANGUAGE 'c'
-   WITH (isstrict, iscachable);
+   IMMUTABLE STRICT;
 
 COMMENT ON FUNCTION strans_path_inverse (spath, strans) IS
   'returns a inverse transformated spherical path';
