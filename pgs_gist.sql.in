@@ -76,7 +76,8 @@ CREATE FUNCTION g_spherekey_union(bytea, internal)
 CREATE FUNCTION g_spherekey_penalty (internal, internal, internal)
    RETURNS internal
    AS 'MODULE_PATHNAME', 'g_spherekey_penalty'
-   LANGUAGE 'c';
+   LANGUAGE 'c'
+   STRICT;
 
 CREATE FUNCTION g_spherekey_picksplit(internal, internal)
    RETURNS internal
