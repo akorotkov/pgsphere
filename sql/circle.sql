@@ -1,5 +1,6 @@
 \set ECHO none
 SELECT set_sphere_output_precision(8);
+SET extra_float_digits = 0;
 \set ECHO all
 
 -- Input/Output ---
