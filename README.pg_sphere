@@ -1,10 +1,12 @@
 This is an R-Tree implementation using GiST for spherical objects
 like spherical points and spherical circles with 
-useful functions and operators.
-
+useful functions and operators. It also support the Block Range
+INdexing (BRIN), recently included in PostgreSQL for large
+datasets.
 
 NOTICE:
      This version will work only with postgresql version 9.1 and above.
+     BRIN support work only with postgresql version 9.4 and above.
 
 INSTALLATION:
 
@@ -23,6 +25,14 @@ LONG REGRESSION TEST:
   make USE_PGXS=1 crushtest
 
 The 'make' program must be compatible with GNU make.
+
+UPGRADES:
+
+In case of upgrades from pre-9.5 versions, please run the following command in
+case you are interested to activate BRIN support (adjust psql connection
+parameters to your needs):
+
+  bash utils/upgrade_from_pre95.sh | psql -U postgres -h localhost -p 5432 <dbname> 2> errors.log
 
 For more information, have a look at http://pgsphere.projects.postgresql.org
 and https://github.com/akorotkov/pgsphere

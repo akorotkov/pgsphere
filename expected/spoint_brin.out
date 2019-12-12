@@ -1,0 +1,56 @@
+CREATE TABLE
+COPY 77
+CREATE FUNCTION
+CREATE INDEX
+SET
+SET
+SET
+ ?column? |  qnodes
+----------+----------
+ scan_seq | Seq Scan
+(1 row)
+
+                    p
+-----------------------------------------
+ (0.349065850398866 , 0.174532925199433)
+(1 row)
+
+ ?column? |  qnodes
+----------+----------
+ scan_seq | Seq Scan
+(1 row)
+
+                    p
+-----------------------------------------
+ (0.349065850398866 , 0.174532925199433)
+(1 row)
+
+SET
+SET
+SET
+ ?column? |               qnodes
+----------+------------------------------------
+ scan_idx | Bitmap Heap Scan,Bitmap Index Scan
+(1 row)
+
+                    p
+-----------------------------------------
+ (0.349065850398866 , 0.174532925199433)
+(1 row)
+
+ ?column? |               qnodes
+----------+------------------------------------
+ scan_idx | Bitmap Heap Scan,Bitmap Index Scan
+(1 row)
+
+                    p
+-----------------------------------------
+ (0.349065850398866 , 0.174532925199433)
+(1 row)
+
+DROP INDEX
+DROP TABLE
+DROP FUNCTION
+SET
+SET
+SET
