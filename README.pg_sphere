@@ -29,3 +29,28 @@ and https://github.com/akorotkov/pgsphere
 
 Have a lot of fun!
 
+# Supplementary
+## Running in a docker container:
+* we are using as a base container - 
+
+```
+https://github.com/postgis/docker-postgis
+docker run --name some-postgis -e POSTGRES_PASSWORD=mysecretpassword -d postgis/postgis
+```
+* login and install **pg_sphere**
+```
+apt update
+apt install git vim make bison flex
+apt install -y postgresql-server-dev-14
+mkdir /src
+cd  /src
+git clone https://github.com/akorotkov/pgsphere.git
+cd /src/pgsphere
+gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config
+gmake USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config install
+```
+
+* Final install on the given db in this example the db name is **gaiadb22**
+```
+PGPASSWORD=gaia2022 psql -h localhost -U postgres -c "CREATE EXTENSION pg_sphere;" gaiadb22
+```
