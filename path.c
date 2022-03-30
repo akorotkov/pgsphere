@@ -513,13 +513,14 @@ spherepath_in(PG_FUNCTION_ARGS)
 	nelem = get_path_count();
 	if (nelem > 1)
 	{
-		SPoint		arr[nelem];
-
+		SPoint		*arr=malloc(sizeof(SPoint)*nelem);
+		
 		for (i = 0; i < nelem; i++)
 		{
 			get_path_elem(i, &arr[i].lng, &arr[i].lat);
 		}
 		path = spherepath_from_array(&arr[0], nelem);
+		free(arr);
 	}
 	else
 	{
